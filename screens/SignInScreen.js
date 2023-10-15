@@ -3,7 +3,6 @@ import { View, StyleSheet, Image, useWindowDimensions } from "react-native";
 import Logo from "../assets/Logo2.png";
 import CustomInput from "../components/CustomInput";
 import CustomButton from "../components/CustomButton";
-import { useState } from "react";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";

@@ -43,7 +43,7 @@ const SignupSchema = Yup.object().shape({
     .min(8, "❌ Password should contain at least 8 characters")
     .oneOf([Yup.ref("password")], "❌ Your passwords do not match"),
   phoneNum: Yup.string()
-    .required("Please enter your phone number")
+    .required("❌ Please enter your phone number")
     .matches(/^[0-9]+$/, "❌ Use digits only")
     .min(10, "❌ Must be exactly 10 digits")
     .max(10, "❌ Must be exactly 10 digits"),
