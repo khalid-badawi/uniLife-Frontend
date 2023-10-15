@@ -76,11 +76,10 @@ const SignUpScreen = () => {
       {({
         values,
         errors,
-        touched,
+
         handleSubmit,
         handleChange,
         setFieldTouched,
-        isValid,
       }) => (
         <ScrollView
           showsVerticalScrollIndicator={false}
