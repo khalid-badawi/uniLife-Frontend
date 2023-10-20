@@ -10,6 +10,7 @@ const CustomInput = ({
   errors,
   onBlur,
   keyboardType,
+  editable = true,
 }) => {
   return (
     <View>
@@ -25,6 +26,7 @@ const CustomInput = ({
           secureTextEntry={secureTextEntry}
           onBlur={onBlur}
           keyboardType={keyboardType}
+          editable={editable}
         />
       </View>
       {errors && <Text style={styles.errorText}>{errors}</Text>}
@@ -45,6 +47,7 @@ const styles = StyleSheet.create({
   },
   input: {
     fontSize: 15,
+    marginBottom: 2,
   },
   icon: {
     marginRight: 8,

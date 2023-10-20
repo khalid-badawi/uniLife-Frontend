@@ -12,8 +12,6 @@ import CustomButton from "../components/CustomButton";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 
-import CodeInput from "react-native-code-input";
-
 const validate = Yup.object().shape({
   password: Yup.string()
     .min(8, "❌ Password should contain at least 8 characters")
@@ -95,6 +93,7 @@ const styles = StyleSheet.create({
   root: {
     alignItems: "center",
     padding: 20,
+    backgroundColor: "white",
   },
 
   logo: {

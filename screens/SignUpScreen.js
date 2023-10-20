@@ -198,6 +198,7 @@ const styles = StyleSheet.create({
   root: {
     alignItems: "center",
     padding: 20,
+    backgroundColor: "white",
   },
 
   logo: {
