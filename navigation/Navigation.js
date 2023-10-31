@@ -7,9 +7,11 @@ import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
 import ResetPasswordScreen from "../screens/ResetPassword";
 import ConfirmCodeScreen from "../screens/ConfirmCodeScreen";
 import ScheduleScreen from "../screens/ScheduleScreen";
-import { StyleSheet } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import MapScreen from "../screens/MapScreen";
 import AddScheduleScreen from "../screens/AddScheduleScreen";
+import { useNavigation } from "@react-navigation/native";
+import Icon from "react-native-vector-icons/AntDesign";
 const Stack = createNativeStackNavigator();
 
 export default function Navigation() {
@@ -17,7 +19,15 @@ export default function Navigation() {
     <NavigationContainer>
       <Stack.Navigator
         initialRouteName="ScheduleInput"
-        screenOptions={{ headerShown: false }}
+        screenOptions={({ navigation }) => ({
+          headerShown: true,
+          headerTitleAlign: "center",
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Icon name="back" size={25} />
+            </TouchableOpacity>
+          ),
+        })}
       >
         <Stack.Screen name="SignIn" component={SignInScreen} />
         <Stack.Screen name="SignUp" component={SignUpScreen} />

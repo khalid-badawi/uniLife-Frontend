@@ -3,7 +3,7 @@ import React from "react";
 
 const ScheduleItem = () => {
   return (
-    <View>
+    <View style={styles.root}>
       <Text>ScheduleItem</Text>
     </View>
   );

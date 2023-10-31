@@ -20,8 +20,7 @@ const ScheduleScreen = () => {
           resizeMode="contain"
         />
       </View>
-      <Text style={styles.text}>My Schedule</Text>
-      <ScheduleItem></ScheduleItem>
+      <ScheduleItem />
     </View>
   );
 };

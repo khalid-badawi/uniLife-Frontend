@@ -8,11 +8,12 @@ import {
   useWindowDimensions,
   Pressable,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import Logo from "../assets/Logo2.png";
 import CustomInput from "./CustomInput";
 import CustomButton from "./CustomButton";
 import DateTimePicker from "@react-native-community/datetimepicker";
-
+import { useNavigation } from "@react-navigation/native";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
@@ -35,9 +36,24 @@ const onSignUpPressed = () => {
 };
 
 const ScheduleInput = () => {
-  const [startTime, setStartTime] = useState(new Date());
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [startTime, setStartTime] = useState(new Date());
   const [textStartTime, setTextStartTime] = useState("");
+  const [endTime, setEndTime] = useState(new Date());
+  const [textEndTime, setTextEndTime] = useState("");
+  const [day, setDay] = useState("sunday");
+  const handleDayChange = (day) => {
+    setDay(day);
+  };
+  const daysOfWeek = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Saturday",
+  ];
+  const navigation = useNavigation();
   const toggleTimePicker = () => {
     setShowTimePicker(!showTimePicker);
   };
@@ -125,7 +141,7 @@ const ScheduleInput = () => {
             )}
             <Pressable onPress={toggleTimePicker}>
               <CustomInput
-                placeholder="StartTime"
+                placeholder="Start Time"
                 value={textStartTime}
                 setValue={setTextStartTime}
                 secureTextEntry={false}
@@ -133,7 +149,39 @@ const ScheduleInput = () => {
               />
             </Pressable>
           </Animated.View>
+          <Animated.View
+            style={styles.animInput}
+            entering={FadeInDown.delay(200).duration(1000).springify()}
+          >
+            {showTimePicker && (
+              <DateTimePicker
+                mode="time"
+                display="spinner"
+                value={endTime}
+                onChange={onChange}
+              />
+            )}
+            <Pressable onPress={toggleTimePicker}>
+              <CustomInput
+                placeholder="End Time"
+                value={textEndTime}
+                setValue={setTextEndTime}
+                secureTextEntry={false}
+                editable={false}
+              />
+            </Pressable>
+          </Animated.View>
 
+          <Animated.View
+            style={styles.animInputList}
+            entering={FadeInDown.delay(400).duration(1000).springify()}
+          >
+            <Picker selectedValue={day} onValueChange={handleDayChange}>
+              {daysOfWeek.map((day, index) => (
+                <Picker.Item key={index} label={day} value={day} />
+              ))}
+            </Picker>
+          </Animated.View>
           <Animated.View
             style={styles.animInput}
             entering={FadeInDown.delay(400).duration(1000).springify()}
@@ -146,7 +194,7 @@ const ScheduleInput = () => {
           >
             <CustomButton
               text="My Schedule"
-              onPress={() => {}}
+              onPress={() => navigation.navigate("Schedule")}
               type="Tertiary"
             />
           </Animated.View>
@@ -160,6 +208,7 @@ const styles = StyleSheet.create({
   root: {
     alignItems: "center",
     padding: 20,
+    marginTop: 30,
     backgroundColor: "white",
   },
 
@@ -170,8 +219,15 @@ const styles = StyleSheet.create({
   animInput: {
     width: "100%",
   },
+  animInputList: {
+    width: "100%",
+    borderColor: "#8F00FF",
+    borderRadius: 15,
+    borderWidth: 1,
+    marginTop: 5,
+  },
 
-  text: { color: "#8F00FF", fontSize: 40, marginBottom: 20, marginTop: 40 },
+  text: { color: "black", fontSize: 40, marginBottom: 20, marginTop: 40 },
 });
 
 export default ScheduleInput;

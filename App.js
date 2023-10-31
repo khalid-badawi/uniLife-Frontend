@@ -17,7 +17,6 @@ const App = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: Constants.statusBarHeight,
     backgroundColor: "#F9FBFC",
     justifyContent: "center",
   },
