@@ -6,7 +6,7 @@ import CustomButton from "../components/CustomButton";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
-
+import { useNavigation } from "@react-navigation/native";
 const SignInSchema = Yup.object().shape({
   email: Yup.string()
     .required("❌ Please enter your email")
@@ -17,16 +17,17 @@ const SignInSchema = Yup.object().shape({
   password: Yup.string().required("❌ Please enter your password"),
 });
 
-const onForgotPasswordPressed = () => {
-  console.warn("forgot password");
-};
-const onSignUpPressed = () => {
-  console.warn("SignUp");
-};
-
 const SignInScreen = () => {
+  const navigation = useNavigation();
   const { height, width } = useWindowDimensions();
 
+  const onForgotPasswordPressed = () => {
+    console.warn("forgot password");
+  };
+  const onSignUpPressed = () => {
+    console.warn("SignUp");
+    navigation.navigate("SignUp");
+  };
   //states
   const handleSignIn = (values, { resetForm }) => {
     console.warn(values);
@@ -123,6 +124,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
     backgroundColor: "white",
+    flex: 1,
   },
 
   logo: {

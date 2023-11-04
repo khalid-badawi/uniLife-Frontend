@@ -11,14 +11,32 @@ import CustomInput from "../components/CustomInput";
 import Logo from "../assets/Logo2.png";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import axios from "axios";
 
 const validate = Yup.object().shape({
-  code: Yup.string().required("❌ Please Enter the code you have received"),
+  verifyCode: Yup.string().required(
+    "❌ Please Enter the code you have received"
+  ),
 });
 
-const handleConfirm = (values, { resetForm }) => {
+const handleConfirm = async (values, { resetForm }) => {
   console.warn(values);
-  resetForm();
+  try {
+    const response = await axios.post(
+      "http://10.0.2.2:3000/api/v1/unilife/verify",
+      JSON.stringify(values),
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    resetForm();
+    console.log(response.status);
+  } catch (error) {
+    console.error(error.response);
+  }
 };
 
 const onResendPressed = () => {
@@ -28,7 +46,7 @@ const ConfirmCodeScreen = ({ code = "0597401453" }) => {
   const { height, width } = useWindowDimensions();
   return (
     <Formik
-      initialValues={{ code: "" }}
+      initialValues={{ verifyCode: "" }}
       onSubmit={handleConfirm}
       validationSchema={validate}
     >
@@ -61,11 +79,11 @@ const ConfirmCodeScreen = ({ code = "0597401453" }) => {
             <CustomInput
               placeholder="Verification Code"
               value={values.code}
-              setValue={handleChange("code")}
+              setValue={handleChange("verifyCode")}
               secureTextEntry={true}
               errors={errors.code}
               iconName={"key"}
-              onBlur={() => setFieldTouched("code")}
+              onBlur={() => setFieldTouched("verifyCode")}
             />
           </View>
           <View style={styles.animInput}>
@@ -99,7 +117,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   descText: {
-    color: "#643b66",
+    color: "black",
     paddingLeft: 10,
     fontSize: 17,
     marginVertical: 10,

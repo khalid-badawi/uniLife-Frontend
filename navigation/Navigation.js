@@ -12,6 +12,7 @@ import MapScreen from "../screens/MapScreen";
 import AddScheduleScreen from "../screens/AddScheduleScreen";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/AntDesign";
+import { Header } from "react-native-elements";
 const Stack = createNativeStackNavigator();
 
 export default function Navigation() {
@@ -34,7 +35,11 @@ export default function Navigation() {
         <Stack.Screen name="ForgotPW" component={ForgotPasswordScreen} />
         <Stack.Screen name="ResetPW" component={ResetPasswordScreen} />
         <Stack.Screen name="ConfirmCode" component={ConfirmCodeScreen} />
-        <Stack.Screen name="Schedule" component={ScheduleScreen} />
+        <Stack.Screen
+          name="Schedule"
+          component={ScheduleScreen}
+          options={{ headerTitle: "My Schedule" }}
+        />
         <Stack.Screen name="Map" component={MapScreen} />
         <Stack.Screen name="ScheduleInput" component={AddScheduleScreen} />
       </Stack.Navigator>

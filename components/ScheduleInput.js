@@ -12,28 +12,14 @@ import { Picker } from "@react-native-picker/picker";
 import Logo from "../assets/Logo2.png";
 import CustomInput from "./CustomInput";
 import CustomButton from "./CustomButton";
+import DaysSelection from "./DaysSelection";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from "@react-navigation/native";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 
-const addLec = Yup.object().shape({
-  email: Yup.string()
-    .required("❌ Please enter your email")
-    .matches(
-      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
-      "❌ invalid email"
-    ),
-  password: Yup.string().required("❌ Please enter your password"),
-});
-
-const onForgotPasswordPressed = () => {
-  console.warn("forgot password");
-};
-const onSignUpPressed = () => {
-  console.warn("SignUp");
-};
+const addLec = Yup.object().shape({});
 
 const ScheduleInput = () => {
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -44,6 +30,12 @@ const ScheduleInput = () => {
   const [day, setDay] = useState("sunday");
   const handleDayChange = (day) => {
     setDay(day);
+  };
+  const onForgotPasswordPressed = () => {
+    console.warn("forgot password");
+  };
+  const onSignUpPressed = () => {
+    console.warn("SignUp");
   };
   const daysOfWeek = [
     "Sunday",
@@ -69,13 +61,23 @@ const ScheduleInput = () => {
       toggleTimePicker();
     }
   };
+  const [selectedDays, setSelectedDays] = useState([]);
 
+  const toggleDay = (day) => {
+    if (selectedDays.includes(day)) {
+      setSelectedDays(selectedDays.filter((d) => d !== day));
+    } else {
+      setSelectedDays([...selectedDays, day]);
+    }
+  };
   const { height, width } = useWindowDimensions();
 
   //states
   const handleAdd = (values, { resetForm }) => {
     console.warn(values);
     resetForm();
+    setSelectedDays([]);
+    navigation.navigate('')
   };
 
   return (
@@ -172,16 +174,13 @@ const ScheduleInput = () => {
             </Pressable>
           </Animated.View>
 
-          <Animated.View
-            style={styles.animInputList}
-            entering={FadeInDown.delay(400).duration(1000).springify()}
-          >
-            <Picker selectedValue={day} onValueChange={handleDayChange}>
+          {/*<Picker selectedValue={day} onValueChange={handleDayChange}>
               {daysOfWeek.map((day, index) => (
                 <Picker.Item key={index} label={day} value={day} />
               ))}
-            </Picker>
-          </Animated.View>
+              </Picker>*/}
+          <DaysSelection toggleDay={toggleDay} selectedDays={selectedDays} />
+
           <Animated.View
             style={styles.animInput}
             entering={FadeInDown.delay(400).duration(1000).springify()}

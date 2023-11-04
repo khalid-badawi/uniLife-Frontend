@@ -24,14 +24,6 @@
       "favicon": "./assets/favicon.png"
     },
 
-    "plugins": [
-      [
-        "@rnmapbox/maps",
-        {
-          "RNMapboxMapsImpl": "mapbox",
-          "RNMapboxMapsDownloadToken": "sk.ey...qg"
-        }
-      ]
-    ]
+    "plugins": ["@maplibre/maplibre-react-native"]
   }
 }
