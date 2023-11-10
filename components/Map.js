@@ -1,34 +1,36 @@
 import React, { useState, Component, useEffect } from "react";
 import { StyleSheet, View } from "react-native";
-import MapLibreGL from "@maplibre/maplibre-react-native";
+import Mapbox from "@rnmapbox/maps";
 import Geolocation from "react-native-geolocation-service";
 import { RoutingApi, Configuration, RouteRequest } from "@stadiamaps/api";
 import CustomButton from "./CustomButton";
 // Will be null for most users (only Mapbox authenticates this way).
 // Required on Android. See Android installation notes.
-
+import { PermissionsAndroid } from "react-native";
 const KEY = "a02969d3-9209-42cc-82f9-5c57b3394ca4";
-MapLibreGL.setAccessToken(null);
-
-const styleUrl = `https://tiles.stadiamaps.com/styles/alidade_smooth.json?api_key=${KEY}`;
+Mapbox.setWellKnownTileServer("Mapbox");
+Mapbox.setAccessToken(
+  "pk.eyJ1IjoiajFyZW4iLCJhIjoiY2xvcm9zdm85MHY5czJrbzZrdXI1amZmMSJ9.UW9QsP8ErGFgGNctDwoG5w"
+);
 
 const Map = () => {
   const [currentPosition, setCurrentPosition] = useState(null);
   const [routeCoordinates, setRouteCoordinates] = useState([]);
 
   const fetchRoute = async () => {
-    const startPoint = { lon: 35.22421, lat: 32.22749 };
-    const endPoint = { lon: 35.22107, lat: 32.22778 };
+    const startPoint = { lon: 35.22309, lat: 32.22747 };
+    const endPoint = { lon: 35.22357, lat: 32.22705 };
     const accessToken =
       "pk.eyJ1IjoiajFyZW4iLCJhIjoiY2xvcm9zdm85MHY5czJrbzZrdXI1amZmMSJ9.UW9QsP8ErGFgGNctDwoG5w"; // Replace with your Mapbox access token
 
     // Specify the profile as "walking" for walking directions
+
     const mapboxUrl = `https://api.mapbox.com/directions/v5/mapbox/walking/${startPoint.lon},${startPoint.lat};${endPoint.lon},${endPoint.lat}?geometries=geojson&access_token=${accessToken}`;
 
     try {
       const response = await fetch(mapboxUrl);
       const data = await response.json();
-
+      console.log(data);
       if (data.code === "Ok") {
         const coordinates = data.routes[0].geometry.coordinates.map(
           (coord) => ({
@@ -64,28 +66,48 @@ const Map = () => {
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
     );
   }, []);
+  const coordinates = routeCoordinates.map((coord) => [
+    coord.longitude,
+    coord.latitude,
+  ]);
+
   return (
     <View style={styles.page}>
-      <MapLibreGL.MapView
+      <Mapbox.MapView
         style={styles.map}
         logoEnabled={false}
-        styleURL={styleUrl}
-        //styleJSON="https://api.maptiler.com/maps/openstreetmap/style.json?key=Thtl7ezKGt6Au52pKwMs"
+        styleURL="mapbox://styles/mapbox/streets-v12"
       >
-        <MapLibreGL.Camera
+        <Mapbox.Camera
           zoomLevel={15.5}
           centerCoordinate={[35.220937, 32.227382]}
         />
 
         {currentPosition && (
-          <MapLibreGL.PointAnnotation
+          <Mapbox.PointAnnotation
             id="currentPosition"
             coordinate={[35.224218, 32.227513]}
           />
         )}
-      </MapLibreGL.MapView>
+
+        {/* Drawing the line */}
+        <Mapbox.ShapeSource
+          id="lineSource"
+          shape={{
+            type: "LineString",
+            coordinates: coordinates,
+          }}
+        >
+          <Mapbox.LineLayer
+            id="lineLayer"
+            style={{
+              lineColor: "blue",
+              lineWidth: 3,
+            }}
+          />
+        </Mapbox.ShapeSource>
+      </Mapbox.MapView>
       <CustomButton text="route" onPress={fetchRoute} />
-      <CustomButton text="route" onPress={x} />
     </View>
   );
 };

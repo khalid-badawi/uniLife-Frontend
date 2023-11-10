@@ -1,10 +1,8 @@
-import "react-native-gesture-handler";
 import React from "react";
 
 import { View, StyleSheet } from "react-native";
 import Navigation from "./navigation/Navigation";
 
-import Constants from "expo-constants";
 
 const App = () => {
   return (

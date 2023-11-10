@@ -19,7 +19,7 @@ export default function Navigation() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="MapScreen"
+        initialRouteName="SignIn"
         screenOptions={({ navigation }) => ({
           headerShown: true,
           headerTitleAlign: "center",

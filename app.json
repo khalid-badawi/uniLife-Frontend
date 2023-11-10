@@ -24,7 +24,21 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
+    "plugins": [
+      [
+        "@rnmapbox/maps",
+        {
+          "RNMapboxMapsImpl": "mapbox",
+          "RNMapboxMapsDownloadToken": "sk.eyJ1IjoiajFyZW4iLCJhIjoiY2xvcnk4OWl4MHhjbTJrczgycnJ1bDM1ZiJ9.pptmAq8ypIfHZTwU89l8Gw"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Show current location on map."
+        }
+      ]
+    ]
 
-    "plugins": ["@maplibre/maplibre-react-native"]
   }
 }
