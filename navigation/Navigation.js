@@ -19,7 +19,7 @@ export default function Navigation() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="ScheduleInput"
+        initialRouteName="MapScreen"
         screenOptions={({ navigation }) => ({
           headerShown: true,
           headerTitleAlign: "center",
@@ -40,7 +40,7 @@ export default function Navigation() {
           component={ScheduleScreen}
           options={{ headerTitle: "My Schedule" }}
         />
-        <Stack.Screen name="Map" component={MapScreen} />
+        <Stack.Screen name="MapScreen" component={MapScreen} />
         <Stack.Screen name="ScheduleInput" component={AddScheduleScreen} />
       </Stack.Navigator>
     </NavigationContainer>
