@@ -21,7 +21,8 @@ import Animated, {
   FadeInDown,
   FadeInUp,
 } from "react-native-reanimated";
-
+import { Navigation } from "react-native-feather";
+import { useNavigation } from "@react-navigation/native";
 const lectureArray = [
   {
     subject: "Mathematics",
@@ -78,7 +79,7 @@ const ScheduleScreen = () => {
     "Thursday",
     "Saturday",
   ];
-
+  const navigation = useNavigation();
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
 
   const moveNextDay = () => {
@@ -132,7 +133,12 @@ const ScheduleScreen = () => {
         />
       </View>
       <View style={styles.footer}>
-        <CustomButton text="Add a Lecture" type="Tertiary" color="#8F00FF" />
+        <CustomButton
+          text="Add a Lecture"
+          type="Tertiary"
+          color="#8F00FF"
+          onPress={() => navigation.navigate("ScheduleInput")}
+        />
       </View>
     </Animated.View>
   );

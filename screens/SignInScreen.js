@@ -5,6 +5,7 @@ import CustomInput from "../components/CustomInput";
 import CustomButton from "../components/CustomButton";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
+import axios from "axios";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
 const SignInSchema = Yup.object().shape({
@@ -29,8 +30,23 @@ const SignInScreen = () => {
     navigation.navigate("SignUp");
   };
   //states
-  const handleSignIn = (values, { resetForm }) => {
-    console.warn(values);
+  const handleSignIn = async (values, { resetForm }) => {
+    try {
+      const response = await axios.post(
+        "http://10.0.2.2:3000/api/v1/unilife/login",
+        JSON.stringify(values),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(response);
+
+      navigation.navigate("Schedule");
+    } catch (error) {
+      console.error(error.response);
+    }
     resetForm();
   };
 

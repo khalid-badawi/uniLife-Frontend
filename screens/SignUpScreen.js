@@ -210,6 +210,9 @@ const SignUpScreen = () => {
                 <CustomButton
                   text="Already have an account? Sign in"
                   type="Tertiary"
+                  onPress={() => {
+                    navigation.navigate("SignIn");
+                  }}
                 />
               </Animated.View>
             </View>
