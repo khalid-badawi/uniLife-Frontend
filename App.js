@@ -2,12 +2,14 @@ import React from "react";
 
 import { View, StyleSheet } from "react-native";
 import Navigation from "./navigation/Navigation";
-
+import { UserProvider } from "./Contexts/UserContext";
 
 const App = () => {
   return (
     <View style={styles.container}>
-      <Navigation />
+      <UserProvider>
+        <Navigation />
+      </UserProvider>
     </View>
   );
 };

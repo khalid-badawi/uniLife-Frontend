@@ -60,6 +60,7 @@ const styles = StyleSheet.create({
     color: "red",
     marginBottom: 2,
     marginLeft: 4,
+    fontSize: 15,
   },
 });
 

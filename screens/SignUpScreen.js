@@ -5,9 +5,10 @@ import {
   Image,
   useWindowDimensions,
   ScrollView,
-  Button,
   KeyboardAvoidingView,
   Platform,
+  Text,
+  Alert,
 } from "react-native";
 import Logo from "../assets/Logo2.png";
 import CustomInput from "../components/CustomInput";
@@ -56,6 +57,7 @@ const SignupSchema = Yup.object().shape({
 const SignUpScreen = () => {
   const navigation = useNavigation();
   const { height, width } = useWindowDimensions();
+  const [errorMsg, setErrorMsg] = useState("");
   const handleSubmit = async (values) => {
     try {
       const response = await axios.post(
@@ -70,7 +72,22 @@ const SignUpScreen = () => {
       console.log(response.status);
       navigation.navigate("ConfirmCode");
     } catch (error) {
-      console.error(error.response);
+      if (error.response) {
+        setErrorMsg(error.response.data.message);
+      } else if (error.request) {
+        Alert.alert(
+          "Network Error",
+          "There was a problem with the network. Please check your internet connection and try again.",
+          [{ text: "OK" }]
+        );
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        Alert.alert(
+          "Something Wrong",
+          "Something went wrong, try again please",
+          [{ text: "OK" }]
+        );
+      }
     }
   };
 
@@ -123,7 +140,7 @@ const SignUpScreen = () => {
               </Animated.View>
               <Animated.View
                 style={styles.animInput}
-                entering={FadeInDown.delay(200).duration(1000).springify()}
+                entering={FadeInDown.delay(50).duration(1000).springify()}
               >
                 <CustomInput
                   placeholder="Username"
@@ -137,7 +154,7 @@ const SignUpScreen = () => {
               </Animated.View>
               <Animated.View
                 style={styles.animInput}
-                entering={FadeInDown.delay(400).duration(1000).springify()}
+                entering={FadeInDown.delay(100).duration(1000).springify()}
               >
                 <CustomInput
                   placeholder="Email"
@@ -151,7 +168,7 @@ const SignUpScreen = () => {
               </Animated.View>
               <Animated.View
                 style={styles.animInput}
-                entering={FadeInDown.delay(600).duration(1000).springify()}
+                entering={FadeInDown.delay(150).duration(1000).springify()}
               >
                 <CustomInput
                   placeholder="Password"
@@ -165,7 +182,7 @@ const SignUpScreen = () => {
               </Animated.View>
               <Animated.View
                 style={styles.animInput}
-                entering={FadeInDown.delay(800).duration(1000).springify()}
+                entering={FadeInDown.delay(200).duration(1000).springify()}
               >
                 <CustomInput
                   placeholder="Confirm Password"
@@ -180,7 +197,7 @@ const SignUpScreen = () => {
 
               <Animated.View
                 style={styles.animInput}
-                entering={FadeInDown.delay(1200).duration(1000).springify()}
+                entering={FadeInDown.delay(250).duration(1000).springify()}
               >
                 <CustomInput
                   placeholder="Phone Number"
@@ -195,7 +212,7 @@ const SignUpScreen = () => {
               </Animated.View>
               <Animated.View
                 style={styles.animInput}
-                entering={FadeInDown.delay(1200).duration(1000).springify()}
+                entering={FadeInDown.delay(300).duration(1000).springify()}
               >
                 <CustomButton
                   text="Register"
@@ -203,9 +220,10 @@ const SignUpScreen = () => {
                   type="Primary"
                 />
               </Animated.View>
+              {errorMsg && <Text style={styles.errorText}>❌ {errorMsg}</Text>}
               <Animated.View
                 style={styles.animInput}
-                entering={FadeInDown.delay(1200).duration(1000).springify()}
+                entering={FadeInDown.delay(350).duration(1000).springify()}
               >
                 <CustomButton
                   text="Already have an account? Sign in"
@@ -240,6 +258,12 @@ const styles = StyleSheet.create({
   },
   animInput: {
     width: "100%",
+  },
+  errorText: {
+    color: "red",
+    marginBottom: 2,
+    marginLeft: 4,
+    fontSize: 15,
   },
 });
 

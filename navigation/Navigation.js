@@ -13,13 +13,14 @@ import AddScheduleScreen from "../screens/AddScheduleScreen";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/AntDesign";
 import { Header } from "react-native-elements";
+import IndoorQR from "../screens/IndoorQR";
 const Stack = createNativeStackNavigator();
 
 export default function Navigation() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="MapScreen"
+        initialRouteName="SignIn"
         screenOptions={({ navigation }) => ({
           headerShown: true,
           headerTitleAlign: "center",
@@ -30,7 +31,11 @@ export default function Navigation() {
           ),
         })}
       >
-        <Stack.Screen name="SignIn" component={SignInScreen} />
+        <Stack.Screen
+          name="SignIn"
+          component={SignInScreen}
+          options={{ headerShown: false }}
+        />
         <Stack.Screen name="SignUp" component={SignUpScreen} />
         <Stack.Screen name="ForgotPW" component={ForgotPasswordScreen} />
         <Stack.Screen name="ResetPW" component={ResetPasswordScreen} />
@@ -41,6 +46,7 @@ export default function Navigation() {
           options={{ headerTitle: "My Schedule" }}
         />
         <Stack.Screen name="MapScreen" component={MapScreen} />
+        <Stack.Screen name="IndoorQR" component={IndoorQR} />
         <Stack.Screen name="ScheduleInput" component={AddScheduleScreen} />
       </Stack.Navigator>
     </NavigationContainer>

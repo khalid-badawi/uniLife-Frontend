@@ -1,11 +1,19 @@
-import React from "react";
-import { View, StyleSheet, Image, useWindowDimensions } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  StyleSheet,
+  Image,
+  useWindowDimensions,
+  Text,
+  Alert,
+} from "react-native";
 import Logo from "../assets/Logo2.png";
 import CustomInput from "../components/CustomInput";
 import CustomButton from "../components/CustomButton";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
+import * as Keychain from "react-native-keychain";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
 const SignInSchema = Yup.object().shape({
@@ -21,14 +29,44 @@ const SignInSchema = Yup.object().shape({
 const SignInScreen = () => {
   const navigation = useNavigation();
   const { height, width } = useWindowDimensions();
+  const [errorMsg, setErrorMsg] = useState("");
 
   const onForgotPasswordPressed = () => {
     console.warn("forgot password");
   };
   const onSignUpPressed = () => {
-    console.warn("SignUp");
     navigation.navigate("SignUp");
   };
+
+  const storeTokenInKeychain = async (token) => {
+    try {
+      // Store the token in the keychain
+      await Keychain.setGenericPassword("myTokenKey", token);
+
+      console.log("Token stored successfully");
+    } catch (error) {
+      console.error("Error storing token:", error);
+    }
+  };
+  const getTokenFromKeychain = async () => {
+    try {
+      // Retrieve the token from the keychain
+      const credentials = await Keychain.getGenericPassword();
+
+      if (credentials) {
+        const token = credentials.password;
+        console.log("Token retrieved successfully:", token);
+        return token;
+      } else {
+        console.log("No token found in the keychain");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error retrieving token:", error);
+      return null;
+    }
+  };
+
   //states
   const handleSignIn = async (values, { resetForm }) => {
     try {
@@ -41,18 +79,34 @@ const SignInScreen = () => {
           },
         }
       );
-      console.log(response);
-
-      navigation.navigate("Schedule");
+      await storeTokenInKeychain(response.data.token);
+      const token = await getTokenFromKeychain();
+      setErrorMsg("");
+      navigation.navigate("MapScreen");
     } catch (error) {
-      console.error(error.response);
+      if (error.response) {
+        setErrorMsg(error.response.data.message);
+      } else if (error.request) {
+        Alert.alert(
+          "Network Error",
+          "There was a problem with the network. Please check your internet connection and try again.",
+          [{ text: "OK" }]
+        );
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        Alert.alert(
+          "Something Wrong",
+          "Something went wrong, try again please",
+          [{ text: "OK" }]
+        );
+      }
     }
     resetForm();
   };
 
   return (
     <Formik
-      initialValues={{ email: "", password: "" }}
+      initialValues={{ email: "s11923593@stu.najah.edu", password: "12345Sk@" }}
       onSubmit={handleSignIn}
       validationSchema={SignInSchema}
     >
@@ -109,6 +163,7 @@ const SignInScreen = () => {
           >
             <CustomButton text="Sign In" onPress={handleSubmit} />
           </Animated.View>
+          {errorMsg && <Text style={styles.errorText}>❌ {errorMsg}</Text>}
           <Animated.View
             style={styles.animInput}
             entering={FadeInDown.delay(600).duration(1000).springify()}
@@ -149,6 +204,12 @@ const styles = StyleSheet.create({
   },
   animInput: {
     width: "100%",
+  },
+  errorText: {
+    color: "red",
+    marginBottom: 2,
+    marginLeft: 4,
+    fontSize: 15,
   },
 });
 
