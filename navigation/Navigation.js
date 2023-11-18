@@ -14,13 +14,14 @@ import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/AntDesign";
 import { Header } from "react-native-elements";
 import IndoorQR from "../screens/IndoorQR";
+import CafiteriaHome from "../screens/CafiteriaHome";
 const Stack = createNativeStackNavigator();
 
 export default function Navigation() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="SignIn"
+        initialRouteName="CafiteriaScreen"
         screenOptions={({ navigation }) => ({
           headerShown: true,
           headerTitleAlign: "center",
@@ -47,6 +48,11 @@ export default function Navigation() {
         />
         <Stack.Screen name="MapScreen" component={MapScreen} />
         <Stack.Screen name="IndoorQR" component={IndoorQR} />
+        <Stack.Screen
+          name="CafiteriaScreen"
+          component={CafiteriaHome}
+          options={{ headerShown: false }}
+        />
         <Stack.Screen name="ScheduleInput" component={AddScheduleScreen} />
       </Stack.Navigator>
     </NavigationContainer>

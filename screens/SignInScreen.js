@@ -82,7 +82,7 @@ const SignInScreen = () => {
       await storeTokenInKeychain(response.data.token);
       const token = await getTokenFromKeychain();
       setErrorMsg("");
-      navigation.navigate("MapScreen");
+      navigation.navigate("Schedule");
     } catch (error) {
       if (error.response) {
         setErrorMsg(error.response.data.message);
