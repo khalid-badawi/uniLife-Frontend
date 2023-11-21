@@ -35,11 +35,17 @@ const restaurants = [
   },
 ];
 const CafiteriaHome = () => {
-  const [search, setSearch] = useState("");
   return (
     <View style={styles.root}>
       <View style={{ flexDirection: "row", marginTop: 20, width: "100%" }}>
-        <Text style={styles.title}>Hello, Ahmad</Text>
+        <Text style={{ ...styles.title, color: "#8F0FF0" }}>
+          Hello,{" "}
+          <Text
+            style={{ ...styles.title, color: "#8F0FF0", fontWeight: "1000" }}
+          >
+            Ahmad
+          </Text>
+        </Text>
         {/* Wrap the content inside TouchableOpacity */}
         <TouchableOpacity
           onPress={() => {
@@ -52,7 +58,7 @@ const CafiteriaHome = () => {
           <Icon name="food" style={styles.icon} size={22} />
         </TouchableOpacity>
       </View>
-      <Text style={styles.descTxt}>Where do you wanna eat from 😋</Text>
+      <Text style={styles.descTxt}>Which restaurant today? 😋</Text>
       {/* <View style={styles.searchBarCont}>
         <Icon name="search" style={styles.icon} size={20} />
 
@@ -89,7 +95,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: "bold",
     marginLeft: 10,
   },
   descTxt: {

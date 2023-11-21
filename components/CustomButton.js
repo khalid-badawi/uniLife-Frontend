@@ -13,18 +13,20 @@ const CustomButton = ({ onPress, text, color, type = "Primary" }) => {
 
 const styles = StyleSheet.create({
   container: {
-    width: "100%",
     alignItems: "center",
-    borderRadius: 20,
+
     marginVertical: 5,
   },
   containerPrimary: {
     backgroundColor: "#8F00FF",
     padding: 15,
+    width: "100%",
+    borderRadius: 20,
   },
   containerTertiary: {
     backgroundColor: "transparent",
     padding: 5,
+    width: "100%",
   },
 
   text: {
@@ -34,6 +36,31 @@ const styles = StyleSheet.create({
   },
   textTertiary: {
     color: "#8F00FF",
+  },
+  textNotSelected: {
+    color: "#8F00FF",
+    fontSize: 15,
+  },
+  textSelected: {
+    fontSize: 15,
+  },
+  containerSelected: {
+    color: "white",
+    backgroundColor: "#8F00F0",
+    alignSelf: "flex-start",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+
+    marginHorizontal: 5,
+  },
+  containerNotSelected: {
+    backgroundColor: "#e6cafc",
+    alignSelf: "flex-start",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+    marginHorizontal: 5,
   },
 });
 

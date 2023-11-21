@@ -4,76 +4,77 @@ import test from "../assets/test.jpg";
 import test2 from "../assets/test2.png";
 import Icon from "react-native-vector-icons/AntDesign";
 
-const MenuItem = ({ type = "order" }) => {
+const MenuItem = ({ item }) => {
   return (
     <View style={styles.root}>
       <Image
         source={test2}
         style={styles.img} // Fixed style object
-        resizeMode="contain"
+        resizeMode="stretch"
       />
-
-      <View style={styles.textCont}>
-        <Text style={styles.mainTxt}>Cheese burger</Text>
-        <Text style={{ color: "gray" }}>cheese burger</Text>
-      </View>
+      <Text style={styles.mainTxt}>{item.itemName}</Text>
+      <Text style={styles.descTxt}>{item.itemDescription}</Text>
       <View
         style={{
-          position: "absolute",
-          bottom: 12,
-          left: 15,
           flexDirection: "row",
+
+          marginTop: 20,
+          marginHorizontal: 10,
         }}
       >
-        <Text
-          style={{
-            fontSize: 15,
-            fontWeight: "bold",
-            marginTop: 10,
-          }}
-        >
-          20 NIS
-        </Text>
-      </View>
-      {type === "order" && (
         <View
           style={{
-            position: "absolute",
-            bottom: 12,
-            right: 10,
             flexDirection: "row",
+            width: "25%",
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: "bold",
+            }}
+          >
+            20₪
+          </Text>
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "50%",
           }}
         >
           <TouchableOpacity>
-            <Icon name="minussquare" style={styles.icon} size={22} />
+            <Icon name="minussquare" style={styles.icon} size={25} />
           </TouchableOpacity>
           <Text style={{ marginHorizontal: 5 }}>2</Text>
           <TouchableOpacity>
-            <Icon name="plussquare" style={styles.icon} size={22} />
+            <Icon name="plussquare" style={styles.icon} size={25} />
           </TouchableOpacity>
         </View>
-      )}
-      {type === "menu" && (
+
         <View
           style={{
-            position: "absolute",
-            bottom: 12,
-            right: 10,
             flexDirection: "row",
+            width: "25%",
+            justifyContent: "flex-end",
           }}
         >
           <TouchableOpacity style={{ flexDirection: "row" }}>
-            <Text style={{ color: "#8F00FF", fontWeight: "600" }}>details</Text>
-            <Icon name="arrowright" style={styles.icon} size={20} />
+            <Text style={{ fontSize: 16, fontWeight: "600", color: "#8F00FF" }}>
+              details
+            </Text>
+            <Icon name="arrowright" style={{ ...styles.icon }} size={21} />
           </TouchableOpacity>
         </View>
-      )}
+      </View>
     </View>
   );
 };
 const styles = StyleSheet.create({
   root: {
-    marginHorizontal: 5,
+    marginHorizontal: 10,
     marginTop: 10,
     backgroundColor: "white",
     borderRadius: 25,
@@ -81,17 +82,16 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     shadowOffset: { height: 6, width: 0 },
     shadowOpacity: 0.1,
-    height: 250,
-    width: 180,
-    borderColor: "#8F00FF",
-    borderWidth: 1,
+    paddingBottom: 10,
+    width: "90%",
+    alignSelf: "center",
   },
 
   img: {
     alignSelf: "center",
-    width: 170,
-    height: 150,
-    borderRadius: 75,
+    width: "60%",
+    height: 170,
+
     marginVertical: 0,
   },
   textCont: {
@@ -100,7 +100,15 @@ const styles = StyleSheet.create({
   },
   mainTxt: {
     fontWeight: "bold",
-    fontSize: 18,
+    fontSize: 20,
+    //color: "#8F00F0",
+    marginLeft: 15,
+    alignSelf: "center",
+    marginBottom: 10,
+  },
+  descTxt: {
+    marginLeft: 15,
+    marginRight: 2,
   },
 
   icon: {
