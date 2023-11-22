@@ -8,6 +8,9 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import CustomButton from "../components/CustomButton";
+import { BlurView } from "@react-native-community/blur";
+import Animated, { FadeOutDown, FadeInUp } from "react-native-reanimated";
+
 const menuItems = [
   {
     itemId: "1",
@@ -31,6 +34,28 @@ const menuItems = [
     price: 10.99,
     catigory: "Special",
   },
+  {
+    itemId: "4",
+    itemName: "Classic Burger",
+    itemDescription: "Juicy beef patty with lettuce, tomato, and cheese",
+    price: 9.99,
+    catigory: "Meals",
+  },
+  {
+    itemId: "12",
+    itemName: "Chicken Shawarma Wrap",
+    itemDescription:
+      "Grilled chicken with garlic sauce and veggies wrapped in pita",
+    price: 12.99,
+    catigory: "Sandwiches",
+  },
+  {
+    itemId: "9",
+    itemName: "Margherita Pizza",
+    itemDescription: "Classic pizza with fresh mozzarella, tomatoes, and basil",
+    price: 10.99,
+    catigory: "Special",
+  },
   // Add more items as needed
 ];
 const RestaurantScreen = () => {
@@ -43,7 +68,15 @@ const RestaurantScreen = () => {
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
   };
+  function filterItemsByCategory(items, selectedCategory) {
+    if (selectedCategory === "All") {
+      return items;
+    }
+    return items.filter((item) => item.catigory === selectedCategory);
+  }
+  const filteredMenu = filterItemsByCategory(menuItems, selectedCategory);
 
+  const [orderContent, setOrderContent] = useState([]);
   return (
     <View style={styles.root}>
       <View style={{ flexDirection: "row", marginTop: 20, width: "100%" }}>
@@ -77,30 +110,79 @@ const RestaurantScreen = () => {
 
         <TextInput
           style={styles.searchBar}
-          placeholder="Search Menu..."
+          placeholder={
+            selectedCategory === "All"
+              ? `Search Menu...`
+              : `Search ${selectedCategory}...`
+          }
           onChangeText={(text) => setSearch(text)}
         />
       </View>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={{ marginLeft: 10, flexDirection: "row", height: 80 }}
-      >
-        {uniqueCategories.map((category) => (
-          <CustomButton
-            key={category}
-            text={category}
-            type={category === selectedCategory ? "Selected" : "NotSelected"}
-            onPress={() => handleCategoryClick(category)}
+      <View style={{ marginLeft: 10 }}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={{
+            flexDirection: "row",
+            height: 80,
+            marginTop: 5,
+          }}
+        >
+          {uniqueCategories.map((category) => (
+            <CustomButton
+              key={category}
+              text={category}
+              type={category === selectedCategory ? "Selected" : "NotSelected"}
+              onPress={() => handleCategoryClick(category)}
+            />
+          ))}
+        </ScrollView>
+      </View>
+      <View style={{ flex: 1 }}>
+        <FlatList
+          data={filteredMenu}
+          renderItem={({ item }) => (
+            <MenuItem
+              item={item}
+              setOrderContent={setOrderContent}
+              orderContent={orderContent}
+            />
+          )}
+          keyExtractor={(item) => item.itemId}
+        />
+      </View>
+      {orderContent.length !== 0 && (
+        <Animated.View
+          style={styles.footer}
+          entering={FadeInUp.duration(200).springify().damping(10)}
+          exiting={FadeOutDown.duration(200).springify().damping(10)}
+        >
+          {/* Use BlurView to blur the content under the footer */}
+          <BlurView
+            overlayColor=""
+            style={{ ...StyleSheet.absoluteFillObject }}
+            blurType="light"
+            blurAmount={2}
+            reducedTransparencyFallbackColor="white"
           />
-        ))}
-      </ScrollView>
+          <View style={{ width: "70%", opacity: 1 }}>
+            <CustomButton text="Order" />
+          </View>
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: "bold",
 
-      <FlatList
-        data={menuItems}
-        renderItem={({ item }) => <MenuItem item={item} />}
-        keyExtractor={(item) => item.itemId}
-      />
+              backgroundColor: "#e6cafc",
+              paddingVertical: 10,
+              paddingHorizontal: 20,
+              borderRadius: 20,
+            }}
+          >
+            <Text style={{ color: "#8F00FF" }}>Total Price</Text>:20₪
+          </Text>
+        </Animated.View>
+      )}
     </View>
   );
 };
@@ -118,7 +200,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     fontSize: 15,
     color: "gray",
-    fontWeight: "400",
   },
   searchBarCont: {
     height: 50,
@@ -135,6 +216,17 @@ const styles = StyleSheet.create({
   icon: {
     marginLeft: 10,
     alignSelf: "center",
+  },
+  footer: {
+    backgroundColor: "transparent",
+    width: "100%",
+
+    alignSelf: "center",
+    position: "absolute",
+    alignItems: "center",
+    justifyContent: "center",
+    bottom: 5,
+    borderRadius: 0,
   },
 });
 export default RestaurantScreen;

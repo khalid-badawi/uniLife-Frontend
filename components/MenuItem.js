@@ -1,10 +1,63 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import test from "../assets/test.jpg";
 import test2 from "../assets/test2.png";
 import Icon from "react-native-vector-icons/AntDesign";
 
-const MenuItem = ({ item }) => {
+const MenuItem = ({ item, setOrderContent, orderContent }) => {
+  const [quantity, setQuantity] = useState(() => {
+    const foundItem = orderContent.find(
+      (orderItem) => orderItem.itemId === item.itemId
+    );
+    if (foundItem) {
+      return foundItem.Quantity;
+    } else {
+      return 0;
+    }
+  });
+  const handleMinus = () => {
+    if (quantity > 0) {
+      setQuantity(quantity - 1);
+      const index = orderContent.findIndex(
+        (orderItem) => orderItem.itemId === item.itemId
+      );
+      if (index !== -1) {
+        // If item exists in orderContent, update its quantity or remove if quantity is 1
+        const updatedOrderContent = [...orderContent];
+        if (updatedOrderContent[index].Quantity > 1) {
+          updatedOrderContent[index] = {
+            ...updatedOrderContent[index],
+            Quantity: updatedOrderContent[index].Quantity - 1,
+          };
+        } else {
+          updatedOrderContent.splice(index, 1);
+        }
+        setOrderContent(updatedOrderContent);
+      }
+    }
+    console.log(orderContent);
+  };
+
+  const handlePlus = () => {
+    setQuantity(quantity + 1);
+    const index = orderContent.findIndex(
+      (orderItem) => orderItem.itemId === item.itemId
+    );
+
+    if (index !== -1) {
+      // If item exists in orderContent, update its quantity
+      const updatedOrderContent = [...orderContent];
+      updatedOrderContent[index] = {
+        ...updatedOrderContent[index],
+        Quantity: updatedOrderContent[index].Quantity + 1,
+      };
+      setOrderContent(updatedOrderContent);
+    } else {
+      // If item does not exist in orderContent, add a new entry
+      setOrderContent([...orderContent, { itemId: item.itemId, Quantity: 1 }]);
+    }
+    console.log(orderContent);
+  };
   return (
     <View style={styles.root}>
       <Image
@@ -34,7 +87,7 @@ const MenuItem = ({ item }) => {
               fontWeight: "bold",
             }}
           >
-            20₪
+            {item.price}₪
           </Text>
         </View>
         <View
@@ -45,11 +98,11 @@ const MenuItem = ({ item }) => {
             width: "50%",
           }}
         >
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleMinus}>
             <Icon name="minussquare" style={styles.icon} size={25} />
           </TouchableOpacity>
-          <Text style={{ marginHorizontal: 5 }}>2</Text>
-          <TouchableOpacity>
+          <Text style={{ marginHorizontal: 5 }}>{quantity}</Text>
+          <TouchableOpacity onPress={handlePlus}>
             <Icon name="plussquare" style={styles.icon} size={25} />
           </TouchableOpacity>
         </View>
@@ -75,7 +128,8 @@ const MenuItem = ({ item }) => {
 const styles = StyleSheet.create({
   root: {
     marginHorizontal: 10,
-    marginTop: 10,
+    marginTop: 2,
+    marginBottom: 10,
     backgroundColor: "white",
     borderRadius: 25,
     elevation: 10,
