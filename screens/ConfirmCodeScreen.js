@@ -12,38 +12,38 @@ import Logo from "../assets/Logo2.png";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
-
+import { useNavigation } from "@react-navigation/native";
 const validate = Yup.object().shape({
   verifyCode: Yup.string().required(
     "❌ Please Enter the code you have received"
   ),
 });
 
-const handleConfirm = async (values, { resetForm }) => {
-  console.warn(values);
-  try {
-    const response = await axios.post(
-      "http://10.0.2.2:3000/api/v1/unilife/verify",
-      JSON.stringify(values),
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    resetForm();
-    console.log(response.status);
-  } catch (error) {
-    console.error(error.response);
-  }
-};
-
 const onResendPressed = () => {
   console.warn("ok");
 };
 const ConfirmCodeScreen = ({ code = "0597401453" }) => {
   const { height, width } = useWindowDimensions();
+  const navigation = useNavigation();
+  const handleConfirm = async (values, { resetForm }) => {
+    console.warn(values);
+    try {
+      const response = await axios.post(
+        "http://10.0.2.2:3000/api/v1/unilife/verify",
+        JSON.stringify(values),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      resetForm();
+      navigation.navigate("SignIn");
+    } catch (error) {
+      console.error(error.response);
+    }
+  };
   return (
     <Formik
       initialValues={{ verifyCode: "" }}

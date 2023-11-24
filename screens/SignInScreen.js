@@ -16,6 +16,8 @@ import axios from "axios";
 import * as Keychain from "react-native-keychain";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
+import { useUser } from "../Contexts/UserContext";
+import { useContext } from "react";
 const SignInSchema = Yup.object().shape({
   email: Yup.string()
     .required("❌ Please enter your email")
@@ -31,6 +33,7 @@ const SignInScreen = () => {
   const { height, width } = useWindowDimensions();
   const [errorMsg, setErrorMsg] = useState("");
 
+  const { userId, setUserId } = useUser();
   const onForgotPasswordPressed = () => {
     console.warn("forgot password");
   };
@@ -80,8 +83,9 @@ const SignInScreen = () => {
         }
       );
       await storeTokenInKeychain(response.data.token);
-      const token = await getTokenFromKeychain();
+
       setErrorMsg("");
+      setUserId(response.data.data.id);
       navigation.navigate("Schedule");
     } catch (error) {
       if (error.response) {

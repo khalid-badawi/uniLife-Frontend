@@ -60,6 +60,7 @@ const menuItems = [
 ];
 const RestaurantScreen = () => {
   const [search, setSearch] = useState("");
+  const [orderContent, setOrderContent] = useState([]);
   const uniqueCategories = [
     "All",
     ...Array.from(new Set(menuItems.map((item) => item.catigory))),
@@ -76,7 +77,6 @@ const RestaurantScreen = () => {
   }
   const filteredMenu = filterItemsByCategory(menuItems, selectedCategory);
 
-  const [orderContent, setOrderContent] = useState([]);
   return (
     <View style={styles.root}>
       <View style={{ flexDirection: "row", marginTop: 20, width: "100%" }}>

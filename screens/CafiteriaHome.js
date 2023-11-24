@@ -6,6 +6,7 @@ import { FlatList } from "react-native";
 import { ScrollView, TextInput } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { TouchableOpacity } from "react-native";
+import { useEffect } from "react";
 const restaurants = [
   {
     title: "Cuisine Delight",
@@ -34,6 +35,7 @@ const restaurants = [
     description: "Fresh seafood served with a side of ocean views.",
   },
 ];
+
 const CafiteriaHome = () => {
   return (
     <View style={styles.root}>
