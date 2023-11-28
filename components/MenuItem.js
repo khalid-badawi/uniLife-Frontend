@@ -1,26 +1,28 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import test from "../assets/test.jpg";
 import test2 from "../assets/test2.png";
 import Icon from "react-native-vector-icons/AntDesign";
+import ItemDetails from "./ItemDetails";
+import CustomButton from "./CustomButton";
 
 const MenuItem = ({ item, setOrderContent, orderContent }) => {
-  const [quantity, setQuantity] = useState(() => {
+  const [quantity, setQuantity] = useState(0);
+  useEffect(() => {
     const foundItem = orderContent.find(
       (orderItem) => orderItem.itemId === item.itemId
     );
-    if (foundItem) {
-      return foundItem.Quantity;
-    } else {
-      return 0;
-    }
-  });
+    setQuantity(foundItem ? foundItem.Quantity : 0);
+  }, [orderContent]);
+  const [isModalVisible, setModalVisible] = useState(false);
+
   const handleMinus = () => {
     if (quantity > 0) {
       setQuantity(quantity - 1);
       const index = orderContent.findIndex(
         (orderItem) => orderItem.itemId === item.itemId
       );
+
       if (index !== -1) {
         // If item exists in orderContent, update its quantity or remove if quantity is 1
         const updatedOrderContent = [...orderContent];
@@ -54,7 +56,15 @@ const MenuItem = ({ item, setOrderContent, orderContent }) => {
       setOrderContent(updatedOrderContent);
     } else {
       // If item does not exist in orderContent, add a new entry
-      setOrderContent([...orderContent, { itemId: item.itemId, Quantity: 1 }]);
+      setOrderContent([
+        ...orderContent,
+        {
+          itemId: item.itemId,
+          Quantity: 1,
+          price: item.price,
+          itemName: item.itemName,
+        },
+      ]);
     }
     console.log(orderContent);
   };
@@ -114,7 +124,10 @@ const MenuItem = ({ item, setOrderContent, orderContent }) => {
             justifyContent: "flex-end",
           }}
         >
-          <TouchableOpacity style={{ flexDirection: "row" }}>
+          <TouchableOpacity
+            style={{ flexDirection: "row" }}
+            onPress={() => setModalVisible(true)}
+          >
             <Text style={{ fontSize: 16, fontWeight: "600", color: "#8F00FF" }}>
               details
             </Text>
@@ -122,6 +135,14 @@ const MenuItem = ({ item, setOrderContent, orderContent }) => {
           </TouchableOpacity>
         </View>
       </View>
+
+      <ItemDetails
+        isVisible={isModalVisible}
+        closeModal={() => {
+          setModalVisible(false);
+        }}
+        item={item}
+      />
     </View>
   );
 };
@@ -133,9 +154,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 25,
     elevation: 10,
-    shadowRadius: 6,
-    shadowOffset: { height: 6, width: 0 },
-    shadowOpacity: 0.1,
+
     paddingBottom: 10,
     width: "90%",
     alignSelf: "center",

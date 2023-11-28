@@ -10,6 +10,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import CustomButton from "../components/CustomButton";
 import { BlurView } from "@react-native-community/blur";
 import Animated, { FadeOutDown, FadeInUp } from "react-native-reanimated";
+import { useNavigation } from "@react-navigation/native";
 
 const menuItems = [
   {
@@ -59,6 +60,8 @@ const menuItems = [
   // Add more items as needed
 ];
 const RestaurantScreen = () => {
+  const navigation = useNavigation();
+
   const [search, setSearch] = useState("");
   const [orderContent, setOrderContent] = useState([]);
   const uniqueCategories = [
@@ -68,6 +71,7 @@ const RestaurantScreen = () => {
   const [selectedCategory, setSelectedCategory] = useState(uniqueCategories[0]);
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
+    setSearch("");
   };
   function filterItemsByCategory(items, selectedCategory) {
     if (selectedCategory === "All") {
@@ -76,6 +80,13 @@ const RestaurantScreen = () => {
     return items.filter((item) => item.catigory === selectedCategory);
   }
   const filteredMenu = filterItemsByCategory(menuItems, selectedCategory);
+  const filteredMenuItems = filteredMenu.filter((item) =>
+    item.itemName.toLowerCase().includes(search.toLowerCase())
+  );
+  const totalPrice = orderContent.reduce(
+    (acc, item) => acc + item.Quantity * item.price,
+    0
+  );
 
   return (
     <View style={styles.root}>
@@ -91,8 +102,7 @@ const RestaurantScreen = () => {
         {/* Wrap the content inside TouchableOpacity */}
         <TouchableOpacity
           onPress={() => {
-            // Handle onPress action
-            console.log("My Orders pressed");
+            navigation.navigate("MyOrders");
           }}
           style={{ position: "absolute", right: 12, flexDirection: "row" }}
         >
@@ -140,7 +150,7 @@ const RestaurantScreen = () => {
       </View>
       <View style={{ flex: 1 }}>
         <FlatList
-          data={filteredMenu}
+          data={filteredMenuItems}
           renderItem={({ item }) => (
             <MenuItem
               item={item}
@@ -149,6 +159,9 @@ const RestaurantScreen = () => {
             />
           )}
           keyExtractor={(item) => item.itemId}
+          contentContainerStyle={{
+            paddingBottom: orderContent.length !== 0 ? 120 : 0,
+          }}
         />
       </View>
       {orderContent.length !== 0 && (
@@ -162,11 +175,19 @@ const RestaurantScreen = () => {
             overlayColor=""
             style={{ ...StyleSheet.absoluteFillObject }}
             blurType="light"
-            blurAmount={2}
+            blurAmount={1}
             reducedTransparencyFallbackColor="white"
           />
-          <View style={{ width: "70%", opacity: 1 }}>
-            <CustomButton text="Order" />
+          <View style={{ width: "70%" }}>
+            <CustomButton
+              text="Order"
+              onPress={() =>
+                navigation.navigate("CheckOut", {
+                  data: orderContent,
+                  price: totalPrice,
+                })
+              }
+            />
           </View>
           <Text
             style={{
@@ -179,8 +200,23 @@ const RestaurantScreen = () => {
               borderRadius: 20,
             }}
           >
-            <Text style={{ color: "#8F00FF" }}>Total Price</Text>:20₪
+            <Text style={{ color: "#8F00FF" }}>Total Price:</Text>
+            {totalPrice}₪
           </Text>
+          {/* <View
+            style={{
+              position: "absolute",
+              right: 10,
+              bottom: 5,
+              backgroundColor: "white",
+            }}
+          >
+            <CustomButton
+              text="Reset"
+              type="Tertiary"
+              onPress={() => setOrderContent([])}
+            />
+          </View> */}
         </Animated.View>
       )}
     </View>

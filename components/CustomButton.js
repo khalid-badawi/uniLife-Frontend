@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#8F00FF",
     padding: 15,
     width: "100%",
-    borderRadius: 20,
+    borderRadius: 30,
   },
   containerTertiary: {
     backgroundColor: "transparent",

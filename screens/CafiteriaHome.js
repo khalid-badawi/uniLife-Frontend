@@ -1,12 +1,61 @@
 import { View, Text, StyleSheet } from "react-native";
 import React, { useState } from "react";
 import RestCard from "../components/RestCard";
-import MenuItem from "../components/MenuItem";
+import PopularMeal from "../components/PopularMeal";
 import { FlatList } from "react-native";
 import { ScrollView, TextInput } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { TouchableOpacity } from "react-native";
 import { useEffect } from "react";
+
+const menuItems = [
+  {
+    itemId: "1",
+    itemName: "Classic Burger",
+    itemDescription: "Juicy beef patty with lettuce, tomato, and cheese",
+    price: 9.99,
+    catigory: "Meals",
+  },
+  {
+    itemId: "2",
+    itemName: "Chicken Shawarma Wrap",
+    itemDescription:
+      "Grilled chicken with garlic sauce and veggies wrapped in pita",
+    price: 12.99,
+    catigory: "Sandwiches",
+  },
+  {
+    itemId: "3",
+    itemName: "Margherita Pizza",
+    itemDescription: "Classic pizza with fresh mozzarella, tomatoes, and basil",
+    price: 10.99,
+    catigory: "Special",
+  },
+  {
+    itemId: "4",
+    itemName: "Classic Burger",
+    itemDescription: "Juicy beef patty with lettuce, tomato, and cheese",
+    price: 9.99,
+    catigory: "Meals",
+  },
+  {
+    itemId: "12",
+    itemName: "Chicken Shawarma Wrap",
+    itemDescription:
+      "Grilled chicken with garlic sauce and veggies wrapped in pita",
+    price: 12.99,
+    catigory: "Sandwiches",
+  },
+  {
+    itemId: "9",
+    itemName: "Margherita Pizza",
+    itemDescription: "Classic pizza with fresh mozzarella, tomatoes, and basil",
+    price: 10.99,
+    catigory: "Special",
+  },
+  // Add more items as needed
+];
+
 const restaurants = [
   {
     title: "Cuisine Delight",
@@ -40,10 +89,10 @@ const CafiteriaHome = () => {
   return (
     <View style={styles.root}>
       <View style={{ flexDirection: "row", marginTop: 20, width: "100%" }}>
-        <Text style={{ ...styles.title, color: "#8F0FF0" }}>
+        <Text style={styles.title}>
           Hello,{" "}
           <Text
-            style={{ ...styles.title, color: "#8F0FF0", fontWeight: "1000" }}
+            style={{ ...styles.title, color: "#8F0FF0", fontWeight: "bold" }}
           >
             Ahmad
           </Text>
@@ -72,9 +121,7 @@ const CafiteriaHome = () => {
       </View> */}
       <View
         style={{
-          height: "55%",
-          borderBottomColor: "#8F0FF0",
-          borderBottomWidth: 1,
+          height: "45%",
         }}
       >
         <View style={{ height: "99%" }}>
@@ -82,10 +129,19 @@ const CafiteriaHome = () => {
             data={restaurants}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => <RestCard {...item} />}
+            contentContainerStyle={{ marginBottom: 10 }}
           />
         </View>
       </View>
-      <Text style={styles.title}>Popular Meals ️‍🔥</Text>
+      <Text style={{ ...styles.title, fontWeight: "bold", marginTop: 5 }}>
+        Popular Meals ️‍🔥
+      </Text>
+      <FlatList
+        horizontal
+        data={menuItems}
+        keyExtractor={(item) => item.itemId}
+        renderItem={({ item }) => <PopularMeal item={item} />}
+      />
     </View>
   );
 };

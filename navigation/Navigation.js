@@ -16,6 +16,8 @@ import { Header } from "react-native-elements";
 import IndoorQR from "../screens/IndoorQR";
 import CafiteriaHome from "../screens/CafiteriaHome";
 import RestaurantScreen from "../screens/RestaurantScreen";
+import CheckOut from "../screens/CheckOut";
+import MyOrders from "../screens/MyOrders";
 const Stack = createNativeStackNavigator();
 
 export default function Navigation() {
@@ -24,7 +26,7 @@ export default function Navigation() {
       <Stack.Navigator
         initialRouteName="RestaurantScreen"
         screenOptions={({ navigation }) => ({
-          headerShown: true,
+          headerShown: false,
           headerTitleAlign: "center",
           headerLeft: () => (
             <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -39,10 +41,12 @@ export default function Navigation() {
           options={{ headerShown: false }}
         />
         <Stack.Screen name="SignUp" component={SignUpScreen} />
+        <Stack.Screen name="MyOrders" component={MyOrders} />
         <Stack.Screen name="ForgotPW" component={ForgotPasswordScreen} />
         <Stack.Screen name="ResetPW" component={ResetPasswordScreen} />
         <Stack.Screen name="ConfirmCode" component={ConfirmCodeScreen} />
         <Stack.Screen name="RestaurantScreen" component={RestaurantScreen} />
+        <Stack.Screen name="CheckOut" component={CheckOut} />
         <Stack.Screen
           name="Schedule"
           component={ScheduleScreen}
