@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "888008442105",
+    "project_id": "unilife1-e80d9",
+    "storage_bucket": "unilife1-e80d9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:888008442105:android:8adef4f0ed3567f3ce6228",
+        "android_client_info": {
+          "package_name": "com.anonymous.uniLife"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD482Y0m3Sx4fSzsACFv-vhIRj6rxXlD70"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

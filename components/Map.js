@@ -1,14 +1,11 @@
 import React, { useState, Component, useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import Mapbox from "@rnmapbox/maps";
-import Geolocation from "react-native-geolocation-service";
-import { RoutingApi, Configuration, RouteRequest } from "@stadiamaps/api";
-import CustomButton from "./CustomButton";
+
 // Will be null for most users (only Mapbox authenticates this way).
 // Required on Android. See Android installation notes.
 import { PermissionsAndroid } from "react-native";
-const routeData = require("../data/routeData.json");
-const KEY = "a02969d3-9209-42cc-82f9-5c57b3394ca4";
+
 Mapbox.setWellKnownTileServer("Mapbox");
 Mapbox.setAccessToken(
   "pk.eyJ1IjoiajFyZW4iLCJhIjoiY2xvcm9zdm85MHY5czJrbzZrdXI1amZmMSJ9.UW9QsP8ErGFgGNctDwoG5w"
