@@ -90,7 +90,7 @@ const RestaurantScreen = () => {
 
   return (
     <View style={styles.root}>
-      <View style={{ flexDirection: "row", marginTop: 20, width: "100%" }}>
+      <View style={{ flexDirection: "row", width: "100%" }}>
         <Text style={{ ...styles.title }}>
           Welcome,{" "}
           <Text

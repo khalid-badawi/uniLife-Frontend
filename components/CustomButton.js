@@ -1,8 +1,15 @@
 import React from "react";
 import { Text, StyleSheet, TouchableOpacity } from "react-native";
-const CustomButton = ({ onPress, text, color, type = "Primary" }) => {
+const CustomButton = ({
+  onPress,
+  text,
+  color,
+  type = "Primary",
+  disabled = false,
+}) => {
   return (
     <TouchableOpacity
+      disabled={disabled}
       onPress={onPress}
       style={[styles.container, styles[`container${type}`]]}
     >

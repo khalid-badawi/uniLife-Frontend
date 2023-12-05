@@ -86,7 +86,7 @@ const SignInScreen = () => {
 
       setErrorMsg("");
       setUserId(response.data.data.id);
-      navigation.navigate("Schedule");
+      navigation.navigate("ChatScreen");
     } catch (error) {
       if (error.response) {
         setErrorMsg(error.response.data.message);

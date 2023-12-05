@@ -1,6 +1,6 @@
 import React from "react";
 
-import { View, StyleSheet, StatusBar } from "react-native";
+import { View, StyleSheet, StatusBar, Text } from "react-native";
 import Navigation from "./navigation/Navigation";
 import { UserProvider } from "./Contexts/UserContext";
 
@@ -17,8 +17,6 @@ const App = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "white",
-    justifyContent: "center",
     flex: 1,
   },
 });

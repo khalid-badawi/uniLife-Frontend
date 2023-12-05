@@ -2,13 +2,23 @@ import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import Icon from "react-native-vector-icons/AntDesign";
 import { TouchableOpacity } from "react-native";
-const CustomHeader = ({ onPress, text }) => {
+import CustomButton from "./CustomButton";
+const CustomHeader = ({ onPress, text, type, handleButtonPress, BtnText }) => {
   return (
     <View style={styles.root}>
       <TouchableOpacity onPress={onPress}>
         <Icon name="back" style={styles.icon} size={25} />
       </TouchableOpacity>
-      <Text style={styles.txt}>{text}</Text>
+      <Text style={{ ...styles.txt, flex: 1, textAlign: "center" }}>
+        {text}
+      </Text>
+      {BtnText && (
+        <View style={styles.Button}>
+          <TouchableOpacity onPress={handleButtonPress}>
+            <Text style={{ ...styles.txt, color: "#8F00FF" }}>{BtnText}</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };
@@ -16,17 +26,24 @@ const CustomHeader = ({ onPress, text }) => {
 const styles = StyleSheet.create({
   root: {
     flexDirection: "row",
-    padding: 15,
+    justifyContent: "space-between",
+    alignItems: "center", // Center the items vertically
+    paddingBottom: 15,
+    paddingHorizontal: 15,
     elevation: 5,
     backgroundColor: "#fff",
+    marginBottom: 5,
   },
   icon: {
-    marginRight: 10,
     fontWeight: "bold",
   },
   txt: {
     fontSize: 18,
     fontWeight: "500",
   },
+  Button: {
+    justifyContent: "flex-end",
+  },
 });
+
 export default CustomHeader;

@@ -43,7 +43,7 @@ const CheckOut = ({ navigation, route }) => {
           style={{ textAlignVertical: "top" }}
           multiline={true}
           numberOfLines={4}
-          onChangeText={(text) => setNotes({ text })}
+          onChangeText={(text) => setNotes(text)}
           value={notes}
           placeholder="Any Notes?"
         />

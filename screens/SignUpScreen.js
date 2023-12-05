@@ -25,6 +25,7 @@ import Animated, {
   FadeInUp,
   BounceInDown,
 } from "react-native-reanimated";
+import CustomPicker from "../components/CustomPicker";
 const SignupSchema = Yup.object().shape({
   username: Yup.string()
     .min(3, "❌ Too Short!")
@@ -52,6 +53,7 @@ const SignupSchema = Yup.object().shape({
     .matches(/^[0-9]+$/, "❌ Use digits only")
     .min(10, "❌ Must be exactly 10 digits")
     .max(10, "❌ Must be exactly 10 digits"),
+  major: Yup.string().required("❌Please Choose your major"),
 });
 
 const SignUpScreen = () => {
@@ -69,6 +71,7 @@ const SignUpScreen = () => {
           },
         }
       );
+      console.log(values);
       console.log(response.status);
       navigation.navigate("ConfirmCode");
     } catch (error) {
@@ -99,6 +102,7 @@ const SignUpScreen = () => {
         password: "",
         confirmPassword: "",
         phoneNum: "",
+        major: "",
       }}
       onSubmit={(values) => {
         handleSubmit(values);
@@ -208,6 +212,16 @@ const SignUpScreen = () => {
                   iconName={"phone"}
                   keyboardType="phone-pad"
                   onBlur={() => setFieldTouched("phoneNum")}
+                />
+              </Animated.View>
+              <Animated.View
+                style={{ ...styles.animInput, flexDirection: "row" }}
+                entering={FadeInDown.delay(250).duration(1000).springify()}
+              >
+                <CustomPicker
+                  value={values.major}
+                  errors={errors.major}
+                  onValueChange={handleChange("major")}
                 />
               </Animated.View>
               <Animated.View

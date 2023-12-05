@@ -18,13 +18,16 @@ import CafiteriaHome from "../screens/CafiteriaHome";
 import RestaurantScreen from "../screens/RestaurantScreen";
 import CheckOut from "../screens/CheckOut";
 import MyOrders from "../screens/MyOrders";
+import CreatePost from "../screens/CreatePost";
+import PostsMainScreen from "../screens/PostsMainScreen";
+import ChatScreen from "../screens/ChatScreen";
 const Stack = createNativeStackNavigator();
 
 export default function Navigation() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="RestaurantScreen"
+        initialRouteName="SignIn"
         screenOptions={({ navigation }) => ({
           headerShown: false,
           headerTitleAlign: "center",
@@ -45,8 +48,11 @@ export default function Navigation() {
         <Stack.Screen name="ForgotPW" component={ForgotPasswordScreen} />
         <Stack.Screen name="ResetPW" component={ResetPasswordScreen} />
         <Stack.Screen name="ConfirmCode" component={ConfirmCodeScreen} />
+        <Stack.Screen name="PostsMain" component={PostsMainScreen} />
         <Stack.Screen name="RestaurantScreen" component={RestaurantScreen} />
         <Stack.Screen name="CheckOut" component={CheckOut} />
+        <Stack.Screen name="ChatScreen" component={ChatScreen} />
+        <Stack.Screen name="CreatePost" component={CreatePost} />
         <Stack.Screen
           name="Schedule"
           component={ScheduleScreen}
