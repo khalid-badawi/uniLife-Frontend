@@ -18,6 +18,8 @@ import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
 import { useUser } from "../Contexts/UserContext";
 import { useContext } from "react";
+import messaging from "@react-native-firebase/messaging";
+
 const SignInSchema = Yup.object().shape({
   email: Yup.string()
     .required("❌ Please enter your email")
@@ -27,7 +29,17 @@ const SignInSchema = Yup.object().shape({
     ),
   password: Yup.string().required("❌ Please enter your password"),
 });
-
+const requestFCMPermission = async () => {
+  try {
+    const permissionStatus = await messaging().requestPermission();
+    if (permissionStatus) {
+      const fcmToken = await messaging().getToken();
+      console.log("fcmToken:", fcmToken);
+    }
+  } catch (error) {
+    console.error("Error requesting FCM permission:", error);
+  }
+};
 const SignInScreen = () => {
   const navigation = useNavigation();
   const { height, width } = useWindowDimensions();
@@ -85,6 +97,7 @@ const SignInScreen = () => {
       await storeTokenInKeychain(response.data.token);
 
       setErrorMsg("");
+      requestFCMPermission();
       setUserId(response.data.data.id);
       navigation.navigate("ChatScreen");
     } catch (error) {
