@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet } from "react-native";
-import React, { useState } from "react";
+import { View, Text, StyleSheet, Alert } from "react-native";
+import React, { useEffect, useState } from "react";
 import RestCard from "../components/RestCard";
 import MenuItem from "../components/MenuItem";
 import { FlatList } from "react-native";
@@ -10,63 +10,36 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import CustomButton from "../components/CustomButton";
 import { BlurView } from "@react-native-community/blur";
 import Animated, { FadeOutDown, FadeInUp } from "react-native-reanimated";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { useUser } from "../Contexts/UserContext";
+import axios from "axios";
+import * as Keychain from "react-native-keychain";
+const getTokenFromKeychain = async () => {
+  try {
+    // Retrieve the token from the keychain
+    const credentials = await Keychain.getGenericPassword();
 
-const menuItems = [
-  {
-    itemId: "1",
-    itemName: "Classic Burger",
-    itemDescription: "Juicy beef patty with lettuce, tomato, and cheese",
-    price: 9.99,
-    catigory: "Meals",
-  },
-  {
-    itemId: "2",
-    itemName: "Chicken Shawarma Wrap",
-    itemDescription:
-      "Grilled chicken with garlic sauce and veggies wrapped in pita",
-    price: 12.99,
-    catigory: "Sandwiches",
-  },
-  {
-    itemId: "3",
-    itemName: "Margherita Pizza",
-    itemDescription: "Classic pizza with fresh mozzarella, tomatoes, and basil",
-    price: 10.99,
-    catigory: "Special",
-  },
-  {
-    itemId: "4",
-    itemName: "Classic Burger",
-    itemDescription: "Juicy beef patty with lettuce, tomato, and cheese",
-    price: 9.99,
-    catigory: "Meals",
-  },
-  {
-    itemId: "12",
-    itemName: "Chicken Shawarma Wrap",
-    itemDescription:
-      "Grilled chicken with garlic sauce and veggies wrapped in pita",
-    price: 12.99,
-    catigory: "Sandwiches",
-  },
-  {
-    itemId: "9",
-    itemName: "Margherita Pizza",
-    itemDescription: "Classic pizza with fresh mozzarella, tomatoes, and basil",
-    price: 10.99,
-    catigory: "Special",
-  },
-  // Add more items as needed
-];
+    if (credentials) {
+      const token = credentials.password;
+      console.log("Token retrieved successfully:", token);
+      return token;
+    } else {
+      console.log("No token found in the keychain");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error retrieving token:", error);
+    return null;
+  }
+};
 const RestaurantScreen = () => {
   const navigation = useNavigation();
-
+  const [menuItems, setMenuItems] = useState([]);
   const [search, setSearch] = useState("");
   const [orderContent, setOrderContent] = useState([]);
   const uniqueCategories = [
     "All",
-    ...Array.from(new Set(menuItems.map((item) => item.catigory))),
+    ...Array.from(new Set(menuItems.map((item) => item.category))),
   ];
   const [selectedCategory, setSelectedCategory] = useState(uniqueCategories[0]);
   const handleCategoryClick = (category) => {
@@ -77,17 +50,63 @@ const RestaurantScreen = () => {
     if (selectedCategory === "All") {
       return items;
     }
-    return items.filter((item) => item.catigory === selectedCategory);
+    return items.filter((item) => item.category === selectedCategory);
   }
   const filteredMenu = filterItemsByCategory(menuItems, selectedCategory);
   const filteredMenuItems = filteredMenu.filter((item) =>
-    item.itemName.toLowerCase().includes(search.toLowerCase())
+    item.nameOfFood.toLowerCase().includes(search.toLowerCase())
   );
   const totalPrice = orderContent.reduce(
     (acc, item) => acc + item.Quantity * item.price,
     0
   );
+  const route = useRoute();
+  const { restaurantId } = route.params;
+  console.log(restaurantId);
+  const { userId } = useUser();
+  const BASE_URL = "http://10.0.2.2:3000/api/v1/unilife";
 
+  useEffect(() => {
+    const getMenu = async () => {
+      try {
+        const token = await getTokenFromKeychain();
+        const response = await axios.get(
+          `${BASE_URL}/menu/${restaurantId}/${userId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // Handle the response data here, for example:
+        const result = response.data.data;
+        setMenuItems(result);
+        console.log(result);
+        //setChat(response.data.data);
+      } catch (error) {
+        if (error.response) {
+          Alert.alert("Error", error.response.data.message);
+        } else if (error.request) {
+          Alert.alert(
+            "Network Error",
+            "There was a problem with the network. Please check your internet connection and try again.",
+            [{ text: "OK" }]
+          );
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          Alert.alert(
+            "Something Wrong",
+            "Something went wrong, try again please",
+            [{ text: "OK" }]
+          );
+        }
+      }
+    };
+    getMenu();
+  }, []);
+  console.log(orderContent.length);
   return (
     <View style={styles.root}>
       <View style={{ flexDirection: "row", width: "100%" }}>
@@ -158,7 +177,7 @@ const RestaurantScreen = () => {
               orderContent={orderContent}
             />
           )}
-          keyExtractor={(item) => item.itemId}
+          keyExtractor={(item) => item.foodId.toString()}
           contentContainerStyle={{
             paddingBottom: orderContent.length !== 0 ? 120 : 0,
           }}
@@ -183,6 +202,7 @@ const RestaurantScreen = () => {
               text="Order"
               onPress={() =>
                 navigation.navigate("CheckOut", {
+                  restaurantId,
                   data: orderContent,
                   price: totalPrice,
                 })
@@ -226,6 +246,7 @@ const styles = StyleSheet.create({
   root: {
     backgroundColor: "white",
     flex: 1,
+    paddingTop: 10,
   },
   title: {
     fontSize: 20,

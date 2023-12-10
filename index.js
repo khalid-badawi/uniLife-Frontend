@@ -1,71 +1,53 @@
 import { registerRootComponent } from "expo";
 
 import App from "./App";
-import messaging from "@react-native-firebase/messaging";
 import PushNotification from "react-native-push-notification";
-
+import messaging from "@react-native-firebase/messaging";
 // Must be outside of any component LifeCycle (such as `componentDidMount`).
 PushNotification.configure({
-  // (optional) Called when Token is generated (iOS and Android)
   onRegister: function (token) {
     console.log("TOKEN:", token);
   },
-
-  // (required) Called when a remote is received or opened, or local notification is opened
   onNotification: function (notification) {
-    console.log("NOTIFICATION:", notification);
+    const notificationTime = new Date(Date.now()).toLocaleString(); // Get the current time in a readable format
+    const notificationMessage = `${notification.message}\n\n${notificationTime}`;
 
-    // process the notification
+    PushNotification.localNotification({
+      channelId: "your-channel-id",
+      title: notification.title,
+      message: notificationMessage,
+    });
 
-    // (required) Called when a remote is received or opened, or local notification is opened
+    // Handle notification in background or when the app is closed
   },
-
-  // (optional) Called when Registered Action is pressed and invokeApp is false, if true onNotification will be called (Android)
   onAction: function (notification) {
     console.log("ACTION:", notification.action);
     console.log("NOTIFICATION:", notification);
-
-    // process the action
   },
-
-  // (optional) Called when the user fails to register for remote notifications. Typically occurs when APNS is having issues, or the device is a simulator. (iOS)
   onRegistrationError: function (err) {
     console.error(err.message, err);
   },
-
-  // IOS ONLY (optional): default: all - Permissions to register.
   permissions: {
     alert: true,
     badge: true,
     sound: true,
   },
-
-  // Should the initial notification be popped automatically
-  // default: true
   popInitialNotification: true,
-
-  /**
-   * (optional) default: true
-   * - Specified if permissions (ios) and token (android and ios) will requested or not,
-   * - if not, you must call PushNotificationsHandler.requestPermissions() later
-   * - if you are not using remote notification or do not have Firebase installed, use this:
-   *     requestPermissions: Platform.OS === 'ios'
-   */
   requestPermissions: true,
 });
 PushNotification.createChannel(
   {
-    channelId: "default-channel",
-    channelName: "Default Channel",
-    channelDescription: "A default notification channel",
-    playSound: true,
+    channelId: "your-channel-id", // Set your own unique channel ID
+    channelName: "Your Channel Name",
+    channelDescription: "A channel to categorize your notifications",
     soundName: "default",
-    importance: 4, // Adjust the importance level as needed (4 is high)
+    importance: 4, // Set the importance level (0 - 4)
     vibrate: true,
   },
-  (created) => console.log(`createChannel returned '${created}'`)
+  (created) => console.log(`Channel created: ${created}`)
 );
 messaging().setBackgroundMessageHandler(async (remoteMessage) => {
   console.log("Message handled in the background!", remoteMessage);
 });
+
 registerRootComponent(App);

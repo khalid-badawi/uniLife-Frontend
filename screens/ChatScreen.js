@@ -10,6 +10,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Keyboard,
+  Image,
 } from "react-native";
 import CustomHeader from "../components/CustomHeader";
 import io from "socket.io-client";
@@ -20,6 +21,8 @@ import Icon from "react-native-vector-icons/Feather";
 import EmojiSelector, { Categories } from "react-native-emoji-selector";
 import messaging from "@react-native-firebase/messaging";
 import PushNotification from "react-native-push-notification";
+import { useRoute } from "@react-navigation/native";
+import * as FileSystem from "expo-file-system";
 
 const socket = io.connect("http://192.168.1.2:3000");
 const sampleMessages = [
@@ -55,12 +58,47 @@ const ChatScreen = () => {
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState([]);
   const [showEmojiSelector, setShowEmojiSelector] = useState(false);
-
+  const [receivedImage, setReceivedImage] = useState(null);
   const { userId } = useUser();
   const currentUserId = userId;
+  const { recieverId } = useRoute();
   const recieverUser = currentUserId === 1 ? 2 : 1;
   const messageId = chat.length + 1;
   console.log(currentUserId, recieverUser);
+
+  useEffect(() => {
+    const convertImageToBase64 = async () => {
+      const imageUrl =
+        "https://firebasestorage.googleapis.com/v0/b/unilife-1b22d.appspot.com/o/images%2FBooks%2F4_image.jpeg?alt=media&token=8e872bf8-9d16-46d0-830d-6cb6f9e90743";
+
+      try {
+        const { uri } = await FileSystem.downloadAsync(
+          imageUrl,
+          FileSystem.documentDirectory + "image.jpg"
+        );
+
+        const base64 = await FileSystem.readAsStringAsync(uri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+
+        const senderId = currentUserId;
+        const receiverId = recieverUser;
+
+        socket.emit("imageMessage", {
+          senderId,
+          receiverId,
+          image: base64,
+        });
+
+        // Delete the image file after sending
+        await FileSystem.deleteAsync(uri, { idempotent: true });
+      } catch (error) {
+        console.error("Error converting image to base64:", error);
+      }
+    };
+
+    convertImageToBase64();
+  }, []);
 
   useEffect(() => {
     const getMessages = async () => {
@@ -154,48 +192,6 @@ const ChatScreen = () => {
     };
   }, []);
 
-  //notification
-  async function requestUserPermission() {
-    const authStatus = await messaging().requestPermission();
-    const enabled =
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-    if (enabled) {
-      console.log("Auth Status:", authStatus);
-    }
-  }
-  const NotificationListner = () => {
-    messaging().onNotificationOpenedApp((remoteMessage) => {
-      console.log(
-        "Notification caused app to open from background state:",
-        remoteMessage.notification
-      );
-    });
-    messaging()
-      .getInitialNotification()
-      .then((remoteMessage) => {
-        if (remoteMessage) {
-          console.log(
-            "Notification caused app to open from quit state:",
-            remoteMessage.notification
-          );
-        }
-      });
-
-    messaging().onMessage(async (remoteMessage) => {
-      console.log("notification on forground...", remoteMessage.data);
-      PushNotification.localNotification({
-        title: remoteMessage.notification.title,
-        message: remoteMessage.notification.body,
-        channelId: "default-channel", // Add this line
-      });
-    });
-  };
-  useEffect(() => {
-    requestUserPermission();
-    NotificationListner();
-  }, []);
-
   //notificationEnd
   useEffect(() => {
     socket.connect();
@@ -203,6 +199,10 @@ const ChatScreen = () => {
       // Create a new message object with the same structure as the existing messages
       const newMessage = { senderId, text: message, createdAt: Date.now() };
       setChat((prevChat) => [newMessage, ...prevChat]);
+    });
+    socket.on("imageMessage", ({ image, senderId }) => {
+      setReceivedImage(image);
+      console.log(image);
     });
 
     // Cleanup on component unmount
@@ -332,12 +332,15 @@ const ChatScreen = () => {
   };
   return (
     <View style={styles.container}>
-      <CustomHeader text="Ahmad" />
       <FlatList
         data={[...chat]}
         renderItem={renderMessageItem}
         keyExtractor={(_, index) => index.toString()}
         inverted
+      />
+      <Image
+        source={{ uri: `data:image/jpeg;base64,${receivedImage}` }}
+        style={{ width: 200, height: 200 }}
       />
       <View style={styles.inputContainer}>
         <TouchableOpacity
@@ -387,6 +390,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     backgroundColor: "white",
+    paddingTop: 10,
   },
   messageContainer: {
     flexDirection: "row",

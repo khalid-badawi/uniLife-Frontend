@@ -12,7 +12,7 @@ const truncateText = (text, limit) => {
     return text;
   }
 };
-const RestCard = ({ visitRest, title, rating, description }) => {
+const RestCard = ({ visitRest, username, image }) => {
   const desc =
     "asdljksads sadl sakjdjladasdsad ksad ljksad lkasdl ksad lkjsad lksadj lsakdj lksadj aslkdj salkdj aslkjd saldj  sa dlksad jsad lsakd jsaldk jsalkd ";
   const truncatedDescription = truncateText(desc, 8); // Change 10 to your desired word limit
@@ -21,13 +21,13 @@ const RestCard = ({ visitRest, title, rating, description }) => {
     <Pressable onPress={visitRest}>
       <View style={styles.root}>
         <Image
-          source={test}
+          source={{ uri: image }}
           style={styles.img} // Fixed style object
           resizeMode="contain"
         />
 
         <View style={styles.textCont}>
-          <Text style={styles.mainTxt}>Friesday</Text>
+          <Text style={styles.mainTxt}>{username}</Text>
 
           <Text style={{ flex: 1, flexWrap: "wrap" }}>
             {truncatedDescription}
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     backgroundColor: "white",
     borderRadius: 25,
-
+    marginBottom: 5,
     elevation: 10,
 
     height: 105,

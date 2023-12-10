@@ -30,9 +30,8 @@ const styles = StyleSheet.create({
     alignItems: "center", // Center the items vertically
     paddingBottom: 15,
     paddingHorizontal: 15,
+    backgroundColor: "white",
     elevation: 5,
-    backgroundColor: "#fff",
-    marginBottom: 5,
   },
   icon: {
     fontWeight: "bold",

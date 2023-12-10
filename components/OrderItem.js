@@ -2,34 +2,22 @@ import { View, Text, StyleSheet, FlatList } from "react-native";
 import React from "react";
 import MenuRow from "./MenuRow";
 import CustomHeader from "./CustomHeader";
-const data = [
-  { Quantity: 1, itemId: "1", itemName: "Classic Burger", price: 9.99 },
-  { Quantity: 2, itemId: "2", itemName: "Chicken Shawarma Wrap", price: 12.99 },
-  { Quantity: 2, itemId: "3", itemName: "Margherita Pizza", price: 10.99 },
-  { Quantity: 2, itemId: "4", itemName: "Classic Burger", price: 9.99 },
-  {
-    Quantity: 1,
-    itemId: "12",
-    itemName: "Chicken Shawarma Wrap",
-    price: 12.99,
-  },
-  { Quantity: 1, itemId: "9", itemName: "Margherita Pizza", price: 10.99 },
-];
-const OrderItem = ({ navigation }) => {
+
+const OrderItem = ({ item }) => {
   return (
     <View style={styles.root}>
       <View style={styles.card}>
         <View style={{ flexDirection: "row", marginVertical: 5 }}>
           <Text style={styles.mainTxt}>Ordered By: </Text>
-          <Text style={styles.descTxt}>Sa7eeta</Text>
+          <Text style={styles.descTxt}>{item.restaurantName}</Text>
         </View>
         <View style={{ flexDirection: "row", marginVertical: 5 }}>
           <Text style={styles.mainTxt}>Ordered ID: </Text>
-          <Text style={styles.descTxt}>105</Text>
+          <Text style={styles.descTxt}>{item.orderId}</Text>
         </View>
         <View style={{ flexDirection: "row", marginVertical: 5 }}>
           <Text style={styles.mainTxt}>Ordered On: </Text>
-          <Text style={styles.descTxt}>17-6-2023</Text>
+          <Text style={styles.descTxt}>{item.createdAt}</Text>
         </View>
         <View
           style={{
@@ -42,23 +30,39 @@ const OrderItem = ({ navigation }) => {
           <Text style={styles.mainTxt}>Content: </Text>
           <View>
             <FlatList
-              data={data}
+              data={item.items}
               renderItem={({ item }) => (
                 <MenuRow
-                  itemText={item.itemName}
-                  quantity={item.Quantity}
+                  itemText={item.nameOfFood}
+                  quantity={item.Qauntity}
                   color="black"
                 />
               )}
-              keyExtractor={(item) => item.itemId}
+              keyExtractor={(item) => item.nameOfFood}
               persistentScrollbar={true}
               scrollIndicatorInsets={{ color: "blue" }}
             />
           </View>
         </View>
-        <View style={{ flexDirection: "row", marginVertical: 10 }}>
-          <Text style={styles.mainTxt}>Status: </Text>
-          <Text style={{ ...styles.descTxt, color: "green" }}>Ready</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            marginVertical: 10,
+            justifyContent: "space-between",
+          }}
+        >
+          <Text
+            style={{ ...styles.descTxt, color: "green", fontWeight: "bold" }}
+          >
+            <Text style={styles.mainTxt}>Status: </Text>
+            {item.status}
+          </Text>
+
+          <Text
+            style={{ ...styles.descTxt, color: "black", fontWeight: "bold" }}
+          >
+            {item.totalPrice}₪
+          </Text>
         </View>
       </View>
     </View>

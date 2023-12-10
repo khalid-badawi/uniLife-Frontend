@@ -10,7 +10,7 @@ const MenuItem = ({ item, setOrderContent, orderContent }) => {
   const [quantity, setQuantity] = useState(0);
   useEffect(() => {
     const foundItem = orderContent.find(
-      (orderItem) => orderItem.itemId === item.itemId
+      (orderItem) => orderItem.itemId === item.foodId
     );
     setQuantity(foundItem ? foundItem.Quantity : 0);
   }, [orderContent]);
@@ -20,7 +20,7 @@ const MenuItem = ({ item, setOrderContent, orderContent }) => {
     if (quantity > 0) {
       setQuantity(quantity - 1);
       const index = orderContent.findIndex(
-        (orderItem) => orderItem.itemId === item.itemId
+        (orderItem) => orderItem.itemId === item.foodId
       );
 
       if (index !== -1) {
@@ -43,7 +43,7 @@ const MenuItem = ({ item, setOrderContent, orderContent }) => {
   const handlePlus = () => {
     setQuantity(quantity + 1);
     const index = orderContent.findIndex(
-      (orderItem) => orderItem.itemId === item.itemId
+      (orderItem) => orderItem.itemId === item.foodId
     );
 
     if (index !== -1) {
@@ -59,24 +59,23 @@ const MenuItem = ({ item, setOrderContent, orderContent }) => {
       setOrderContent([
         ...orderContent,
         {
-          itemId: item.itemId,
+          itemId: item.foodId,
           Quantity: 1,
           price: item.price,
-          itemName: item.itemName,
+          itemName: item.nameOfFood,
         },
       ]);
     }
-    console.log(orderContent);
   };
   return (
     <View style={styles.root}>
       <Image
-        source={test2}
+        source={{ uri: item.image }}
         style={styles.img} // Fixed style object
         resizeMode="stretch"
       />
-      <Text style={styles.mainTxt}>{item.itemName}</Text>
-      <Text style={styles.descTxt}>{item.itemDescription}</Text>
+      <Text style={styles.mainTxt}>{item.nameOfFood}</Text>
+      <Text style={styles.descTxt}>{item.description}</Text>
       <View
         style={{
           flexDirection: "row",
@@ -137,6 +136,7 @@ const MenuItem = ({ item, setOrderContent, orderContent }) => {
       </View>
 
       <ItemDetails
+        key={item.foodId} // Add a unique key prop
         isVisible={isModalVisible}
         closeModal={() => {
           setModalVisible(false);
@@ -164,8 +164,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     width: "60%",
     height: 170,
-
-    marginVertical: 0,
+    marginVertical: 10,
   },
   textCont: {
     width: "100%",

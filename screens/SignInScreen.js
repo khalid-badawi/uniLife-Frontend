@@ -99,7 +99,7 @@ const SignInScreen = () => {
       setErrorMsg("");
       requestFCMPermission();
       setUserId(response.data.data.id);
-      navigation.navigate("ChatScreen");
+      navigation.navigate("Main");
     } catch (error) {
       if (error.response) {
         setErrorMsg(error.response.data.message);

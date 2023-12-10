@@ -8,6 +8,7 @@ import PickImage from "../components/PickImage";
 import axios from "axios";
 import * as Keychain from "react-native-keychain";
 import { useUser } from "../Contexts/UserContext";
+import { useNavigation } from "@react-navigation/native";
 const RAPIDAPI_HOST = "investing-cryptocurrency-markets.p.rapidapi.com";
 const RAPIDAPI_KEY = "3bd39bcb8dmshb5db9a8e916f20dp198b41jsn95ca2c49a7d2";
 const majors = [
@@ -52,6 +53,7 @@ const CreatePost = () => {
   const [relatedMajors, setRelatedMajors] = useState([]);
   const [image, setImage] = useState(null);
   const { userId } = useUser();
+  const navigation = useNavigation();
 
   const handleMajorChange = (major) => {
     console.log(major);
@@ -135,6 +137,7 @@ const CreatePost = () => {
         text="Create Post"
         BtnText="Post"
         handleButtonPress={handlePostPress}
+        onPress={() => navigation.goBack()}
       />
       <View style={{ marginTop: 10 }}>
         <TextArea

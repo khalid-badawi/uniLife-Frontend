@@ -1,24 +1,70 @@
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import { View, Text, StyleSheet, FlatList, Alert } from "react-native";
 import React, { useState } from "react";
 import CustomButton from "../components/CustomButton";
 import MenuRow from "../components/MenuRow";
 import CustomHeader from "../components/CustomHeader";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { color } from "react-native-elements/dist/helpers";
 import { TextInput } from "react-native";
-import { Colors } from "react-native/Libraries/NewAppScreen";
+import axios from "axios";
+import { getTokenFromKeychain } from "../globalFunc/Keychain";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { useUser } from "../Contexts/UserContext";
 
-const CheckOut = ({ navigation, route }) => {
-  const data = route.params.data;
+const CheckOut = () => {
+  const route = useRoute();
+  const navigation = useNavigation();
+  const { restaurantId, data } = route.params;
+
+  const transformedArray = data.map((item) => {
+    return {
+      foodId: item.itemId,
+      Qauntity: item.Quantity,
+    };
+  });
+
   const price = route.params.price;
   const [notes, setNotes] = useState("");
+  const { userId } = useUser();
+  const confirmOrder = async () => {
+    try {
+      console.log("hi");
+      const token = await getTokenFromKeychain();
+      const response = await axios.post(
+        `http://10.0.2.2:3000/api/v1/unilife/order/${userId}`,
+        JSON.stringify({ restaurantId, orderItem: transformedArray, notes }),
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
+      console.log("gg");
+    } catch (error) {
+      if (error.response) {
+        Alert.alert("Error", error.response.data.message);
+      } else if (error.request) {
+        Alert.alert(
+          "Network Error",
+          "There was a problem with the network. Please check your internet connection and try again.",
+          [{ text: "OK" }]
+        );
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        Alert.alert(
+          "Something Wrong",
+          "Something went wrong, try again please",
+          [{ text: "OK" }]
+        );
+      }
+    }
+  };
   return (
     <View style={styles.root}>
-      <CustomHeader text="Confirm Order" onPress={() => navigation.goBack()} />
       <Icon name="cart-check" size={100} style={styles.icon} />
 
-      <Text style={styles.mainTxt}>Almost Done</Text>
+      <Text style={styles.mainTxt}>Details</Text>
       <View style={styles.dataCont}>
         <FlatList
           data={data}
@@ -49,7 +95,7 @@ const CheckOut = ({ navigation, route }) => {
         />
       </View>
       <View style={styles.buttonsCont}>
-        <CustomButton text="Check Out" />
+        <CustomButton text="Check Out" onPress={confirmOrder} />
         <CustomButton
           text="Cancel"
           type="Tertiary"
@@ -64,6 +110,8 @@ const styles = StyleSheet.create({
   root: {
     height: "100%",
     backgroundColor: "white",
+    flex: 1,
+    paddingTop: 10,
   },
   mainTxt: {
     marginTop: 20,

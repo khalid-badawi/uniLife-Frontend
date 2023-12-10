@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Alert } from "react-native";
 import React, { useState } from "react";
 import RestCard from "../components/RestCard";
 import PopularMeal from "../components/PopularMeal";
@@ -7,7 +7,10 @@ import { ScrollView, TextInput } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { TouchableOpacity } from "react-native";
 import { useEffect } from "react";
-
+import axios from "axios";
+import * as Keychain from "react-native-keychain";
+import { useUser } from "../Contexts/UserContext";
+import { useNavigation } from "@react-navigation/native";
 const menuItems = [
   {
     itemId: "1",
@@ -56,39 +59,76 @@ const menuItems = [
   // Add more items as needed
 ];
 
-const restaurants = [
-  {
-    title: "Cuisine Delight",
-    rating: 4.5,
-    description: "A delightful blend of flavors from around the world.",
-  },
-  {
-    title: "Sizzle Grill",
-    rating: 4.2,
-    description: "Grilled perfection with a touch of smoky goodness.",
-  },
-  {
-    title: "Pasta Paradise",
-    rating: 4.8,
-    description:
-      "Authentic Italian pasta dishes that will transport you to Italy.",
-  },
-  {
-    title: "Spice Haven",
-    rating: 4.0,
-    description: "Bold and flavorful dishes from various spice-rich cuisines.",
-  },
-  {
-    title: "Ocean Breeze Seafood",
-    rating: 4.6,
-    description: "Fresh seafood served with a side of ocean views.",
-  },
-];
+const getTokenFromKeychain = async () => {
+  try {
+    // Retrieve the token from the keychain
+    const credentials = await Keychain.getGenericPassword();
+
+    if (credentials) {
+      const token = credentials.password;
+      console.log("Token retrieved successfully:", token);
+      return token;
+    } else {
+      console.log("No token found in the keychain");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error retrieving token:", error);
+    return null;
+  }
+};
 
 const CafiteriaHome = () => {
+  const navigation = useNavigation();
+  const [restaurants, setRestaurants] = useState([]);
+  const { userId } = useUser();
+  const BASE_URL = "http://10.0.2.2:3000/api/v1/unilife";
+
+  const visitRestaurant = (restaurantId) => {
+    console.log(restaurantId);
+    navigation.navigate("RestaurantScreen", { restaurantId });
+  };
+
+  useEffect(() => {
+    const getRseturnats = async () => {
+      try {
+        const token = await getTokenFromKeychain();
+        const response = await axios.get(`${BASE_URL}/restaurants/${userId}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // Handle the response data here, for example:
+        setRestaurants(response.data.data);
+        console.log(response.data.data);
+      } catch (error) {
+        if (error.response) {
+          Alert.alert("Error", error.response.data.message);
+        } else if (error.request) {
+          Alert.alert(
+            "Network Error",
+            "There was a problem with the network. Please check your internet connection and try again.",
+            [{ text: "OK" }]
+          );
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          Alert.alert(
+            "Something Wrong",
+            "Something went wrong, try again please",
+            [{ text: "OK" }]
+          );
+        }
+      }
+    };
+
+    getRseturnats();
+  }, []);
+
   return (
     <View style={styles.root}>
-      <View style={{ flexDirection: "row", marginTop: 20, width: "100%" }}>
+      <View style={{ flexDirection: "row", width: "100%" }}>
         <Text style={styles.title}>
           Hello,{" "}
           <Text
@@ -121,27 +161,25 @@ const CafiteriaHome = () => {
       </View> */}
       <View
         style={{
-          height: "45%",
+          height: "100%",
         }}
       >
         <View style={{ height: "99%" }}>
           <FlatList
             data={restaurants}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => <RestCard {...item} />}
+            keyExtractor={(item, index) => item.id}
+            renderItem={({ item }) => (
+              <RestCard
+                {...item}
+                visitRest={() => {
+                  visitRestaurant(item.id);
+                }}
+              />
+            )}
             contentContainerStyle={{ marginBottom: 10 }}
           />
         </View>
       </View>
-      <Text style={{ ...styles.title, fontWeight: "bold", marginTop: 5 }}>
-        Popular Meals ️‍🔥
-      </Text>
-      <FlatList
-        horizontal
-        data={menuItems}
-        keyExtractor={(item) => item.itemId}
-        renderItem={({ item }) => <PopularMeal item={item} />}
-      />
     </View>
   );
 };
@@ -150,6 +188,7 @@ const styles = StyleSheet.create({
   root: {
     backgroundColor: "white",
     flex: 1,
+    paddingTop: 10,
   },
   title: {
     fontSize: 20,
