@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, FlatList, Alert } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CustomButton from "../components/CustomButton";
 import MenuRow from "../components/MenuRow";
 import CustomHeader from "../components/CustomHeader";
@@ -10,11 +10,56 @@ import { getTokenFromKeychain } from "../globalFunc/Keychain";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useUser } from "../Contexts/UserContext";
 import BASE_URL from "../BaseUrl";
+import io from "socket.io-client";
+
+const socket = io.connect("http://192.168.1.8:3000");
 
 const CheckOut = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const { restaurantId, data } = route.params;
+
+  useEffect(() => {
+    // Connect to the server and listen for private messages
+    const connectToSocket = () => {
+      socket.connect();
+    };
+
+    const handleReconnect = (attemptNumber) => {
+      console.log(`Reconnecting... Attempt ${attemptNumber}`);
+    };
+
+    const handleConnect = () => {
+      console.log("Connected to Socket.IO");
+    };
+
+    const handleDisconnect = () => {
+      console.log("Disconnected from Socket.IO");
+      // Attempt to reconnect when disconnected
+      connectToSocket();
+    };
+
+    // Set up event listeners for connection status
+    socket.on("connect", handleConnect);
+    socket.on("disconnect", handleDisconnect);
+
+    socket.io.opts.reconnection = true; // Enable reconnection
+    socket.io.opts.reconnectionAttempts = Infinity; // Retry indefinitely
+    socket.io.opts.reconnectionDelay = 1000; // Initial delay before reconnecting
+    socket.io.opts.reconnectionDelayMax = 5000; // Maximum delay between reconnects
+    socket.io.opts.randomizationFactor = 0.5; // Randomization factor for delay
+
+    // Start the initial connection
+    connectToSocket();
+
+    // Cleanup on component unmount
+    return () => {
+      socket.disconnect();
+      //Remove event listeners
+      socket.off("connect", handleConnect);
+      socket.off("disconnect", handleDisconnect);
+    };
+  }, []);
 
   const transformedArray = data.map((item) => {
     return {
@@ -61,6 +106,16 @@ const CheckOut = () => {
       }
     }
   };
+
+  const handleCheckOut = async () => {
+    await confirmOrder();
+    socket.connect();
+    console.log("xdssss");
+    socket.emit("newOrder", {
+      restaurantId: 2,
+    });
+  };
+
   return (
     <View style={styles.root}>
       <Icon name="cart-check" size={100} style={styles.icon} />
@@ -96,7 +151,7 @@ const CheckOut = () => {
         />
       </View>
       <View style={styles.buttonsCont}>
-        <CustomButton text="Check Out" onPress={confirmOrder} />
+        <CustomButton text="Check Out" onPress={handleCheckOut} />
         <CustomButton
           text="Cancel"
           type="Tertiary"
@@ -130,7 +185,7 @@ const styles = StyleSheet.create({
     height: "40%",
     borderRadius: 20,
     marginBottom: 10,
-    marginHorizontal: 15,
+    marginHorizontal: 5,
     backgroundColor: "#8F00FF",
   },
   notesCont: {

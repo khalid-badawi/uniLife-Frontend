@@ -3,7 +3,7 @@ import React from "react";
 import { StyleSheet } from "react-native";
 
 const MenuRow = ({ itemText, quantity, color = "white" }) => {
-  const dots = ".".repeat(100 - itemText.length);
+  const dots = ".".repeat(1000 - itemText.length);
 
   return (
     <View style={styles.root}>
@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 16,
     marginVertical: 5,
-    width: "80%",
+    width: "95%",
   },
   txt: {
     fontWeight: "bold",

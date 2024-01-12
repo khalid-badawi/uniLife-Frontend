@@ -36,6 +36,7 @@ const requestFCMPermission = async () => {
     if (permissionStatus) {
       const fcmToken = await messaging().getToken();
       console.log("fcmToken:", fcmToken);
+      return fcmToken;
     }
   } catch (error) {
     console.error("Error requesting FCM permission:", error);
@@ -86,9 +87,11 @@ const SignInScreen = () => {
   //states
   const handleSignIn = async (values, { resetForm }) => {
     try {
+      const fcmTok = await requestFCMPermission();
+
       const response = await axios.post(
         `${BASE_URL}/login`,
-        JSON.stringify(values),
+        JSON.stringify({ ...values, token: fcmTok }),
         {
           headers: {
             "Content-Type": "application/json",
@@ -96,7 +99,6 @@ const SignInScreen = () => {
         }
       );
       await storeTokenInKeychain(response.data.token);
-
       setErrorMsg("");
       requestFCMPermission();
       setUserId(response.data.data.id);
