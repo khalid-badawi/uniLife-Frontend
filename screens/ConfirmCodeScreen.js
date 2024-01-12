@@ -13,6 +13,7 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
+import BASE_URL from "../BaseUrl";
 const validate = Yup.object().shape({
   verifyCode: Yup.string().required(
     "❌ Please Enter the code you have received"
@@ -29,7 +30,7 @@ const ConfirmCodeScreen = ({ code = "0597401453" }) => {
     console.warn(values);
     try {
       const response = await axios.post(
-        "http://10.0.2.2:3000/api/v1/unilife/verify",
+        `${BASE_URL}/verify`,
         JSON.stringify(values),
         {
           headers: {
@@ -106,7 +107,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: "white",
-    
   },
   logoCont: {
     alignItems: "center",

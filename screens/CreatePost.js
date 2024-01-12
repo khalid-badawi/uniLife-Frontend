@@ -9,6 +9,7 @@ import axios from "axios";
 import * as Keychain from "react-native-keychain";
 import { useUser } from "../Contexts/UserContext";
 import { useNavigation } from "@react-navigation/native";
+import BASE_URL from "../BaseUrl";
 const RAPIDAPI_HOST = "investing-cryptocurrency-markets.p.rapidapi.com";
 const RAPIDAPI_KEY = "3bd39bcb8dmshb5db9a8e916f20dp198b41jsn95ca2c49a7d2";
 const majors = [
@@ -99,7 +100,7 @@ const CreatePost = () => {
         console.log(formData);
 
         const response = await axios.post(
-          `http://10.0.2.2:3000/api/v1/unilife/post/${userId}`,
+          `${BASE_URL}/post/${userId}`,
           formData,
           {
             headers: {

@@ -10,7 +10,7 @@ import {
   Text,
   Alert,
 } from "react-native";
-import Logo from "../assets/Logo2.png";
+import Logo from "../assets/defaultProfile.jpg";
 import CustomInput from "../components/CustomInput";
 import CustomButton from "../components/CustomButton";
 import { useState } from "react";
@@ -26,6 +26,7 @@ import Animated, {
   BounceInDown,
 } from "react-native-reanimated";
 import CustomPicker from "../components/CustomPicker";
+import PickImageSmall from "../components/PickImageSmall";
 import BASE_URL from "../BaseUrl";
 const SignupSchema = Yup.object().shape({
   username: Yup.string()
@@ -57,10 +58,11 @@ const SignupSchema = Yup.object().shape({
   major: Yup.string().required("❌Please Choose your major"),
 });
 
-const SignUpScreen = () => {
+const EditProfileScreen = () => {
   const navigation = useNavigation();
   const { height, width } = useWindowDimensions();
   const [errorMsg, setErrorMsg] = useState("");
+  const [image, setImage] = useState("");
   const handleSubmit = async (values) => {
     try {
       const response = await axios.post(
@@ -139,9 +141,16 @@ const SignUpScreen = () => {
               >
                 <Image
                   source={Logo}
-                  style={{ ...styles.logo, height: height * 0.3, width: width }} // Fixed style object
+                  style={styles.logo} // Fixed style object
                   resizeMode="contain"
                 />
+                <View style={{ position: "absolute", bottom: 40, right: 20 }}>
+                  <PickImageSmall
+                    image={image}
+                    setImage={setImage}
+                    iconName="edit"
+                  />
+                </View>
               </Animated.View>
               <Animated.View
                 style={styles.animInput}
@@ -157,52 +166,10 @@ const SignUpScreen = () => {
                   onBlur={() => setFieldTouched("username")}
                 />
               </Animated.View>
-              <Animated.View
-                style={styles.animInput}
-                entering={FadeInDown.delay(100).duration(1000).springify()}
-              >
-                <CustomInput
-                  placeholder="Email"
-                  value={values.email}
-                  setValue={handleChange("email")}
-                  secureTextEntry={false}
-                  errors={errors.email}
-                  iconName={"mail"}
-                  onBlur={() => setFieldTouched("email")}
-                />
-              </Animated.View>
-              <Animated.View
-                style={styles.animInput}
-                entering={FadeInDown.delay(150).duration(1000).springify()}
-              >
-                <CustomInput
-                  placeholder="Password"
-                  value={values.password}
-                  setValue={handleChange("password")}
-                  secureTextEntry={true}
-                  errors={errors.password}
-                  iconName={"key"}
-                  onBlur={() => setFieldTouched("password")}
-                />
-              </Animated.View>
-              <Animated.View
-                style={styles.animInput}
-                entering={FadeInDown.delay(200).duration(1000).springify()}
-              >
-                <CustomInput
-                  placeholder="Confirm Password"
-                  value={values.confirmPassword}
-                  setValue={handleChange("confirmPassword")}
-                  secureTextEntry={true}
-                  errors={errors.confirmPassword}
-                  iconName={"key"}
-                  onBlur={() => setFieldTouched("confirmPassword")}
-                />
-              </Animated.View>
 
               <Animated.View
                 style={styles.animInput}
-                entering={FadeInDown.delay(250).duration(1000).springify()}
+                entering={FadeInDown.delay(100).duration(1000).springify()}
               >
                 <CustomInput
                   placeholder="Phone Number"
@@ -217,7 +184,7 @@ const SignUpScreen = () => {
               </Animated.View>
               <Animated.View
                 style={{ ...styles.animInput, flexDirection: "row" }}
-                entering={FadeInDown.delay(250).duration(1000).springify()}
+                entering={FadeInDown.delay(150).duration(1000).springify()}
               >
                 <CustomPicker
                   value={values.major}
@@ -227,10 +194,10 @@ const SignUpScreen = () => {
               </Animated.View>
               <Animated.View
                 style={styles.animInput}
-                entering={FadeInDown.delay(300).duration(1000).springify()}
+                entering={FadeInDown.delay(250).duration(1000).springify()}
               >
                 <CustomButton
-                  text="Register"
+                  text="Edit"
                   onPress={handleSubmit}
                   type="Primary"
                 />
@@ -238,10 +205,10 @@ const SignUpScreen = () => {
               {errorMsg && <Text style={styles.errorText}>❌ {errorMsg}</Text>}
               <Animated.View
                 style={styles.animInput}
-                entering={FadeInDown.delay(350).duration(1000).springify()}
+                entering={FadeInDown.delay(300).duration(1000).springify()}
               >
                 <CustomButton
-                  text="Already have an account? Sign in"
+                  text="Change Password"
                   type="Tertiary"
                   onPress={() => {
                     navigation.navigate("SignIn");
@@ -268,11 +235,19 @@ const styles = StyleSheet.create({
   },
 
   logo: {
-    borderRadius: 3,
-    marginBottom: 10,
+    height: 230,
+    width: 230,
+
+    borderRadius: 115,
+    alignSelf: "center",
+    marginTop: 30,
+    borderWidth: 1.5,
+    borderColor: "#8F00FF",
+    marginBottom: 20,
   },
   animInput: {
     width: "100%",
+    marginTop: 5,
   },
   errorText: {
     color: "red",
@@ -282,4 +257,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignUpScreen;
+export default EditProfileScreen;

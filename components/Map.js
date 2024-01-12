@@ -16,24 +16,66 @@ const Map = ({
   setCurrentPosition,
   routeCoordinates,
   destCoordinates,
+  fetch,
 }) => {
-  const x = () => {
-    console.log(routeCoordinates);
+  const [userLocationWatchId, setUserLocationWatchId] = useState(null);
+  const debounce = (func, delay) => {
+    let timeoutId;
+    return function () {
+      const context = this;
+      const args = arguments;
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        func.apply(context, args);
+      }, delay);
+    };
   };
-  // useEffect(() => {
-  //   Geolocation.getCurrentPosition(
-  //     (position) => {
-  //       const { latitude, longitude } = position.coords;
+  useEffect(() => {
+    // Call the fetch function after a delay of 3 seconds when currentPosition changes
+    const delayedFetch = debounce(() => {
+      fetch();
+    }, 500);
+    console.log("hello");
 
-  //       console.warn(longitude);
-  //       console.warn(latitude);
-  //       setCurrentPosition([longitude, latitude]);
-  //     },
-  //     (error) => {
-  //       console.error("error getting current position", error);
-  //     },
-  //     { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-  //   );
+    delayedFetch();
+  }, [currentPosition]);
+  // useEffect(() => {
+  //   // Request location permissions if not granted
+  //   const requestLocationPermission = async () => {
+  //     try {
+  //       const granted = await PermissionsAndroid.request(
+  //         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+  //       );
+  //       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+  //         // Start watching user location
+  //         const watchId = Geolocation.watchPosition(
+  //           (position) => {
+  //             const { latitude, longitude } = position.coords;
+  //             console.log(latitude, longitude);
+  //             setCurrentPosition([longitude, latitude]);
+  //           },
+  //           (error) => {
+  //             console.error("Error getting current position", error);
+  //           },
+  //           { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+  //         );
+  //         setUserLocationWatchId(watchId);
+  //       } else {
+  //         console.warn("Location permission denied");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error requesting location permission", error);
+  //     }
+  //   };
+
+  //   requestLocationPermission();
+
+  //   // Cleanup function to clear the watch when the component is unmounted
+  //   return () => {
+  //     if (userLocationWatchId) {
+  //       Geolocation.clearWatch(userLocationWatchId);
+  //     }
+  //   };
   // }, []);
   const coordinates = routeCoordinates.map((coord) => [
     coord.longitude,
@@ -53,7 +95,7 @@ const Map = ({
             id="currentPosition"
             coordinate={currentPosition}
             draggable={true}
-            onDragEnd={(event) => {
+            onDrag={(event) => {
               setCurrentPosition(event.geometry.coordinates);
             }}
           />

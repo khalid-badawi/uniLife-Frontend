@@ -69,7 +69,9 @@ const OrderItem = ({ item }) => {
   );
 };
 const styles = StyleSheet.create({
-  root: {},
+  root: {
+    marginTop: 5,
+  },
   card: {
     backgroundColor: "white",
     minHeight: 200,

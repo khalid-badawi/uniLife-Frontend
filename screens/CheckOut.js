@@ -9,6 +9,7 @@ import axios from "axios";
 import { getTokenFromKeychain } from "../globalFunc/Keychain";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useUser } from "../Contexts/UserContext";
+import BASE_URL from "../BaseUrl";
 
 const CheckOut = () => {
   const route = useRoute();
@@ -30,7 +31,7 @@ const CheckOut = () => {
       console.log("hi");
       const token = await getTokenFromKeychain();
       const response = await axios.post(
-        `http://10.0.2.2:3000/api/v1/unilife/order/${userId}`,
+        `${BASE_URL}/order/${userId}`,
         JSON.stringify({ restaurantId, orderItem: transformedArray, notes }),
         {
           headers: {

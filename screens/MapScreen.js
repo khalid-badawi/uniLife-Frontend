@@ -9,7 +9,7 @@ const routeData = require("../data/routeData.json");
 
 export default function MapScreen() {
   const searchOptions = ["Building Name", "Class Number"];
-
+  const navigation = useNavigation();
   const { height, width } = useWindowDimensions();
   const [selectedBuilding, setSelectedBuilding] = useState(
     routeData.buildings[0].title
@@ -62,7 +62,6 @@ export default function MapScreen() {
       Math.min(...entranceDistances)
     );
     const selectedEntrance = foundBuilding.alt[minDistanceIndex];
-    console.log(selectedEntrance);
     setDestCoordinates([selectedEntrance.long, selectedEntrance.lat]);
 
     const [long1, lat1] = currentPosition;
@@ -99,6 +98,7 @@ export default function MapScreen() {
           routeCoordinates={routeCoordinates}
           destCoordinates={destCoordinates}
           setCurrentPosition={setCurrentPosition}
+          fetch={fetchRoute}
         />
         <View style={styles.footer}>
           <View
@@ -154,10 +154,16 @@ export default function MapScreen() {
           )}
 
           <CustomButton text="Show Route" onPress={fetchRoute} />
+
           <CustomButton
             text="Next Lecture"
             onPress={showNextLecture}
             type="Tertiary"
+          />
+          <CustomButton
+            text="Indoor Navigation"
+            type="Tertiary"
+            onPress={() => navigation.navigate("IndoorQR")}
           />
         </View>
       </View>

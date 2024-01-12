@@ -16,6 +16,7 @@ import axios from "axios";
 import { getTokenFromKeychain } from "../globalFunc/Keychain";
 import { useUser } from "../Contexts/UserContext";
 import { useNavigation } from "@react-navigation/native";
+import showConfirmationDialog from "./Confirmation";
 const PostCard = ({ type = "", item }) => {
   const { userId } = useUser();
   const BASE_URL = "http://10.0.2.2:3000/api/v1/unilife";
@@ -26,25 +27,77 @@ const PostCard = ({ type = "", item }) => {
   };
   const reserve = async () => {
     try {
-      const token = await getTokenFromKeychain();
-
-      // Assuming you have some data to update the post, replace the following line with your actual data
-      const postData = {
-        // Your updated post data here
-      };
-
-      const response = await axios.patch(
-        `${BASE_URL}/post/reserve/${userId}/${item.id}`,
-        postData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const confirmed = await showConfirmationDialog(
+        "Confirmation",
+        "Are you sure you want to reserve this item?"
       );
 
-      // Update the state or perform any other actions as needed
+      if (confirmed) {
+        const token = await getTokenFromKeychain();
+
+        // Assuming you have some data to update the post, replace the following line with your actual data
+
+        const response = await axios.patch(
+          `${BASE_URL}/post/reserve/${userId}/${item.id}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // Update the state or perform any other actions as needed
+      } else {
+        // User canceled the operation
+        console.log("Reservation canceled");
+      }
+    } catch (error) {
+      if (error.response) {
+        Alert.alert("Error", error.response.data.message);
+      } else if (error.request) {
+        Alert.alert(
+          "Network Error",
+          "There was a problem with the network. Please check your internet connection and try again.",
+          [{ text: "OK" }]
+        );
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        Alert.alert(
+          "Something Wrong",
+          "Something went wrong, try again please",
+          [{ text: "OK" }]
+        );
+      }
+    }
+  };
+  const unreserve = async () => {
+    try {
+      const confirmed = await showConfirmationDialog(
+        "Confirmation",
+        "Are you sure you want to unreserve this item?"
+      );
+
+      if (confirmed) {
+        const token = await getTokenFromKeychain();
+
+        // Assuming you have some data to update the post, replace the following line with your actual data
+
+        const response = await axios.patch(
+          `${BASE_URL}/post/unreserve/${userId}/${item.id}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // Update the state or perform any other actions as needed
+      } else {
+        // User canceled the operation
+        console.log("Reservation canceled");
+      }
     } catch (error) {
       if (error.response) {
         Alert.alert("Error", error.response.data.message);
@@ -162,7 +215,7 @@ const PostCard = ({ type = "", item }) => {
           }}
         >
           <Text style={{ fontSize: 15, fontWeight: "bold", color: "#8F00FF" }}>
-            The Item Was Reserved By Khalid
+            Reserved By Khalid
           </Text>
         </View>
       )}
@@ -174,7 +227,6 @@ const styles = StyleSheet.create({
   root: {
     width: "100%",
     backgroundColor: "white",
-    paddingTop: 10,
   },
   header: {
     flexDirection: "row",
@@ -190,6 +242,7 @@ const styles = StyleSheet.create({
   profileImgCont: {
     borderRadius: 20,
     backgroundColor: "blue",
+    marginTop: 10,
   },
   img: {
     alignSelf: "center",
@@ -199,8 +252,8 @@ const styles = StyleSheet.create({
   },
   MainTxt: {
     marginLeft: 10,
-    fontWeight: "bold",
     fontSize: 16,
+    fontWeight: "bold",
   },
   descTxt: {
     marginLeft: 15,

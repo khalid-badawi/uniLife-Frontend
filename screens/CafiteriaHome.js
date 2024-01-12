@@ -11,6 +11,8 @@ import axios from "axios";
 import * as Keychain from "react-native-keychain";
 import { useUser } from "../Contexts/UserContext";
 import { useNavigation } from "@react-navigation/native";
+import BASE_URL from "../BaseUrl";
+
 const menuItems = [
   {
     itemId: "1",
@@ -82,7 +84,6 @@ const CafiteriaHome = () => {
   const navigation = useNavigation();
   const [restaurants, setRestaurants] = useState([]);
   const { userId } = useUser();
-  const BASE_URL = "http://10.0.2.2:3000/api/v1/unilife";
 
   const visitRestaurant = (restaurantId) => {
     console.log(restaurantId);

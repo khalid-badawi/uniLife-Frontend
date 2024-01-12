@@ -19,6 +19,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useUser } from "../Contexts/UserContext";
 import { useContext } from "react";
 import messaging from "@react-native-firebase/messaging";
+import BASE_URL from "../BaseUrl";
 
 const SignInSchema = Yup.object().shape({
   email: Yup.string()
@@ -86,7 +87,7 @@ const SignInScreen = () => {
   const handleSignIn = async (values, { resetForm }) => {
     try {
       const response = await axios.post(
-        "http://10.0.2.2:3000/api/v1/unilife/login",
+        `${BASE_URL}/login`,
         JSON.stringify(values),
         {
           headers: {
@@ -123,7 +124,10 @@ const SignInScreen = () => {
 
   return (
     <Formik
-      initialValues={{ email: "s11923593@stu.najah.edu", password: "12345Sk@" }}
+      initialValues={{
+        email: "s11923593@stu.najah.edu",
+        password: "1234saiF@",
+      }}
       onSubmit={handleSignIn}
       validationSchema={SignInSchema}
     >

@@ -16,6 +16,7 @@ import CustomButton from "../components/CustomButton";
 import { getTokenFromKeychain } from "../globalFunc/Keychain";
 import axios from "axios";
 import { useUser } from "../Contexts/UserContext";
+import BASE_URL from "../BaseUrl";
 const MyOrders = () => {
   const navigation = useNavigation();
   const [search, setSearch] = useState("");
@@ -26,7 +27,7 @@ const MyOrders = () => {
     setSelectedCategory(category);
     setSearch("");
   };
-  const BASE_URL = "http://10.0.2.2:3000/api/v1/unilife";
+
   const [selectedCategory, setSelectedCategory] = useState(uniqueCategories[0]);
   useEffect(() => {
     const getMenu = async () => {

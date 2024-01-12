@@ -12,7 +12,7 @@ import {
   Keyboard,
   Image,
 } from "react-native";
-import CustomHeader from "../components/CustomHeader";
+import CustomHeader from "../navigation/CustomHeader";
 import io from "socket.io-client";
 import axios from "axios";
 import * as Keychain from "react-native-keychain";
@@ -23,19 +23,11 @@ import messaging from "@react-native-firebase/messaging";
 import PushNotification from "react-native-push-notification";
 import { useRoute } from "@react-navigation/native";
 import * as FileSystem from "expo-file-system";
+import BASE_URL from "../BaseUrl";
+import PickImageSmall from "../components/PickImageSmall";
 
-const socket = io.connect("http://192.168.1.2:3000");
-const sampleMessages = [
-  { id: 1, senderId: 1, content: "Hello" },
-  { id: 2, senderId: 2, content: "Hi there!" },
-  {
-    id: 3,
-    senderId: 1,
-    content:
-      "Howssssssssssaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaassaaaaaaaaaa are you?",
-  },
-  // Add more messages as needed
-];
+const socket = io.connect("http://192.168.1.8:3000");
+
 const getTokenFromKeychain = async () => {
   try {
     // Retrieve the token from the keychain
@@ -59,53 +51,21 @@ const ChatScreen = () => {
   const [chat, setChat] = useState([]);
   const [showEmojiSelector, setShowEmojiSelector] = useState(false);
   const [receivedImage, setReceivedImage] = useState(null);
+  const [image, setImage] = useState(null);
   const { userId } = useUser();
   const currentUserId = userId;
+  console.log("Currentuser=" + currentUserId);
   const { recieverId } = useRoute();
-  const recieverUser = currentUserId === 1 ? 2 : 1;
+  const recieverUser = currentUserId === 4 ? 5 : 4;
   const messageId = chat.length + 1;
   console.log(currentUserId, recieverUser);
-
-  useEffect(() => {
-    const convertImageToBase64 = async () => {
-      const imageUrl =
-        "https://firebasestorage.googleapis.com/v0/b/unilife-1b22d.appspot.com/o/images%2FBooks%2F4_image.jpeg?alt=media&token=8e872bf8-9d16-46d0-830d-6cb6f9e90743";
-
-      try {
-        const { uri } = await FileSystem.downloadAsync(
-          imageUrl,
-          FileSystem.documentDirectory + "image.jpg"
-        );
-
-        const base64 = await FileSystem.readAsStringAsync(uri, {
-          encoding: FileSystem.EncodingType.Base64,
-        });
-
-        const senderId = currentUserId;
-        const receiverId = recieverUser;
-
-        socket.emit("imageMessage", {
-          senderId,
-          receiverId,
-          image: base64,
-        });
-
-        // Delete the image file after sending
-        await FileSystem.deleteAsync(uri, { idempotent: true });
-      } catch (error) {
-        console.error("Error converting image to base64:", error);
-      }
-    };
-
-    convertImageToBase64();
-  }, []);
 
   useEffect(() => {
     const getMessages = async () => {
       try {
         const token = await getTokenFromKeychain();
         const response = await axios.get(
-          `http://10.0.2.2:3000/api/v1/unilife/message/${currentUserId}/${recieverUser}`,
+          `${BASE_URL}/message/${currentUserId}/${recieverUser}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -176,7 +136,7 @@ const ChatScreen = () => {
     // Cleanup on component unmount
     return () => {
       socket.disconnect();
-      // Remove event listeners
+      //Remove event listeners
       socket.off("connect", handleConnect);
       socket.off("disconnect", handleDisconnect);
     };
@@ -195,6 +155,7 @@ const ChatScreen = () => {
   //notificationEnd
   useEffect(() => {
     socket.connect();
+    console.log("xd");
     socket.on("privateMessage", ({ senderId, message }) => {
       // Create a new message object with the same structure as the existing messages
       const newMessage = { senderId, text: message, createdAt: Date.now() };
@@ -210,44 +171,69 @@ const ChatScreen = () => {
       socket.disconnect();
     };
   }, []);
-  const storeMessage = async () => {
-    try {
-      const token = await getTokenFromKeychain();
-      const response = await axios.post(
-        `http://10.0.2.2:3000/api/v1/unilife/message/${currentUserId}/${recieverUser}`,
-        JSON.stringify({ text: message }),
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+  // const storeMessage = async () => {
+  //   try {
+  //     const token = await getTokenFromKeychain();
 
-      console.log("gg");
+  //     const formData = new FormData();
+
+  //     formData.append("data", JSON.stringify({ text: message }));
+  //     console.log(formData);
+  //     const response = await axios.post(
+  //       `http://10.0.2.2:3000/api/v1/unilife/message/${currentUserId}/${recieverUser}`,
+  //       formData,
+  //       {
+  //         headers: {
+  //           "Content-Type": "multipart/form-data",
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+  //   } catch (error) {
+  //     if (error.response) {
+  //       Alert.alert("Error", error.response.data.message);
+  //     } else if (error.request) {
+  //       Alert.alert(
+  //         "Network Error",
+  //         "There was a problem with the network. Please check your internet connection and try again.",
+  //         [{ text: "OK" }]
+  //       );
+  //     } else {
+  //       // Something happened in setting up the request that triggered an Error
+  //       Alert.alert(
+  //         "Something Wrong",
+  //         "Something went wrong, try again please",
+  //         [{ text: "OK" }]
+  //       );
+  //     }
+  //   }
+  // };
+  const sendImage = async () => {
+    try {
+      console.log("uri:", image.uri);
+      const base64 = await FileSystem.readAsStringAsync(image.uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      const senderId = currentUserId;
+      const receiverId = recieverUser;
+
+      socket.emit("imageMessage", {
+        senderId,
+        receiverId,
+        image: base64,
+      });
+      setImage(null);
     } catch (error) {
-      if (error.response) {
-        Alert.alert("Error", error.response.data.message);
-      } else if (error.request) {
-        Alert.alert(
-          "Network Error",
-          "There was a problem with the network. Please check your internet connection and try again.",
-          [{ text: "OK" }]
-        );
-      } else {
-        // Something happened in setting up the request that triggered an Error
-        Alert.alert(
-          "Something Wrong",
-          "Something went wrong, try again please",
-          [{ text: "OK" }]
-        );
-      }
+      console.error("Error converting image to base64:", error);
     }
   };
 
   const handleSend = async () => {
-    if (message.trim() !== "") {
-      await storeMessage();
+    if (image) {
+      await sendImage();
+    } else if (message.trim() !== "") {
+      // await storeMessage();
       socket.emit("privateMessage", {
         id: messageId,
         senderId: currentUserId,
@@ -267,6 +253,7 @@ const ChatScreen = () => {
 
   const renderMessageItem = ({ item, index }) => {
     const isCurrentUser = item.senderId === currentUserId;
+    let objectURL = "";
     const bubbleStyle = isCurrentUser
       ? styles.currentUserBubble
       : styles.otherUserBubble;
@@ -303,9 +290,20 @@ const ChatScreen = () => {
               {messageDate.toLocaleTimeString(undefined, timeFormatOptions)}
             </Text>
           )}
-          <View style={[styles.messageBubble, bubbleStyle]}>
-            <Text style={textStyle}>{item.text}</Text>
-          </View>
+          {item.text && (
+            <View style={[styles.messageBubble, bubbleStyle]}>
+              <Text style={textStyle}>{item.text}</Text>
+            </View>
+          )}
+
+          {item.image && (
+            <View>
+              <Image
+                source={{ uri: item.image }}
+                style={{ width: 200, height: 200 }}
+              />
+            </View>
+          )}
           {!isCurrentUser && (
             <Text style={styles.createdAtText}>
               {messageDate.toLocaleTimeString(undefined, timeFormatOptions)}
@@ -338,10 +336,7 @@ const ChatScreen = () => {
         keyExtractor={(_, index) => index.toString()}
         inverted
       />
-      <Image
-        source={{ uri: `data:image/jpeg;base64,${receivedImage}` }}
-        style={{ width: 200, height: 200 }}
-      />
+
       <View style={styles.inputContainer}>
         <TouchableOpacity
           onPress={() => {
@@ -351,6 +346,15 @@ const ChatScreen = () => {
           style={styles.btnCont}
         >
           <Icon name="smile" size={22} color="white" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.btnCont}>
+          <PickImageSmall
+            iconName="image"
+            size={22}
+            image={image}
+            setImage={setImage}
+            sendImage={sendImage}
+          />
         </TouchableOpacity>
         <TextInput
           style={styles.input}
@@ -390,7 +394,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     backgroundColor: "white",
-    paddingTop: 10,
   },
   messageContainer: {
     flexDirection: "row",

@@ -16,6 +16,7 @@ import FilterModal from "../components/FilterModal";
 import axios from "axios";
 import { getTokenFromKeychain } from "../globalFunc/Keychain";
 import { useUser } from "../Contexts/UserContext";
+import BASE_URL from "../BaseUrl";
 const PostsMainScreen = () => {
   const [searchText, setSearchText] = useState("");
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
@@ -34,7 +35,6 @@ const PostsMainScreen = () => {
   };
 
   const { userId } = useUser();
-  const BASE_URL = "http://10.0.2.2:3000/api/v1/unilife";
 
   const search = async () => {
     if (mounted) {
@@ -122,16 +122,6 @@ const PostsMainScreen = () => {
 
   return (
     <View style={styles.root}>
-      <View style={{ flexDirection: "row" }}>
-        <View style={{ width: "80%" }}>
-          <SearchBar placeholder="Search..." setSearchText={setSearchText} />
-        </View>
-        <TouchableOpacity style={{ alignSelf: "center" }}>
-          <Text style={{ fontSize: 16, color: "#8F00FF", fontWeight: "500" }}>
-            My Posts
-          </Text>
-        </TouchableOpacity>
-      </View>
       <TouchableOpacity style={styles.filter} onPress={openFilterModal}>
         <AntDesign name="filter" size={22} style={styles.icon} />
         <Text style={{ fontSize: 16, color: "#8F00FF", fontWeight: "500" }}>
