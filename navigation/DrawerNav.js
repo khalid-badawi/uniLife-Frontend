@@ -14,6 +14,9 @@ import ScheduleScreen from "../screens/ScheduleScreen";
 import MyOrders from "../screens/MyOrders";
 import LogOut from "../screens/LogOut";
 import MyPostsScreen from "../screens/MyPostsScreen";
+import ScheduleStack from "./ScheduleStack";
+import EditProfileStack from "./EditProfileStack";
+import ChatStack from "./ChatStack";
 const Drawer = createDrawerNavigator();
 
 const DrawerNav = () => {
@@ -37,7 +40,7 @@ const DrawerNav = () => {
       <Drawer.Screen name="MainNav" component={TabNav} />
       <Drawer.Screen
         name="EditProfile"
-        component={EditProfileScreen}
+        component={EditProfileStack}
         options={({ route }) => ({
           drawerIcon: ({ focused, color, size }) => (
             <Icon
@@ -51,7 +54,7 @@ const DrawerNav = () => {
       />
       <Drawer.Screen
         name="ChatScreen"
-        component={ChatScreen}
+        component={ChatStack}
         options={({ route }) => ({
           drawerIcon: ({ focused, color, size }) => (
             <Icon
@@ -64,8 +67,8 @@ const DrawerNav = () => {
         })}
       />
       <Drawer.Screen
-        name="ScheduleScreen"
-        component={ScheduleScreen}
+        name="Schedule"
+        component={ScheduleStack}
         options={({ route }) => ({
           drawerIcon: ({ focused, color, size }) => (
             <Icon2

@@ -21,6 +21,7 @@ const MyOrders = () => {
   const navigation = useNavigation();
   const [search, setSearch] = useState("");
   const [orders, setOrders] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const uniqueCategories = ["Date", "Restaurant"];
   const { userId } = useUser();
   const handleCategoryClick = (category) => {
@@ -32,6 +33,7 @@ const MyOrders = () => {
   useEffect(() => {
     const getMenu = async () => {
       try {
+        setIsLoading(true);
         const token = await getTokenFromKeychain();
         const response = await axios.get(`${BASE_URL}/orders/${userId}`, {
           headers: {
@@ -39,11 +41,12 @@ const MyOrders = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-
+        console.log("Hellooo");
         // Handle the response data here, for example:
-        const result = response.data.retrieveData;
+        const result = response.data;
         setOrders(result);
-        console.log(result);
+        console.log(result[0]);
+        setIsLoading(false);
         //setChat(response.data.data);
       } catch (error) {
         if (error.response) {
@@ -67,49 +70,60 @@ const MyOrders = () => {
     getMenu();
   }, []);
   return (
-    <View style={styles.root}>
-      <View style={styles.searchBarCont}>
-        <Ionicons name="search" style={styles.icon} size={20} />
+    <>
+      {isLoading && (
+        <View>
+          <Text>gg</Text>
+        </View>
+      )}
+      {!isLoading && (
+        <View style={styles.root}>
+          <View style={styles.searchBarCont}>
+            <Ionicons name="search" style={styles.icon} size={20} />
 
-        <TextInput
-          style={styles.searchBar}
-          placeholder="Search..."
-          onChangeText={(text) => setSearch(text)}
-          value={search}
-        />
-      </View>
-      <View
-        style={{
-          marginLeft: 15,
-          marginBottom: 10,
-          flexDirection: "row",
-          alignItems: "center",
-        }}
-      >
-        <Text style={{ fontWeight: "bold", fontSize: 16 }}>SearchBy:</Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={{
-            flex: 1,
-          }}
-        >
-          {uniqueCategories.map((category) => (
-            <CustomButton
-              key={category}
-              text={category}
-              type={category === selectedCategory ? "Selected" : "NotSelected"}
-              onPress={() => handleCategoryClick(category)}
+            <TextInput
+              style={styles.searchBar}
+              placeholder="Search..."
+              onChangeText={(text) => setSearch(text)}
+              value={search}
             />
-          ))}
-        </ScrollView>
-      </View>
-      <FlatList
-        data={orders}
-        renderItem={({ item }) => <OrderItem item={item} />}
-        keyExtractor={(item) => item.orderId.toString()}
-      />
-    </View>
+          </View>
+          <View
+            style={{
+              marginLeft: 15,
+              marginBottom: 10,
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ fontWeight: "bold", fontSize: 16 }}>SearchBy:</Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={{
+                flex: 1,
+              }}
+            >
+              {uniqueCategories.map((category) => (
+                <CustomButton
+                  key={category}
+                  text={category}
+                  type={
+                    category === selectedCategory ? "Selected" : "NotSelected"
+                  }
+                  onPress={() => handleCategoryClick(category)}
+                />
+              ))}
+            </ScrollView>
+          </View>
+          <FlatList
+            data={orders}
+            renderItem={({ item }) => <OrderItem item={item} />}
+            keyExtractor={(item) => item.orderId.toString()}
+          />
+        </View>
+      )}
+    </>
   );
 };
 

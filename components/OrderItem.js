@@ -4,11 +4,12 @@ import MenuRow from "./MenuRow";
 import CustomHeader from "./CustomHeader";
 
 const OrderItem = ({ item }) => {
+  console.log(item);
   return (
     <View style={styles.root}>
       <View style={styles.card}>
         <View style={{ flexDirection: "row", marginVertical: 5 }}>
-          <Text style={styles.mainTxt}>Ordered By: </Text>
+          <Text style={styles.mainTxt}>Ordered From: </Text>
           <Text style={styles.descTxt}>{item.restaurantName}</Text>
         </View>
         <View style={{ flexDirection: "row", marginVertical: 5 }}>
@@ -38,7 +39,7 @@ const OrderItem = ({ item }) => {
                   color="black"
                 />
               )}
-              keyExtractor={(item) => item.nameOfFood}
+              keyExtractor={(item, index) => item.nameOfFood}
               persistentScrollbar={true}
               scrollIndicatorInsets={{ color: "blue" }}
             />

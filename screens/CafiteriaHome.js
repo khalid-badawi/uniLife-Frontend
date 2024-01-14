@@ -102,8 +102,8 @@ const CafiteriaHome = () => {
         });
 
         // Handle the response data here, for example:
-        setRestaurants(response.data.data);
-        console.log(response.data.data);
+        setRestaurants(response.data);
+        console.log(response.data);
       } catch (error) {
         if (error.response) {
           Alert.alert("Error", error.response.data.message);

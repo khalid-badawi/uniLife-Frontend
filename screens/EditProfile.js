@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -15,9 +15,10 @@ import CustomInput from "../components/CustomInput";
 import CustomButton from "../components/CustomButton";
 import { useState } from "react";
 import { Svg } from "react-native-svg";
-import { Formik, Form, Field } from "formik";
+import { Formik, Form, Field, useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
+
 import { useNavigation } from "@react-navigation/native";
 import Animated, {
   FadeIn,
@@ -28,28 +29,14 @@ import Animated, {
 import CustomPicker from "../components/CustomPicker";
 import PickImageSmall from "../components/PickImageSmall";
 import BASE_URL from "../BaseUrl";
+import { getTokenFromKeychain } from "../globalFunc/Keychain";
+import { useUser } from "../Contexts/UserContext";
 const SignupSchema = Yup.object().shape({
   username: Yup.string()
     .min(3, "❌ Too Short!")
     .max(25, "❌ Too Long!")
     .required("❌ please enter a username"),
-  email: Yup.string()
-    .required("❌ Please enter your email")
-    .matches(
-      /^[a-zA-Z0-9._%+-]+@stu\.najah\.edu$/,
-      "❌ You must use a Najah student email"
-    ),
-  password: Yup.string()
-    .min(8, "❌ Password should contain at least 8 characters")
-    .matches(
-      /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}/,
-      "Must contain minimum 8 characters, at least one uppercase, at least one uppercase letter, one lowercase letter, one number and one special character"
-    )
-    .required("❌ Please enter your password"),
-  confirmPassword: Yup.string()
-    .required("❌ Please confirm your password")
-    .min(8, "❌ Password should contain at least 8 characters")
-    .oneOf([Yup.ref("password")], "❌ Your passwords do not match"),
+
   phoneNum: Yup.string()
     .required("❌ Please enter your phone number")
     .matches(/^[0-9]+$/, "❌ Use digits only")
@@ -62,24 +49,46 @@ const EditProfileScreen = () => {
   const navigation = useNavigation();
   const { height, width } = useWindowDimensions();
   const [errorMsg, setErrorMsg] = useState("");
-  const [image, setImage] = useState("");
-  const handleSubmit = async (values) => {
+  const [image, setImage] = useState(null);
+  const [imageUrl, setImageUrl] = useState("");
+  console.log(image);
+  const { userId } = useUser();
+  const handleEditPress = async (values) => {
+    // Validate postText, relatedMajors, and image
+
     try {
-      const response = await axios.post(
-        `${BASE_URL}/signup`,
-        JSON.stringify(values),
+      const token = await getTokenFromKeychain();
+
+      const formData = new FormData();
+      formData.append("data", JSON.stringify(values));
+      console.log("image", image);
+      if (image && image.uri) {
+        formData.append("image", {
+          uri: image.uri,
+          type: "image/jpeg",
+          name: "image.jpeg",
+        });
+        setImageUrl(image.uri);
+        setImage(null);
+      }
+
+      console.log("form:", formData);
+      console.log(values);
+      console.log("data", formData);
+
+      const response = await axios.patch(
+        `${BASE_URL}/profile/${userId}`,
+        formData,
         {
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
           },
         }
       );
-      console.log(values);
-      console.log(response.status);
-      navigation.navigate("ConfirmCode");
     } catch (error) {
       if (error.response) {
-        setErrorMsg(error.response.data.message);
+        Alert.alert("Error", error.response.data.message);
       } else if (error.request) {
         Alert.alert(
           "Network Error",
@@ -97,129 +106,181 @@ const EditProfileScreen = () => {
     }
   };
 
+  const formik = useFormik({
+    initialValues: {
+      username: "",
+      email: "",
+      phoneNum: "",
+      major: "",
+    },
+    onSubmit: async (values) => {
+      await handleEditPress(values);
+    },
+    validationSchema: SignupSchema,
+  });
+
+  useEffect(() => {
+    const getProfileInfo = async () => {
+      try {
+        console.log("hi", userId);
+
+        const token = await getTokenFromKeychain();
+        const response = await axios.get(`${BASE_URL}/profile/${userId}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const result = response.data;
+        const { username, phoneNum, major, image, email } = result;
+        formik.setFieldValue("username", username);
+        formik.setFieldValue("phoneNum", phoneNum);
+        formik.setFieldValue("major", major);
+        formik.setFieldValue("email", email);
+        setImageUrl(image);
+
+        console.log(result);
+        //setChat(response.data.data);
+      } catch (error) {
+        if (error.response) {
+          Alert.alert("Error", error.response.data.message);
+        } else if (error.request) {
+          Alert.alert(
+            "Network Error",
+            "There was a problem with the network. Please check your internet connection and try again.",
+            [{ text: "OK" }]
+          );
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          Alert.alert(
+            "Something Wrong",
+            "Something went wrong, try again please",
+            [{ text: "OK" }]
+          );
+        }
+      }
+    };
+    getProfileInfo();
+  }, []);
+  let source;
+
+  if (!image && !imageUrl) {
+    source = Logo;
+  } else if (image) {
+    source = { uri: image.uri };
+  } else if (imageUrl) {
+    source = { uri: imageUrl };
+  } else {
+    source = Logo;
+  }
   return (
-    <Formik
-      initialValues={{
-        username: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-        phoneNum: "",
-        major: "",
-      }}
-      onSubmit={(values) => {
-        handleSubmit(values);
-      }}
-      validationSchema={SignupSchema}
+    <KeyboardAvoidingView
+      style={{ ...styles.root, width: width }}
+      behavior="padding"
+      keyboardVerticalOffset={Platform.select({
+        ios: () => 0,
+        android: () => -300,
+      })()}
     >
-      {({
-        values,
-        errors,
-
-        handleSubmit,
-        handleChange,
-        setFieldTouched,
-      }) => (
-        <KeyboardAvoidingView
-          style={{ ...styles.root, width: width }}
-          behavior="padding"
-          keyboardVerticalOffset={Platform.select({
-            ios: () => 0,
-            android: () => -300,
-          })()}
-        >
-          <ScrollView
-            style={{ flexGrow: 1 }}
-            showsVerticalScrollIndicator={false}
+      <ScrollView style={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
+        <View style={{ ...styles.container, width: width, height: height }}>
+          <Animated.View
+            entering={FadeInDown.delay(200)
+              .duration(1000)
+              .springify()
+              .damping(3)}
           >
-            <View style={{ ...styles.container, width: width, height: height }}>
-              <Animated.View
-                entering={FadeInDown.delay(200)
-                  .duration(1000)
-                  .springify()
-                  .damping(3)}
-              >
-                <Image
-                  source={Logo}
-                  style={styles.logo} // Fixed style object
-                  resizeMode="contain"
-                />
-                <View style={{ position: "absolute", bottom: 40, right: 20 }}>
-                  <PickImageSmall
-                    image={image}
-                    setImage={setImage}
-                    iconName="edit"
-                  />
-                </View>
-              </Animated.View>
-              <Animated.View
-                style={styles.animInput}
-                entering={FadeInDown.delay(50).duration(1000).springify()}
-              >
-                <CustomInput
-                  placeholder="Username"
-                  value={values.username}
-                  setValue={handleChange("username")}
-                  secureTextEntry={false}
-                  iconName={"user"}
-                  errors={errors.username}
-                  onBlur={() => setFieldTouched("username")}
-                />
-              </Animated.View>
-
-              <Animated.View
-                style={styles.animInput}
-                entering={FadeInDown.delay(100).duration(1000).springify()}
-              >
-                <CustomInput
-                  placeholder="Phone Number"
-                  value={values.phoneNum}
-                  setValue={handleChange("phoneNum")}
-                  secureTextEntry={false}
-                  errors={errors.phoneNum}
-                  iconName={"phone"}
-                  keyboardType="phone-pad"
-                  onBlur={() => setFieldTouched("phoneNum")}
-                />
-              </Animated.View>
-              <Animated.View
-                style={{ ...styles.animInput, flexDirection: "row" }}
-                entering={FadeInDown.delay(150).duration(1000).springify()}
-              >
-                <CustomPicker
-                  value={values.major}
-                  errors={errors.major}
-                  onValueChange={handleChange("major")}
-                />
-              </Animated.View>
-              <Animated.View
-                style={styles.animInput}
-                entering={FadeInDown.delay(250).duration(1000).springify()}
-              >
-                <CustomButton
-                  text="Edit"
-                  onPress={handleSubmit}
-                  type="Primary"
-                />
-              </Animated.View>
-              {errorMsg && <Text style={styles.errorText}>❌ {errorMsg}</Text>}
-              <Animated.View
-                style={styles.animInput}
-                entering={FadeInDown.delay(300).duration(1000).springify()}
-              >
-                <CustomButton
-                  text="Change Password"
-                  type="Tertiary"
-                  onPress={() => {
-                    navigation.navigate("SignIn");
-                  }}
-                />
-              </Animated.View>
+            <Image source={source} alt="Profile Image" style={styles.logo} />
+            <View style={{ position: "absolute", bottom: 40, right: 20 }}>
+              <PickImageSmall
+                image={image}
+                setImage={setImage}
+                iconName="edit"
+              />
             </View>
-          </ScrollView>
-        </KeyboardAvoidingView>
-      )}
-    </Formik>
+          </Animated.View>
+          <Animated.View
+            style={styles.animInput}
+            entering={FadeInDown.delay(50).duration(1000).springify()}
+          >
+            <CustomInput
+              placeholder="Username"
+              value={formik.values.username}
+              setValue={formik.handleChange("username")}
+              secureTextEntry={false}
+              iconName={"user"}
+              errors={formik.errors.username}
+              onBlur={() => formik.setFieldTouched("username")}
+            />
+          </Animated.View>
+          <Animated.View
+            style={styles.animInput}
+            entering={FadeInDown.delay(50).duration(1000).springify()}
+          >
+            <CustomInput
+              placeholder="Email"
+              value={formik.values.email}
+              setValue={formik.handleChange("email")}
+              secureTextEntry={false}
+              iconName={"mail"}
+              errors={formik.errors.email}
+              onBlur={() => formik.setFieldTouched("email")}
+              editable={false}
+            />
+          </Animated.View>
+
+          <Animated.View
+            style={styles.animInput}
+            entering={FadeInDown.delay(100).duration(1000).springify()}
+          >
+            <CustomInput
+              placeholder="Phone Number"
+              value={formik.values.phoneNum}
+              setValue={formik.handleChange("phoneNum")}
+              secureTextEntry={false}
+              errors={formik.errors.phoneNum}
+              iconName={"phone"}
+              keyboardType="phone-pad"
+              onBlur={() => formik.setFieldTouched("phoneNum")}
+            />
+          </Animated.View>
+          <Animated.View
+            style={{ ...styles.animInput, flexDirection: "row" }}
+            entering={FadeInDown.delay(150).duration(1000).springify()}
+          >
+            <CustomPicker
+              value={formik.values.major}
+              errors={formik.errors.major}
+              onValueChange={formik.handleChange("major")}
+            />
+          </Animated.View>
+          <Animated.View
+            style={styles.animInput}
+            entering={FadeInDown.delay(250).duration(1000).springify()}
+          >
+            <CustomButton
+              text="Edit"
+              onPress={formik.handleSubmit}
+              type="Primary"
+            />
+          </Animated.View>
+          {errorMsg && <Text style={styles.errorText}>❌ {errorMsg}</Text>}
+          <Animated.View
+            style={styles.animInput}
+            entering={FadeInDown.delay(300).duration(1000).springify()}
+          >
+            <CustomButton
+              text="Change Password"
+              type="Tertiary"
+              onPress={() => {
+                navigation.navigate("SignIn");
+              }}
+            />
+          </Animated.View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

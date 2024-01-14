@@ -27,6 +27,7 @@ const CustomInput = ({
           onBlur={onBlur}
           keyboardType={keyboardType}
           editable={editable}
+          
         />
       </View>
       {errors && <Text style={styles.errorText}>{errors}</Text>}

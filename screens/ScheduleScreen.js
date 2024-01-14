@@ -7,8 +7,9 @@ import {
   FlatList,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import Logo from "../assets/schedule.png";
 import ScheduleItem from "../components/ScheduleItem";
 import DaysSelection from "../components/DaysSelection";
@@ -23,6 +24,10 @@ import Animated, {
 } from "react-native-reanimated";
 import { Navigation } from "react-native-feather";
 import { useNavigation } from "@react-navigation/native";
+import { getTokenFromKeychain } from "../globalFunc/Keychain";
+import BASE_URL from "../BaseUrl";
+import axios from "axios";
+import { useUser } from "../Contexts/UserContext";
 const lectureArray = [
   {
     subject: "Mathematics",
@@ -30,7 +35,6 @@ const lectureArray = [
     startTime: "10:00 AM",
     endTime: "11:30 AM",
     location: "19G2070",
-    days: "Sunday,Monday",
   },
   {
     subject: "History",
@@ -80,21 +84,75 @@ const ScheduleScreen = () => {
     "Saturday",
   ];
   const navigation = useNavigation();
-  const [selectedDayIndex, setSelectedDayIndex] = useState(0);
+  const [dayIndex, setdayIndex] = useState(0);
+  const [lectures, setLectures] = useState([]);
+  const [refreshTrigger, setRefreshTrigger] = useState(false);
 
+  const filterLecturesByDay = (lectures, selectedDay) => {
+    return lectures.filter((lecture) => lecture.day.includes(selectedDay));
+  };
+  const selectedDay = daysOfWeek[dayIndex]; // Assuming daysOfWeek is an array with the names of days
+  const [ignored, forceUpdate] = useReducer((x) => x + 1, 0);
+
+  const filteredLectures = filterLecturesByDay(lectures, selectedDay);
+  const { userId } = useUser();
+  useEffect(() => {
+    const getLectures = async () => {
+      try {
+        const token = await getTokenFromKeychain();
+        const response = await axios.get(`${BASE_URL}/lecture/${userId}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // Handle the response data here, for example:
+        const result = response.data;
+        setLectures(result);
+        console.log(result);
+        //setChat(response.data.data);
+      } catch (error) {
+        if (error.response) {
+          Alert.alert("Error", error.response.data.message);
+        } else if (error.request) {
+          Alert.alert(
+            "Network Error",
+            "There was a problem with the network. Please check your internet connection and try again.",
+            [{ text: "OK" }]
+          );
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          Alert.alert(
+            "Something Wrong",
+            "Something went wrong, try again please",
+            [{ text: "OK" }]
+          );
+        }
+      }
+    };
+    getLectures();
+  }, [refreshTrigger]);
   const moveNextDay = () => {
-    setSelectedDayIndex((prevIndex) => (prevIndex === 5 ? 0 : prevIndex + 1));
+    setdayIndex((prevIndex) => (prevIndex === 5 ? 0 : prevIndex + 1));
   };
 
   const movePreviousDay = () => {
-    setSelectedDayIndex((prevIndex) =>
+    setdayIndex((prevIndex) =>
       prevIndex === 0 ? daysOfWeek.length - 1 : prevIndex - 1
     );
   };
 
   const scheduleData = lectureArray;
 
-  const renderItem = ({ item }) => <ScheduleItem lecture={item} />;
+  const renderItem = ({ item }) => (
+    <ScheduleItem
+      lecture={item}
+      lectures={lectures}
+      setLectures={setLectures}
+      setRefreshTrigger={setRefreshTrigger}
+    />
+  );
 
   const { height, width } = useWindowDimensions();
   return (
@@ -115,7 +173,7 @@ const ScheduleScreen = () => {
             justifyContent: "center",
           }}
         >
-          <Text style={styles.dayTxt}>{daysOfWeek[selectedDayIndex]}</Text>
+          <Text style={styles.dayTxt}>{daysOfWeek[dayIndex]}</Text>
         </View>
 
         <View style={styles.arrow}>
@@ -124,12 +182,11 @@ const ScheduleScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
-      <View style={{ ...styles.list, maxHeight: height * 0.6 }}>
+      <View style={{ ...styles.list, height: height * 0.6 }}>
         <FlatList
-          data={scheduleData}
+          data={filteredLectures}
           renderItem={renderItem}
           keyExtractor={(item, index) => index.toString()}
-          hidd
         />
       </View>
       <View style={styles.footer}>
@@ -137,7 +194,9 @@ const ScheduleScreen = () => {
           text="Add a Lecture"
           type="Tertiary"
           color="#8F00FF"
-          onPress={() => navigation.navigate("ScheduleInput")}
+          onPress={() =>
+            navigation.navigate("Add Schedule", { setRefreshTrigger })
+          }
         />
       </View>
     </Animated.View>

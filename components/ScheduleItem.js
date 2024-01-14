@@ -1,8 +1,58 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import React from "react";
 import SmallBtn from "./SmallBtn";
 import Icon from "react-native-vector-icons/AntDesign";
-const ScheduleItem = ({ lecture }) => {
+import BASE_URL from "../BaseUrl";
+import axios from "axios";
+import { getTokenFromKeychain } from "../globalFunc/Keychain";
+import { useUser } from "../Contexts/UserContext";
+import { useNavigation } from "@react-navigation/native";
+const ScheduleItem = ({
+  lecture,
+  lectures,
+  setLectures,
+  setRefreshTrigger,
+}) => {
+  const id = lecture.id;
+  const navigation = useNavigation();
+  const { userId } = useUser();
+  const deleteLec = async () => {
+    try {
+      const token = await getTokenFromKeychain();
+      const response = await axios.delete(
+        `${BASE_URL}/lecture/${userId}/${id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Handle the response data here, for example:
+      const result = response;
+      const updatedLectures = lectures.filter((item) => item.id !== id);
+      setLectures(updatedLectures);
+    } catch (error) {
+      if (error.response) {
+        Alert.alert("Error", error.response.data.message);
+      } else if (error.request) {
+        Alert.alert(
+          "Network Error",
+          "There was a problem with the network. Please check your internet connection and try again.",
+          [{ text: "OK" }]
+        );
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        Alert.alert(
+          "Something Wrong",
+          "Something went wrong, try again please",
+          [{ text: "OK" }]
+        );
+      }
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.col1}>
@@ -11,21 +61,33 @@ const ScheduleItem = ({ lecture }) => {
         <Text style={styles.txt}>{lecture.endTime}</Text>
       </View>
       <View style={styles.col2}>
-        <Text style={styles.mainTxt}>{lecture.subject}</Text>
-        <Text style={styles.txt}>{lecture.location}</Text>
+        <Text style={styles.mainTxt}>{lecture.Name}</Text>
+        <Text style={styles.txt}>{lecture.classNumber}</Text>
       </View>
       <View
         style={{ width: "10%", justifyContent: "center", alignItems: "center" }}
       >
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate("EditSchedule", {
+              setRefreshTrigger,
+              subject: lecture.Name,
+              classNum: lecture.classNumber,
+              time1: lecture.startTime,
+              time2: lecture.endTime,
+              days: lecture.day,
+              id: id,
+            })
+          }
+        >
           <Icon
             name="edit"
-            style={{ ...styles.icon, marginBottom: 5 }}
-            size={22}
+            style={{ ...styles.icon, marginBottom: 10 }}
+            size={25}
           />
         </TouchableOpacity>
-        <TouchableOpacity>
-          <Icon name="delete" style={styles.icon} size={22} />
+        <TouchableOpacity onPress={deleteLec}>
+          <Icon name="delete" style={styles.icon} size={25} />
         </TouchableOpacity>
       </View>
     </View>
@@ -37,7 +99,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginHorizontal: 10,
 
-    paddingVertical: 5,
+    paddingVertical: 8,
     marginBottom: 5,
     marginTop: 5,
     shadowColor: "#000",

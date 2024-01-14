@@ -81,7 +81,7 @@ const RestaurantScreen = () => {
         );
 
         // Handle the response data here, for example:
-        const result = response.data.data;
+        const result = response.data;
         setMenuItems(result);
         console.log(result);
         //setChat(response.data.data);

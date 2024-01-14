@@ -46,7 +46,7 @@ const getTokenFromKeychain = async () => {
     return null;
   }
 };
-const ChatScreen = () => {
+const ChatScreen = ({ route }) => {
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState([]);
   const [showEmojiSelector, setShowEmojiSelector] = useState(false);
@@ -55,8 +55,12 @@ const ChatScreen = () => {
   const { userId } = useUser();
   const currentUserId = userId;
   console.log("Currentuser=" + currentUserId);
-  const { recieverId } = useRoute();
-  const recieverUser = currentUserId === 4 ? 5 : 4;
+
+  console.log(route);
+  const { receiverId } = route.params;
+  const recieverUser = receiverId;
+  const { userName } = route.params;
+  console.log(recieverUser);
   const messageId = chat.length + 1;
   console.log(currentUserId, recieverUser);
 
@@ -77,6 +81,7 @@ const ChatScreen = () => {
         // Handle the response data here, for example:
         const lol = response.data;
         setChat(response.data.data);
+        console.log(response.data.data);
       } catch (error) {
         if (error.response) {
           Alert.alert("Error", error.response.data.message);
@@ -163,6 +168,9 @@ const ChatScreen = () => {
     });
     socket.on("imageMessage", ({ image, senderId }) => {
       setReceivedImage(image);
+      const newMessage = { senderId, image: image, createdAt: Date.now() };
+      setChat((prevChat) => [newMessage, ...prevChat]);
+
       console.log(image);
     });
 
@@ -223,6 +231,14 @@ const ChatScreen = () => {
         receiverId,
         image: base64,
       });
+      const newMessage = {
+        senderId: currentUserId,
+        image: image.uri,
+        createdAt: Date.now(),
+      };
+      console.log(image);
+      setChat((prevChat) => [newMessage, ...prevChat]);
+      setMessage("");
       setImage(null);
     } catch (error) {
       console.error("Error converting image to base64:", error);
@@ -252,7 +268,8 @@ const ChatScreen = () => {
   };
 
   const renderMessageItem = ({ item, index }) => {
-    const isCurrentUser = item.senderId === currentUserId;
+    const isCurrentUser = parseInt(item.senderId) === currentUserId;
+    console.log(item.senderId, currentUserId, isCurrentUser);
     let objectURL = "";
     const bubbleStyle = isCurrentUser
       ? styles.currentUserBubble
@@ -330,6 +347,7 @@ const ChatScreen = () => {
   };
   return (
     <View style={styles.container}>
+      <CustomHeader title={userName} />
       <FlatList
         data={[...chat]}
         renderItem={renderMessageItem}

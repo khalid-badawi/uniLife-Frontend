@@ -4,14 +4,14 @@ import { StyleSheet } from "react-native";
 
 const MenuRow = ({ itemText, quantity, color = "white" }) => {
   const dots = ".".repeat(1000 - itemText.length);
-
+  console.log(quantity);
   return (
     <View style={styles.root}>
       <Text style={{ ...styles.txt, color }}>{itemText}</Text>
       <Text style={{ ...styles.dots, color }} numberOfLines={1}>
         {dots}
       </Text>
-      <Text style={{ ...styles.txt, color }}>({quantity})</Text>
+      <Text style={{ ...styles.txt }}>({quantity})</Text>
     </View>
   );
 };
@@ -20,9 +20,9 @@ const styles = StyleSheet.create({
   root: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     marginVertical: 5,
-    width: "95%",
+    width: "80%",
   },
   txt: {
     fontWeight: "bold",

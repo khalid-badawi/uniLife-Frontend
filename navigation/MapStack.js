@@ -12,7 +12,7 @@ const MapStack = () => {
         name="MapScreen"
         component={MapScreen}
         options={{
-          header: () => <CustomHeader title="Cafeteria" type="drawer" />,
+          header: () => <CustomHeader title="Map" type="drawer" />,
         }}
       />
       <Stack.Screen

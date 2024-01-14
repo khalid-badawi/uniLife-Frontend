@@ -25,16 +25,24 @@ import * as Keychain from "react-native-keychain";
 
 const addLec = Yup.object().shape({});
 
-const ScheduleInput = ({ setRefreshTrigger }) => {
+const ScheduleUpdate = ({
+  setRefreshTrigger,
+  subject,
+  classNum,
+  time1,
+  time2,
+  days,
+  id,
+}) => {
   const [showTimePicker1, setshowTimePicker1] = useState(false);
   const [showTimePicker2, setshowTimePicker2] = useState(false);
   const [startTime, setStartTime] = useState(new Date());
-  const [textStartTime, setTextStartTime] = useState("");
+  const [textStartTime, setTextStartTime] = useState(time1);
   const [endTime, setEndTime] = useState(new Date());
-  const [textEndTime, setTextEndTime] = useState("");
+  const [textEndTime, setTextEndTime] = useState(time2);
   const [day, setDay] = useState("sunday");
   const navigation = useNavigation();
-  const [selectedDays, setSelectedDays] = useState([]);
+  const [selectedDays, setSelectedDays] = useState(days);
   const [errorMsg, setErrorMsg] = useState("");
   const { height, width } = useWindowDimensions();
   const { userId, setUserId } = useUser();
@@ -118,8 +126,8 @@ const ScheduleInput = ({ setRefreshTrigger }) => {
     };
     try {
       const token = await getTokenFromKeychain();
-      const response = await axios.post(
-        `http://10.0.2.2:3000/api/v1/unilife/addLecture/${userId}`,
+      const response = await axios.patch(
+        `http://10.0.2.2:3000/api/v1/unilife/lecture/${userId}/${id}`,
         JSON.stringify(val),
         {
           headers: {
@@ -129,9 +137,8 @@ const ScheduleInput = ({ setRefreshTrigger }) => {
         }
       );
       //setErrorMsg("");
-      setRefreshTrigger((prev) => !prev);
-
       console.log("gg");
+      setRefreshTrigger((prev) => !prev);
     } catch (error) {
       if (error.response) {
         setErrorMsg(error.response.data.message);
@@ -159,8 +166,8 @@ const ScheduleInput = ({ setRefreshTrigger }) => {
   return (
     <Formik
       initialValues={{
-        subject: "",
-        classNum: "",
+        subject: subject,
+        classNum: classNum,
       }}
       onSubmit={handleAdd}
       validationSchema={addLec}
@@ -178,7 +185,7 @@ const ScheduleInput = ({ setRefreshTrigger }) => {
           <Animated.View
             entering={FadeInUp.delay(200).duration(1000).springify().damping(3)}
           >
-            <Text style={styles.text}>Add a lecture</Text>
+            <Text style={styles.text}>Edit information below</Text>
           </Animated.View>
           <Animated.View
             style={styles.animInput}
@@ -261,7 +268,7 @@ const ScheduleInput = ({ setRefreshTrigger }) => {
             style={styles.animInput}
             entering={FadeInDown.delay(400).duration(1000).springify()}
           >
-            <CustomButton text="Add" onPress={handleSubmit} />
+            <CustomButton text="Edit" onPress={handleSubmit} />
           </Animated.View>
           {errorMsg && <Text style={styles.errorText}>{errorMsg}</Text>}
 
@@ -309,7 +316,7 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     fontSize: 15,
   },
-  text: { color: "black", fontSize: 40, marginBottom: 20, marginTop: 40 },
+  text: { color: "black", fontSize: 30, marginBottom: 20, marginTop: 40 },
 });
 
-export default ScheduleInput;
+export default ScheduleUpdate;
