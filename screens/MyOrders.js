@@ -6,10 +6,11 @@ import {
   TextInput,
   ScrollView,
   Alert,
+  ActivityIndicator,
+  Platform,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import OrderItem from "../components/OrderItem";
-import CustomHeader from "../components/CustomHeader";
 import { useNavigation } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import CustomButton from "../components/CustomButton";
@@ -17,16 +18,38 @@ import { getTokenFromKeychain } from "../globalFunc/Keychain";
 import axios from "axios";
 import { useUser } from "../Contexts/UserContext";
 import BASE_URL from "../BaseUrl";
+import CustomHeader from "../navigation/CustomHeader";
+import DateTimePicker from "@react-native-community/datetimepicker";
+
 const MyOrders = () => {
   const navigation = useNavigation();
   const [search, setSearch] = useState("");
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const uniqueCategories = ["Date", "Restaurant"];
+  const uniqueCategories = ["Latest", "Date"];
+  const [selectedButton] = uniqueCategories;
+  const [date, setDate] = useState(new Date());
   const { userId } = useUser();
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
     setSearch("");
+  };
+  const [showTimePicker1, setshowTimePicker1] = useState(false);
+
+  const toggleTimePicker1 = () => {
+    setshowTimePicker1(!showTimePicker1);
+  };
+  const onChangeStart = ({ type }, selectedDate) => {
+    if (type == "set") {
+      const currentDate = selectedDate;
+
+      setDate(currentDate);
+      if (Platform.OS === "android") {
+        toggleTimePicker1();
+      }
+    } else {
+      toggleTimePicker1();
+    }
   };
 
   const [selectedCategory, setSelectedCategory] = useState(uniqueCategories[0]);
@@ -72,31 +95,24 @@ const MyOrders = () => {
   return (
     <>
       {isLoading && (
-        <View>
-          <Text>gg</Text>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <Text>Loading...</Text>
+          <ActivityIndicator size="large" color="#8F00FF" />
         </View>
       )}
       {!isLoading && (
         <View style={styles.root}>
-          <View style={styles.searchBarCont}>
-            <Ionicons name="search" style={styles.icon} size={20} />
-
-            <TextInput
-              style={styles.searchBar}
-              placeholder="Search..."
-              onChangeText={(text) => setSearch(text)}
-              value={search}
-            />
-          </View>
           <View
             style={{
               marginLeft: 15,
-              marginBottom: 10,
+              marginVertical: 10,
               flexDirection: "row",
               alignItems: "center",
             }}
           >
-            <Text style={{ fontWeight: "bold", fontSize: 16 }}>SearchBy:</Text>
+            <Text style={{ fontWeight: "bold", fontSize: 16 }}>Get By:</Text>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -116,6 +132,7 @@ const MyOrders = () => {
               ))}
             </ScrollView>
           </View>
+          {}
           <FlatList
             data={orders}
             renderItem={({ item }) => <OrderItem item={item} />}

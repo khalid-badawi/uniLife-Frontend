@@ -15,12 +15,15 @@ import { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PushNotification from "react-native-push-notification";
 import { Platform } from "react-native";
+import { SearchProvider } from "./Contexts/SearchContext";
 const App = () => {
   return (
     <SafeAreaView style={styles.container}>
-      <UserProvider>
-        <Navigation />
-      </UserProvider>
+      <SearchProvider>
+        <UserProvider>
+          <Navigation />
+        </UserProvider>
+      </SearchProvider>
       <StatusBar barStyle="light-content" backgroundColor="#A100FF" />
     </SafeAreaView>
   );

@@ -1,15 +1,68 @@
-import { View, Text, Button, StyleSheet } from "react-native";
+import { View, Text, Button, StyleSheet, Alert } from "react-native";
 import React, { useState, useEffect } from "react";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import CustomInput from "../components/CustomInput";
 import Icon from "react-native-vector-icons/AntDesign";
 import CustomButton from "../components/CustomButton";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+import axios from "axios";
+import { getTokenFromKeychain } from "../globalFunc/Keychain";
+import BASE_URL from "../BaseUrl";
+import { useUser } from "../Contexts/UserContext";
 const IndoorQR = () => {
   const [hasPermission, setHasPermission] = useState(null);
   const [openScanner, setOpenScanner] = useState(false);
-  const [textScanned, setTextScanned] = useState("");
+  const [textScanned, setTextScanned] = useState(null);
   const [inputTxt, setInputTxt] = useState("");
+  const [classInput, setClassInput] = useState(null);
+  const [error, setError] = useState("");
+  const [resultData, setResultData] = useState(null);
+  const { userId } = useUser();
+  const getDirection = async () => {
+    if (textScanned) {
+      try {
+        console.log("hi", userId);
 
+        const token = await getTokenFromKeychain();
+        const response = await axios.get(`${BASE_URL}/location/${userId}`, {
+          params: {
+            goalLoc: classInput,
+            myLoc: textScanned,
+          },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // Handle the response data here, for example:
+        const result = response.data;
+        setResultData(result);
+        console.log(result);
+        //setChat(response.data.data);
+      } catch (error) {
+        if (error.response) {
+          Alert.alert("Error", error.response.data.message);
+        } else if (error.request) {
+          Alert.alert(
+            "Network Error",
+            "There was a problem with the network. Please check your internet connection and try again.",
+            [{ text: "OK" }]
+          );
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          Alert.alert(
+            "Something Wrong",
+            "Something went wrong, try again please",
+            [{ text: "OK" }]
+          );
+        }
+      }
+    }
+  };
+  useEffect(() => {
+    getDirection();
+  }, [textScanned]);
   const askForCameraPermission = () => {
     (async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
@@ -21,9 +74,9 @@ const IndoorQR = () => {
     askForCameraPermission();
   }, []);
 
-  const handleBarCodeScanner = ({ type, data }) => {
+  const handleBarCodeScanner = ({ data }) => {
     setTextScanned(data);
-    console.log("Type:" + type + " data:" + data);
+    console.log(" data:" + data);
     setOpenScanner(false);
   };
 
@@ -32,7 +85,7 @@ const IndoorQR = () => {
   };
   const enableScanner = () => {
     setOpenScanner(true);
-    setTextScanned("");
+    setTextScanned(null);
   };
 
   if (hasPermission === null) {
@@ -50,6 +103,80 @@ const IndoorQR = () => {
     );
   }
 
+  var regex1 = /^\d{2}G\d{3}$/;
+  var regex2 = /^\d{1}G\d{3}$/;
+  var regex3 = /^\d{2}B\d{1}\d{3}$/;
+  var regex4 = /^\d{1}B\d{1}\d{3}$/;
+  var regex5 = /^\d{2}\d{1}\d{3}$/;
+  var regex6 = /^\d{1}\d{1}\d{3}$/;
+  function checkRegex(input) {
+    let outputString = "";
+    let matchResult = "";
+    let faculty = "";
+    let classNum = "";
+    let floor = "";
+    switch (true) {
+      case regex1.test(input):
+        console.log("Pattern 1 matched");
+        faculty = input.slice(0, 2); // "11"
+        floor = input.slice(2, 3); // "G"
+        classNum = input.slice(3);
+
+        break;
+      case regex2.test(input):
+        console.log("Pattern 2 matched");
+        faculty = input.slice(0, 1); // "11"
+        floor = input.slice(1, 2); // "G"
+        classNum = input.slice(2);
+
+        break;
+      case regex3.test(input):
+        console.log("Pattern 3 matched");
+        faculty = input.slice(0, 2); // "11"
+        floor = input.slice(2, 4); // "G"
+        classNum = input.slice(4);
+        break;
+      case regex4.test(input):
+        console.log("Pattern 4 matched");
+        faculty = input.slice(0, 1); // "11"
+        floor = input.slice(1, 3); // "G"
+        classNum = input.slice(3);
+        break;
+      case regex5.test(input):
+        console.log("Pattern 5 matched");
+        faculty = input.slice(0, 2); // "11"
+        floor = input.slice(2, 3); // "G"
+        classNum = input.slice(3);
+        break;
+      case regex6.test(input):
+        console.log("Pattern 6 matched");
+        faculty = input.slice(0, 1); // "11"
+        floor = input.slice(1, 2); // "G"
+        classNum = input.slice(2);
+        break;
+      default:
+        console.log("No pattern matched");
+    }
+    if (!classNum && !floor && !faculty) {
+      return null;
+    }
+    return { faculty, floor, classNum };
+  }
+
+  // Test examples
+
+  const handlePress = () => {
+    setClassInput(checkRegex(inputTxt));
+    console.log(classInput);
+    if (!classInput) {
+      setError("Please Enter a valid class number");
+    }
+    setError("");
+
+    enableScanner();
+    setError(JSON.stringify(resultData));
+    console.log(textScanned);
+  };
   return (
     <View style={styles.root}>
       {!openScanner && (
@@ -60,7 +187,7 @@ const IndoorQR = () => {
             style={{ alignSelf: "center", marginTop: 20 }}
           />
           <Text style={styles.resultTxt}>
-            Enter the class number to which you want to go and scan the QR codes
+            Enter the class number to which you want to go and scan the QR code
             you see in the building.
           </Text>
           <View style={styles.input}>
@@ -69,15 +196,18 @@ const IndoorQR = () => {
               setValue={setInputTxt}
               placeholder="Class Number,e.g 11G150"
             />
-            <CustomButton text="Scan" onPress={enableScanner} />
+            <Text style={{ color: "red" }}>{error}</Text>
+            <CustomButton text="Scan" onPress={handlePress} />
           </View>
 
           <View style={{ flex: 1, alignItems: "center" }}>
-            <Text style={styles.resultTxt}>
-              You are currently in{" "}
-              <Text style={styles.nestedTxt}>Engineering Faculty</Text>, Ground
-              Floor, inorder to go to 11G170, Go 7 Buildings towards the right
-            </Text>
+            {resultData && (
+              <Text style={styles.resultTxt}>
+                You are currently in
+                <Text style={styles.nestedTxt}> {resultData.currFac}</Text>,
+                Floor {textScanned.name}
+              </Text>
+            )}
           </View>
         </>
       )}

@@ -2,8 +2,9 @@ import { View, Text, Modal, StyleSheet, Image } from "react-native";
 import React from "react";
 import CustomButton from "./CustomButton";
 import test2 from "../assets/test2.png";
-import CustomHeader from "./CustomHeader";
+import CustomHeader from "../navigation/CustomHeader";
 const ItemDetails = ({ isVisible, closeModal, item }) => {
+  console.log(item);
   return (
     <Modal
       animationType="slide"
@@ -12,15 +13,16 @@ const ItemDetails = ({ isVisible, closeModal, item }) => {
       onRequestClose={closeModal}
     >
       <View style={styles.root}>
-        <CustomHeader onPress={closeModal} text="Details" />
+        <CustomHeader close={closeModal} title="Details" />
         <Image
-          source={test2}
+          source={{ uri: item.image }}
+          alt="Menu Item image"
           style={styles.img} // Fixed style object
           resizeMode="contain"
         />
         <View style={styles.descriptionContainer}>
-          <Text style={styles.mainTxt}>{item.itemName}</Text>
-          <Text style={styles.descTxt}>{item.itemDescription}</Text>
+          <Text style={styles.mainTxt}>{item.nameOfFood}</Text>
+          <Text style={styles.descTxt}>{item.description}</Text>
         </View>
       </View>
     </Modal>
@@ -45,6 +47,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     padding: 15,
     paddingTop: 40,
+    alignItems: "center",
   },
   descTxt: {
     color: "white",

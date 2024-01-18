@@ -6,11 +6,19 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Icon3 from "react-native-vector-icons/MaterialIcons";
 import SearchIcon from "react-native-vector-icons/AntDesign";
 import Icon4 from "react-native-vector-icons/Ionicons";
+import { useSearch } from "../Contexts/SearchContext";
 
-const CustomHeader = ({ title, search = false, type = "stack" }) => {
+const CustomHeader = ({
+  close,
+  title,
+  search = false,
+  type = "stack",
+  searchPlaceHolder = "Search...",
+  children,
+}) => {
   const navigation = useNavigation();
   const [isSearchVisible, setIsSearchVisible] = useState(false);
-  const [searchText, setSearchText] = useState("");
+  const { searchQuery, setSearchQuery } = useSearch();
   const renderLeftComponent = () => {
     if (type === "drawer") {
       return (
@@ -25,7 +33,7 @@ const CustomHeader = ({ title, search = false, type = "stack" }) => {
       return (
         <TouchableOpacity
           style={{ paddingVertical: 5 }}
-          onPress={() => navigation.goBack()}
+          onPress={close ? close : () => navigation.goBack()}
         >
           <Icon4 name="chevron-back" size={25} color="#fff" />
         </TouchableOpacity>
@@ -56,9 +64,10 @@ const CustomHeader = ({ title, search = false, type = "stack" }) => {
                   fontWeight: "700",
                   paddingHorizontal: 5,
                 }}
-                placeholder="Search..."
+                placeholder={searchPlaceHolder}
+                value={searchQuery}
                 placeholderTextColor="white"
-                onChangeText={(text) => setSearchText(text)}
+                onChangeText={(text) => setSearchQuery(text)}
               />
             </View>
           ) : (
@@ -103,6 +112,7 @@ const CustomHeader = ({ title, search = false, type = "stack" }) => {
               <SearchIcon name="search1" size={25} color="white" />
             </TouchableOpacity>
           )}
+          {!search && children}
         </View>
       )}
     />

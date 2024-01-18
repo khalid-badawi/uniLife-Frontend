@@ -347,7 +347,6 @@ const ChatScreen = ({ route }) => {
   };
   return (
     <View style={styles.container}>
-      <CustomHeader title={userName} />
       <FlatList
         data={[...chat]}
         renderItem={renderMessageItem}

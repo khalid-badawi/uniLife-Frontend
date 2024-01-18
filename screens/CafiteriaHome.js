@@ -12,6 +12,7 @@ import * as Keychain from "react-native-keychain";
 import { useUser } from "../Contexts/UserContext";
 import { useNavigation } from "@react-navigation/native";
 import BASE_URL from "../BaseUrl";
+import { useSearch } from "../Contexts/SearchContext";
 
 const menuItems = [
   {
@@ -83,13 +84,13 @@ const getTokenFromKeychain = async () => {
 const CafiteriaHome = () => {
   const navigation = useNavigation();
   const [restaurants, setRestaurants] = useState([]);
-  const { userId } = useUser();
-
+  const { userId, username } = useUser();
+  console.log(username);
   const visitRestaurant = (restaurantId) => {
     console.log(restaurantId);
     navigation.navigate("RestaurantScreen", { restaurantId });
   };
-
+  const { searchQuery, setSearchQuery } = useSearch();
   useEffect(() => {
     const getRseturnats = async () => {
       try {
@@ -135,15 +136,12 @@ const CafiteriaHome = () => {
           <Text
             style={{ ...styles.title, color: "#8F0FF0", fontWeight: "bold" }}
           >
-            Ahmad
+            {username}
           </Text>
         </Text>
         {/* Wrap the content inside TouchableOpacity */}
         <TouchableOpacity
-          onPress={() => {
-            // Handle onPress action
-            console.log("My Orders pressed");
-          }}
+          onPress={() => navigation.navigate("MyOrders")}
           style={{ position: "absolute", right: 12, flexDirection: "row" }}
         >
           <Text style={{ color: "#8F0FF0", fontSize: 20 }}>My Orders</Text>

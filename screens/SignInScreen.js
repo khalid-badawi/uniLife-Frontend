@@ -47,7 +47,7 @@ const SignInScreen = () => {
   const { height, width } = useWindowDimensions();
   const [errorMsg, setErrorMsg] = useState("");
 
-  const { userId, setUserId } = useUser();
+  const { userId, setUserId, setUsername } = useUser();
   const onForgotPasswordPressed = () => {
     console.warn("forgot password");
   };
@@ -102,6 +102,8 @@ const SignInScreen = () => {
       setErrorMsg("");
       requestFCMPermission();
       setUserId(response.data.data.id);
+      setUsername(response.data.data.username);
+      console.log(response.data.data);
       navigation.navigate("Main");
     } catch (error) {
       if (error.response) {

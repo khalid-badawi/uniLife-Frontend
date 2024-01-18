@@ -34,13 +34,14 @@ import CustomDrawer from "../components/CustomDrawer";
 import SearchIcon from "react-native-vector-icons/AntDesign";
 import { Text, View, TextInput } from "react-native";
 import DrawerNav from "./DrawerNav";
+import OthersPosts from "../screens/OthersPosts";
 const Stack = createNativeStackNavigator();
 
 export default function Navigation() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="SignIn"
+        initialRouteName="Test"
         screenOptions={({ navigation }) => ({
           headerShown: false,
           headerTitleAlign: "center",
@@ -49,6 +50,11 @@ export default function Navigation() {
         <Stack.Screen
           name="SignIn"
           component={SignInScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Test"
+          component={DormitoryScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen name="SignUp" component={SignUpScreen} />

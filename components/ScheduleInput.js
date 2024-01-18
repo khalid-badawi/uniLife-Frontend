@@ -38,7 +38,7 @@ const ScheduleInput = ({ setRefreshTrigger }) => {
   const [errorMsg, setErrorMsg] = useState("");
   const { height, width } = useWindowDimensions();
   const { userId, setUserId } = useUser();
-
+  console.log(startTime);
   const getTokenFromKeychain = async () => {
     try {
       // Retrieve the token from the keychain
@@ -79,7 +79,13 @@ const ScheduleInput = ({ setRefreshTrigger }) => {
       setStartTime(currentTime);
       if (Platform.OS === "android") {
         toggleTimePicker1();
-        setTextStartTime(currentTime.toLocaleTimeString());
+        const options = {
+          hour12: false,
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        };
+        setTextStartTime(currentTime.toLocaleTimeString("en-US", options));
       }
     } else {
       toggleTimePicker1();
@@ -92,7 +98,13 @@ const ScheduleInput = ({ setRefreshTrigger }) => {
       setEndTime(currentTime);
       if (Platform.OS === "android") {
         toggleTimePicker2();
-        setTextEndTime(currentTime.toLocaleTimeString());
+        const options = {
+          hour12: false,
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        };
+        setTextEndTime(currentTime.toLocaleTimeString("en-US", options));
       }
     } else {
       toggleTimePicker2();

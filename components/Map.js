@@ -1,7 +1,7 @@
 import React, { useState, Component, useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import Mapbox from "@rnmapbox/maps";
-
+import Icon from "react-native-vector-icons/FontAwesome";
 // Will be null for most users (only Mapbox authenticates this way).
 // Required on Android. See Android installation notes.
 import { PermissionsAndroid } from "react-native";
@@ -97,6 +97,11 @@ const Map = ({
             draggable={true}
             onDrag={(event) => {
               setCurrentPosition(event.geometry.coordinates);
+            }}
+            style={{
+              iconImage: Icon.getImageSourceSync("male", 30), // Use the icon you want (replace 'rocket' with the actual icon name)
+              iconAllowOverlap: true,
+              iconIgnorePlacement: true,
             }}
           />
         }

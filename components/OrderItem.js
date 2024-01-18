@@ -1,10 +1,61 @@
-import { View, Text, StyleSheet, FlatList } from "react-native";
-import React from "react";
+import { View, Text, StyleSheet, FlatList, Alert } from "react-native";
+import React, { useState } from "react";
 import MenuRow from "./MenuRow";
+import { getTokenFromKeychain } from "../globalFunc/Keychain";
+
 import CustomHeader from "./CustomHeader";
+import Rating from "./Rating";
+import axios from "axios";
+import { useUser } from "../Contexts/UserContext";
 
 const OrderItem = ({ item }) => {
   console.log(item);
+  const dateString = item.createdAt;
+  const dateObject = new Date(dateString);
+  const [rating, setRating] = useState(item.rating);
+  const { userId } = useUser();
+  const [ratingNotes, setRatingNotes] = useState("");
+  const handleRate = async () => {
+    try {
+      const token = await getTokenFromKeychain();
+      const response = await axios.patch(
+        `http://10.0.2.2:3000/api/v1/unilife/orders/${userId}/${item.orderId}`,
+        JSON.stringify({ rating, rateDesc: ratingNotes }),
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      //setErrorMsg("");
+      console.log("gg");
+    } catch (error) {
+      if (error.response) {
+        Alert.alert("Error", error.response.data.message);
+      } else if (error.request) {
+        Alert.alert(
+          "Network Error",
+          "There was a problem with the network. Please check your internet connection and try again.",
+          [{ text: "OK" }]
+        );
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        Alert.alert(
+          "Something Wrong",
+          "Something went wrong, try again please",
+          [{ text: "OK" }]
+        );
+      }
+    }
+
+    // resetForm();
+    // setSelectedDays([]);
+    //navigation.navigate("");
+  };
+  // Now you can format the date using either method mentioned earlier
+  // Using toLocaleString:
+  const formattedDate = dateObject.toLocaleString();
   return (
     <View style={styles.root}>
       <View style={styles.card}>
@@ -18,7 +69,7 @@ const OrderItem = ({ item }) => {
         </View>
         <View style={{ flexDirection: "row", marginVertical: 5 }}>
           <Text style={styles.mainTxt}>Ordered On: </Text>
-          <Text style={styles.descTxt}>{item.createdAt}</Text>
+          <Text style={styles.descTxt}>{formattedDate}</Text>
         </View>
         <View
           style={{
@@ -64,6 +115,18 @@ const OrderItem = ({ item }) => {
           >
             {item.totalPrice}₪
           </Text>
+        </View>
+        <View style={{ alignSelf: "center" }}>
+          {item.status === "DELIVERED" && (
+            <Rating
+              rating={rating}
+              setRating={setRating}
+              setRatingNotes={setRatingNotes}
+              ratingNotes={ratingNotes}
+              onConfirm={handleRate}
+              disabled={rating > 0}
+            />
+          )}
         </View>
       </View>
     </View>

@@ -2,20 +2,22 @@ import React from "react";
 import { View, Text, Modal, StyleSheet, TouchableOpacity } from "react-native";
 import CustomButton from "./CustomButton";
 import { Picker } from "@react-native-picker/picker";
-const majors = ["All", "Relevant"];
-const Catigory = ["All", "Books", "Equipments"];
-const FilterModal = ({
+const types = ["All", "Relevant"];
+const distances = ["All", "Books", "Equipments"];
+const DormitoryModal = ({
   visible,
   closeModal,
   major,
   handleMajorChange,
-  catigory,
-  setCatigory,
+  distance,
+  setdistance,
   getPosts,
+  type,
+  setType,
 }) => {
   const onPress = () => {
     closeModal();
-    getPosts();
+    //getPosts();
   };
 
   return (
@@ -30,16 +32,14 @@ const FilterModal = ({
           <View
             style={{ marginTop: 5, flexDirection: "row", alignItems: "center" }}
           >
-            <Text style={styles.txt}>Get Posts: </Text>
+            <Text style={styles.txt}>Type:{"        "} </Text>
             <View style={styles.pickerCont}>
               <Picker
-                selectedValue={major}
-                onValueChange={(itemValue, itemIndex) =>
-                  handleMajorChange(itemValue)
-                }
+                selectedValue={type}
+                onValueChange={(itemValue, itemIndex) => setType(itemValue)}
               >
-                {majors.map((major, index) => (
-                  <Picker.Item key={index} label={major} value={major} />
+                {types.map((type, index) => (
+                  <Picker.Item key={index} label={type} value={type} />
                 ))}
               </Picker>
             </View>
@@ -47,20 +47,36 @@ const FilterModal = ({
           <View
             style={{ marginTop: 5, flexDirection: "row", alignItems: "center" }}
           >
-            <Text style={styles.txt}>Catigory{":   "}</Text>
+            <Text style={styles.txt}>Distance{":  "}</Text>
             <View style={styles.pickerCont}>
               <Picker
-                selectedValue={catigory}
-                onValueChange={(itemValue, itemIndex) => setCatigory(itemValue)}
+                selectedValue={distance}
+                onValueChange={(itemValue, itemIndex) => setdistance(itemValue)}
               >
-                {Catigory.map((catigory, index) => (
-                  <Picker.Item key={index} label={catigory} value={catigory} />
+                {distances.map((distance, index) => (
+                  <Picker.Item key={index} label={distance} value={distance} />
+                ))}
+              </Picker>
+            </View>
+          </View>
+          <View
+            style={{ marginTop: 5, flexDirection: "row", alignItems: "center" }}
+          >
+            <Text style={styles.txt}>Price{":        "}</Text>
+            <View style={styles.pickerCont}>
+              <Picker
+                selectedValue={distance}
+                onValueChange={(itemValue, itemIndex) => setdistance(itemValue)}
+              >
+                {distances.map((distance, index) => (
+                  <Picker.Item key={index} label={distance} value={distance} />
                 ))}
               </Picker>
             </View>
           </View>
           {/* Your filter options and content go here */}
           <CustomButton text="Filter" onPress={onPress} />
+          <CustomButton text="Close" type="Tertiary" onPress={closeModal} />
         </View>
       </View>
     </Modal>
@@ -91,4 +107,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FilterModal;
+export default DormitoryModal;

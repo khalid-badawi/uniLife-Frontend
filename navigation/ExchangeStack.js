@@ -30,9 +30,7 @@ const ExchangeStack = () => {
       <Stack.Screen
         name="CreatePost"
         component={CreatePost}
-        options={{
-          header: () => <CustomHeader title="Cafeteria" type="stack" />,
-        }}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );

@@ -72,6 +72,7 @@ const RestaurantScreen = () => {
         const token = await getTokenFromKeychain();
         const response = await axios.get(
           `${BASE_URL}/menu/${restaurantId}/${userId}`,
+          
           {
             headers: {
               "Content-Type": "application/json",

@@ -1,34 +1,24 @@
-import { View, Text, StyleSheet, FlatList, Alert } from "react-native";
-import React, { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Alert,
+  TouchableOpacity,
+} from "react-native";
+import React, { useEffect, useState } from "react";
 import TextArea from "../components/TextArea";
 import { Picker } from "@react-native-picker/picker";
 import CustomButton from "../components/CustomButton";
-import CustomHeader from "../components/CustomHeader";
 import PickImage from "../components/PickImage";
 import axios from "axios";
 import * as Keychain from "react-native-keychain";
 import { useUser } from "../Contexts/UserContext";
 import { useNavigation } from "@react-navigation/native";
 import BASE_URL from "../BaseUrl";
+import CustomHeader from "../navigation/CustomHeader";
 const RAPIDAPI_HOST = "investing-cryptocurrency-markets.p.rapidapi.com";
 const RAPIDAPI_KEY = "3bd39bcb8dmshb5db9a8e916f20dp198b41jsn95ca2c49a7d2";
-const majors = [
-  "Targeted Majors",
-  "All",
-  "Computer Science",
-  "Electrical Engineering",
-  "Mechanical Engineering",
-  "Civil Engineering",
-  "Chemical Engineering",
-  "Biology",
-  "Physics",
-  "Mathematics",
-  "Psychology",
-  "Economics",
-  "Political Science",
-  "History",
-];
-const Catigories = ["Select Catigory", "Books", "Equipments"];
 const getTokenFromKeychain = async () => {
   try {
     // Retrieve the token from the keychain
@@ -47,29 +37,118 @@ const getTokenFromKeychain = async () => {
     return null;
   }
 };
+
 const CreatePost = () => {
   const [postText, setPostText] = useState("");
   const [selectedMajor, setSelectedMajor] = useState("");
   const [selectedCatigory, setSelectedCatigory] = useState("");
   const [relatedMajors, setRelatedMajors] = useState([]);
+  const [majors, setMajors] = useState([]);
+  const [catigories, setCatigories] = useState([]);
   const [image, setImage] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const { userId } = useUser();
   const navigation = useNavigation();
+  console.log(selectedCatigory);
+  useEffect(() => {
+    const getMenu = async () => {
+      try {
+        setIsLoading(true);
+        const token = await getTokenFromKeychain();
+        const response = await axios.get(`${BASE_URL}/major/${userId}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log("Hellooo");
+        // Handle the response data here, for example:
+        const result = response.data;
+
+        console.log(result);
+        const mappedArray = result.map((item) => item.name);
+        setMajors(["Targeted Majors", "All", ...mappedArray]);
+        setIsLoading(false);
+        //setChat(response.data.data);
+      } catch (error) {
+        if (error.response) {
+          Alert.alert("Error", error.response.data.message);
+        } else if (error.request) {
+          Alert.alert(
+            "Network Error",
+            "There was a problem with the network. Please check your internet connection and try again.",
+            [{ text: "OK" }]
+          );
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          Alert.alert(
+            "Something Wrong",
+            "Something went wrong, try again please",
+            [{ text: "OK" }]
+          );
+        }
+      }
+    };
+    getMenu();
+  }, []);
+  useEffect(() => {
+    const getCatigory = async () => {
+      try {
+        setIsLoading(true);
+        const token = await getTokenFromKeychain();
+        const response = await axios.get(`${BASE_URL}/catigory/${userId}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log("Hellooo");
+        // Handle the response data here, for example:
+        const result = response.data;
+
+        console.log(result);
+        const mappedArray = result.map((item) => item.name);
+        setCatigories(["Select Category", ...mappedArray]);
+
+        setIsLoading(false);
+        //setChat(response.data.data);
+      } catch (error) {
+        if (error.response) {
+          Alert.alert("Error", error.response.data.message);
+        } else if (error.request) {
+          Alert.alert(
+            "Network Error",
+            "There was a problem with the network. Please check your internet connection and try again.",
+            [{ text: "OK" }]
+          );
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          Alert.alert(
+            "Something Wrong",
+            "Something went wrong, try again please",
+            [{ text: "OK" }]
+          );
+        }
+      }
+    };
+    getCatigory();
+  }, []);
 
   const handleMajorChange = (major) => {
     console.log(major);
+    if (major === "Targeted Majors") {
+      return;
+    }
     if (major === "All") {
       setRelatedMajors(["All"]);
-    } else if (
-      !relatedMajors.includes(major) &&
-      !relatedMajors.includes("All")
-    ) {
-      setRelatedMajors([...relatedMajors, major]);
+    } else if (!relatedMajors.includes(major)) {
+      const filtered = relatedMajors.filter((item) => item !== "All");
+      setRelatedMajors([...filtered, major]);
     }
 
     setSelectedMajor("");
   };
-
+  console.log(relatedMajors);
   const handlePostPress = async () => {
     // Validate postText, relatedMajors, and image
     if (
@@ -134,12 +213,16 @@ const CreatePost = () => {
 
   return (
     <View style={styles.root}>
-      <CustomHeader
-        text="Create Post"
-        BtnText="Post"
-        handleButtonPress={handlePostPress}
-        onPress={() => navigation.goBack()}
-      />
+      <CustomHeader title="Create Post">
+        <TouchableOpacity
+          style={{ marginTop: 2, marginRight: 5 }}
+          onPress={handlePostPress}
+        >
+          <Text style={{ color: "white", fontSize: 18, fontWeight: "700" }}>
+            Post
+          </Text>
+        </TouchableOpacity>
+      </CustomHeader>
       <View style={{ marginTop: 10 }}>
         <TextArea
           text={postText}
@@ -155,7 +238,7 @@ const CreatePost = () => {
             setSelectedCatigory(itemValue)
           }
         >
-          {Catigories.map((catigory, index) => (
+          {catigories.map((catigory, index) => (
             <Picker.Item
               key={index}
               label={catigory}
@@ -181,7 +264,16 @@ const CreatePost = () => {
         </Picker>
       </View>
 
-      <View style={{ marginLeft: 10 }}>
+      <View style={{ marginLeft: 10, display: "flex", flexDirection: "row" }}>
+        {relatedMajors.length !== 0 && (
+          <TouchableOpacity
+            style={{ alignSelf: "center" }}
+            onPress={() => setRelatedMajors([])}
+          >
+            <Text style={{ color: "#8F00FF", fontSize: 16 }}>clear all</Text>
+          </TouchableOpacity>
+        )}
+
         <FlatList
           horizontal
           showsHorizontalScrollIndicator={true}
