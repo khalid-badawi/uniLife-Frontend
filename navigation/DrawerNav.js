@@ -17,6 +17,10 @@ import MyPostsScreen from "../screens/MyPostsScreen";
 import ScheduleStack from "./ScheduleStack";
 import EditProfileStack from "./EditProfileStack";
 import ChatStack from "./ChatStack";
+import SavedDorms from "../screens/SavedDorms";
+import MyDormitoriesStack from "./MyDormitoriesStack";
+import OthersPosts from "../screens/OthersPosts";
+import NotificationScreen from "../screens/NotificationScreen";
 const Drawer = createDrawerNavigator();
 
 const DrawerNav = () => {
@@ -81,6 +85,21 @@ const DrawerNav = () => {
         })}
       />
       <Drawer.Screen
+        name="SavedDormsStack"
+        component={MyDormitoriesStack}
+        options={({ route }) => ({
+          drawerIcon: ({ focused, color, size }) => (
+            <Icon2
+              name="table"
+              size={size}
+              color={focused ? "white" : "#808080"}
+            />
+          ),
+          drawerLabel: "Saved Dormitories",
+        })}
+      />
+
+      <Drawer.Screen
         name="MyOrders"
         component={MyOrders}
         options={({ route }) => ({
@@ -92,6 +111,20 @@ const DrawerNav = () => {
             />
           ),
           drawerLabel: "My Orders",
+        })}
+      />
+      <Drawer.Screen
+        name="Notifications"
+        component={NotificationScreen}
+        options={({ route }) => ({
+          drawerIcon: ({ focused, color, size }) => (
+            <Icon2
+              name="shoppingcart"
+              size={size}
+              color={focused ? "white" : "#808080"}
+            />
+          ),
+          drawerLabel: "Notifications",
         })}
       />
       <Drawer.Screen

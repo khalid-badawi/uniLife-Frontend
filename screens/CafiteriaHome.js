@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Alert } from "react-native";
+import { View, Text, StyleSheet, Alert, ActivityIndicator } from "react-native";
 import React, { useState } from "react";
 import RestCard from "../components/RestCard";
 import PopularMeal from "../components/PopularMeal";
@@ -13,54 +13,6 @@ import { useUser } from "../Contexts/UserContext";
 import { useNavigation } from "@react-navigation/native";
 import BASE_URL from "../BaseUrl";
 import { useSearch } from "../Contexts/SearchContext";
-
-const menuItems = [
-  {
-    itemId: "1",
-    itemName: "Classic Burger",
-    itemDescription: "Juicy beef patty with lettuce, tomato, and cheese",
-    price: 9.99,
-    catigory: "Meals",
-  },
-  {
-    itemId: "2",
-    itemName: "Chicken Shawarma Wrap",
-    itemDescription:
-      "Grilled chicken with garlic sauce and veggies wrapped in pita",
-    price: 12.99,
-    catigory: "Sandwiches",
-  },
-  {
-    itemId: "3",
-    itemName: "Margherita Pizza",
-    itemDescription: "Classic pizza with fresh mozzarella, tomatoes, and basil",
-    price: 10.99,
-    catigory: "Special",
-  },
-  {
-    itemId: "4",
-    itemName: "Classic Burger",
-    itemDescription: "Juicy beef patty with lettuce, tomato, and cheese",
-    price: 9.99,
-    catigory: "Meals",
-  },
-  {
-    itemId: "12",
-    itemName: "Chicken Shawarma Wrap",
-    itemDescription:
-      "Grilled chicken with garlic sauce and veggies wrapped in pita",
-    price: 12.99,
-    catigory: "Sandwiches",
-  },
-  {
-    itemId: "9",
-    itemName: "Margherita Pizza",
-    itemDescription: "Classic pizza with fresh mozzarella, tomatoes, and basil",
-    price: 10.99,
-    catigory: "Special",
-  },
-  // Add more items as needed
-];
 
 const getTokenFromKeychain = async () => {
   try {
@@ -85,6 +37,7 @@ const CafiteriaHome = () => {
   const navigation = useNavigation();
   const [restaurants, setRestaurants] = useState([]);
   const { userId, username } = useUser();
+  const [isLoading, setIsLoading] = useState(true);
   console.log(username);
   const visitRestaurant = (restaurantId) => {
     console.log(restaurantId);
@@ -93,6 +46,7 @@ const CafiteriaHome = () => {
   const { searchQuery, setSearchQuery } = useSearch();
   useEffect(() => {
     const getRseturnats = async () => {
+      setIsLoading(true);
       try {
         const token = await getTokenFromKeychain();
         const response = await axios.get(`${BASE_URL}/restaurants/${userId}`, {
@@ -105,6 +59,7 @@ const CafiteriaHome = () => {
         // Handle the response data here, for example:
         setRestaurants(response.data);
         console.log(response.data);
+        setIsLoading(false);
       } catch (error) {
         if (error.response) {
           Alert.alert("Error", error.response.data.message);
@@ -125,31 +80,49 @@ const CafiteriaHome = () => {
       }
     };
 
-    getRseturnats();
+    const unsubscribe = navigation.addListener("focus", () => {
+      getRseturnats();
+    });
+
+    return unsubscribe;
   }, []);
 
   return (
-    <View style={styles.root}>
-      <View style={{ flexDirection: "row", width: "100%" }}>
-        <Text style={styles.title}>
-          Hello,{" "}
-          <Text
-            style={{ ...styles.title, color: "#8F0FF0", fontWeight: "bold" }}
-          >
-            {username}
-          </Text>
-        </Text>
-        {/* Wrap the content inside TouchableOpacity */}
-        <TouchableOpacity
-          onPress={() => navigation.navigate("MyOrders")}
-          style={{ position: "absolute", right: 12, flexDirection: "row" }}
+    <>
+      {isLoading && (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <Text style={{ color: "#8F0FF0", fontSize: 20 }}>My Orders</Text>
-          <Icon name="food" style={styles.icon} size={22} />
-        </TouchableOpacity>
-      </View>
-      <Text style={styles.descTxt}>Which restaurant today? 😋</Text>
-      {/* <View style={styles.searchBarCont}>
+          <Text>Loading...</Text>
+          <ActivityIndicator size="large" color="#8F00FF" />
+        </View>
+      )}
+      {!isLoading && (
+        <View style={styles.root}>
+          <View style={{ flexDirection: "row", width: "100%" }}>
+            <Text style={styles.title}>
+              Hello,{" "}
+              <Text
+                style={{
+                  ...styles.title,
+                  color: "#8F0FF0",
+                  fontWeight: "bold",
+                }}
+              >
+                {username}
+              </Text>
+            </Text>
+            {/* Wrap the content inside TouchableOpacity */}
+            <TouchableOpacity
+              onPress={() => navigation.navigate("MyOrders")}
+              style={{ position: "absolute", right: 12, flexDirection: "row" }}
+            >
+              <Text style={{ color: "#8F0FF0", fontSize: 20 }}>My Orders</Text>
+              <Icon name="food" style={styles.icon} size={22} />
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.descTxt}>Which restaurant today? 😋</Text>
+          {/* <View style={styles.searchBarCont}>
         <Icon name="search" style={styles.icon} size={20} />
 
         <TextInput
@@ -158,28 +131,30 @@ const CafiteriaHome = () => {
           onChangeText={(text) => setSearch(text)}
         />
       </View> */}
-      <View
-        style={{
-          height: "100%",
-        }}
-      >
-        <View style={{ height: "99%" }}>
-          <FlatList
-            data={restaurants}
-            keyExtractor={(item, index) => item.id}
-            renderItem={({ item }) => (
-              <RestCard
-                {...item}
-                visitRest={() => {
-                  visitRestaurant(item.id);
-                }}
+          <View
+            style={{
+              height: "100%",
+            }}
+          >
+            <View style={{ height: "99%" }}>
+              <FlatList
+                data={restaurants}
+                keyExtractor={(item, index) => item.id}
+                renderItem={({ item }) => (
+                  <RestCard
+                    {...item}
+                    visitRest={() => {
+                      visitRestaurant(item.id);
+                    }}
+                  />
+                )}
+                contentContainerStyle={{ marginBottom: 10 }}
               />
-            )}
-            contentContainerStyle={{ marginBottom: 10 }}
-          />
+            </View>
+          </View>
         </View>
-      </View>
-    </View>
+      )}
+    </>
   );
 };
 

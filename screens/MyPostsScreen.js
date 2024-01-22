@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   FlatList,
+  ActivityIndicator,
 } from "react-native";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import { ScrollView } from "react-native";
@@ -20,12 +21,13 @@ import axios from "axios";
 import CustomHeader from "../navigation/CustomHeader";
 import { useSearch } from "../Contexts/SearchContext";
 import CustomButton from "../components/CustomButton";
-const MyPostsScreen = () => {
+const MyPostsScreen = ({ navigation }) => {
   const { searchQuery, setSearchQuery } = useSearch();
 
   console.log(searchQuery);
   const [posts, setPosts] = useState("");
   const [search, setSearch] = useState(searchQuery);
+  const [isLoading, setIsLoading] = useState(true);
   const buttons = ["Posted by me", "Reserved by me"];
   const [selectedButton, setSelectedButton] = useState(buttons[0]);
   console.log("Hi", searchQuery);
@@ -35,6 +37,7 @@ const MyPostsScreen = () => {
   const { userId } = useUser();
   const getPosts = async () => {
     try {
+      setIsLoading(true);
       const token = await getTokenFromKeychain();
       const response = await axios.get(`${BASE_URL}/post/${userId}`, {
         headers: {
@@ -47,7 +50,7 @@ const MyPostsScreen = () => {
       const result = response.data;
       console.log(result);
       setPosts(result);
-
+      setIsLoading(false);
       //setChat(response.data.data);
     } catch (error) {
       if (error.response) {
@@ -70,6 +73,7 @@ const MyPostsScreen = () => {
   };
   const getReservedPosts = async () => {
     try {
+      setIsLoading(true);
       const token = await getTokenFromKeychain();
       const response = await axios.get(`${BASE_URL}/reservedpost/${userId}`, {
         headers: {
@@ -82,6 +86,7 @@ const MyPostsScreen = () => {
       const result = response.data;
       setPosts(result);
       console.log("Hello", result);
+      setIsLoading(false);
 
       //setChat(response.data.data);
     } catch (error) {
@@ -104,50 +109,78 @@ const MyPostsScreen = () => {
     }
   };
   useEffect(() => {
-    if (selectedButton === buttons[0]) {
-      getPosts();
-    } else if (selectedButton === buttons[1]) {
-      getReservedPosts();
+    let done = false;
+
+    const unsubscribe = navigation.addListener("focus", () => {
+      console.log("gg1");
+      if (selectedButton === buttons[0]) {
+        getPosts();
+      } else if (selectedButton === buttons[1]) {
+        getReservedPosts();
+      }
+      done = true;
+    });
+    if (!done) {
+      console.log("gg2");
+      if (selectedButton === buttons[0]) {
+        getPosts();
+      } else if (selectedButton === buttons[1]) {
+        getReservedPosts();
+      }
     }
+
+    return unsubscribe;
   }, [selectedButton]);
   return (
-    <View style={styles.root}>
-      <CustomHeader title="My Posts" />
+    <>
+      {isLoading && (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <Text>Loading...</Text>
+          <ActivityIndicator size="large" color="#8F00FF" />
+        </View>
+      )}
+      {!isLoading && (
+        <View style={styles.root}>
+          <CustomHeader title="My Posts" />
 
-      <View
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          paddingVertical: 15,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        {buttons.map((category) => (
-          <CustomButton
-            key={category}
-            text={category}
-            type={category === selectedButton ? "Selected" : "NotSelected"}
-            onPress={() => handleCategoryClick(category)}
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              paddingVertical: 15,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {buttons.map((category) => (
+              <CustomButton
+                key={category}
+                text={category}
+                type={category === selectedButton ? "Selected" : "NotSelected"}
+                onPress={() => handleCategoryClick(category)}
+              />
+            ))}
+          </View>
+          <View style={{ height: 10, backgroundColor: "#E3E3E3" }}></View>
+          <FlatList
+            data={posts}
+            renderItem={({ item }) => (
+              <PostCard
+                item={item}
+                type={selectedButton === buttons[0] ? "mine" : "reserved"}
+                setPosts={setPosts}
+                posts={posts}
+                selectedButton={selectedButton}
+              />
+            )}
+            keyExtractor={(item) => item.id.toString()}
           />
-        ))}
-      </View>
-      <View style={{ height: 10, backgroundColor: "#E3E3E3" }}></View>
-      <FlatList
-        data={posts}
-        renderItem={({ item }) => (
-          <PostCard
-            item={item}
-            type={selectedButton === buttons[0] ? "mine" : "reserved"}
-            setPosts={setPosts}
-            posts={posts}
-            selectedButton={selectedButton}
-          />
-        )}
-        keyExtractor={(item) => item.id.toString()}
-      />
-      {/* Use the FilterModal component */}
-    </View>
+          {/* Use the FilterModal component */}
+        </View>
+      )}
+    </>
   );
 };
 

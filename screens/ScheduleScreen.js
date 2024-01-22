@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import React, { useState, useEffect, useReducer } from "react";
 import Logo from "../assets/schedule.png";
@@ -93,12 +94,13 @@ const ScheduleScreen = () => {
   };
   const selectedDay = daysOfWeek[dayIndex]; // Assuming daysOfWeek is an array with the names of days
   const [ignored, forceUpdate] = useReducer((x) => x + 1, 0);
-
+  const [isLoading, setIsLoading] = useState(true);
   const filteredLectures = filterLecturesByDay(lectures, selectedDay);
   const { userId } = useUser();
   useEffect(() => {
     const getLectures = async () => {
       try {
+        setIsLoading(true);
         const token = await getTokenFromKeychain();
         const response = await axios.get(`${BASE_URL}/lecture/${userId}`, {
           headers: {
@@ -110,6 +112,7 @@ const ScheduleScreen = () => {
         // Handle the response data here, for example:
         const result = response.data;
         setLectures(result);
+        setIsLoading(false);
         console.log(result);
         //setChat(response.data.data);
       } catch (error) {
@@ -131,7 +134,11 @@ const ScheduleScreen = () => {
         }
       }
     };
-    getLectures();
+    const unsubscribe = navigation.addListener("focus", () => {
+      getLectures();
+    });
+
+    return unsubscribe;
   }, [refreshTrigger]);
   const moveNextDay = () => {
     setdayIndex((prevIndex) => (prevIndex === 5 ? 0 : prevIndex + 1));
@@ -156,50 +163,62 @@ const ScheduleScreen = () => {
 
   const { height, width } = useWindowDimensions();
   return (
-    <Animated.View
-      style={styles.root}
-      entering={BounceInRight.delay(100).duration(500)}
-    >
-      <View style={{ ...styles.header, height: 0.15 * height }}>
-        <View style={styles.arrow}>
-          <TouchableOpacity onPress={movePreviousDay}>
-            <Icon name="caretleft" size={22} color="white" />
-          </TouchableOpacity>
-        </View>
+    <>
+      {isLoading && (
         <View
-          style={{
-            width: "50%",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <Text style={styles.dayTxt}>{daysOfWeek[dayIndex]}</Text>
+          <Text>Loading...</Text>
+          <ActivityIndicator size="large" color="#8F00FF" />
         </View>
+      )}
+      {!isLoading && (
+        <Animated.View
+          style={styles.root}
+          entering={BounceInRight.delay(100).duration(500)}
+        >
+          <View style={{ ...styles.header, height: 0.15 * height }}>
+            <View style={styles.arrow}>
+              <TouchableOpacity onPress={movePreviousDay}>
+                <Icon name="caretleft" size={22} color="white" />
+              </TouchableOpacity>
+            </View>
+            <View
+              style={{
+                width: "50%",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text style={styles.dayTxt}>{daysOfWeek[dayIndex]}</Text>
+            </View>
 
-        <View style={styles.arrow}>
-          <TouchableOpacity onPress={moveNextDay}>
-            <Icon name="caretright" size={22} color="white" />
-          </TouchableOpacity>
-        </View>
-      </View>
-      <View style={{ ...styles.list, height: height * 0.6 }}>
-        <FlatList
-          data={filteredLectures}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => index.toString()}
-        />
-      </View>
-      <View style={styles.footer}>
-        <CustomButton
-          text="Add a Lecture"
-          type="Tertiary"
-          color="#8F00FF"
-          onPress={() =>
-            navigation.navigate("Add Schedule", { setRefreshTrigger })
-          }
-        />
-      </View>
-    </Animated.View>
+            <View style={styles.arrow}>
+              <TouchableOpacity onPress={moveNextDay}>
+                <Icon name="caretright" size={22} color="white" />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={{ ...styles.list, height: height * 0.6 }}>
+            <FlatList
+              data={filteredLectures}
+              renderItem={renderItem}
+              keyExtractor={(item, index) => index.toString()}
+            />
+          </View>
+          <View style={styles.footer}>
+            <CustomButton
+              text="Add a Lecture"
+              type="Tertiary"
+              color="#8F00FF"
+              onPress={() =>
+                navigation.navigate("Add Schedule", { setRefreshTrigger })
+              }
+            />
+          </View>
+        </Animated.View>
+      )}
+    </>
   );
 };
 

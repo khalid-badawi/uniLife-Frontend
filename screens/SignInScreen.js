@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -83,6 +83,18 @@ const SignInScreen = () => {
       return null;
     }
   };
+  // useEffect(() => {
+  //   const checkTokenAndNavigate = async () => {
+  //     const storedToken = await getTokenFromKeychain();
+
+  //     if (storedToken) {
+  //       // Token exists, navigate to the main screen
+  //       navigation.navigate("Main");
+  //     }
+  //   };
+
+  //   checkTokenAndNavigate();
+  // }, []);
 
   //states
   const handleSignIn = async (values, { resetForm }) => {

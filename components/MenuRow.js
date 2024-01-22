@@ -11,7 +11,7 @@ const MenuRow = ({ itemText, quantity, color = "white" }) => {
       <Text style={{ ...styles.dots, color }} numberOfLines={1}>
         {dots}
       </Text>
-      <Text style={{ ...styles.txt }}>({quantity})</Text>
+      <Text style={{ ...styles.txt, color }}>({quantity})</Text>
     </View>
   );
 };
@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 12,
     marginVertical: 5,
-    width: "80%",
+    width: "100%",
   },
   txt: {
     fontWeight: "bold",

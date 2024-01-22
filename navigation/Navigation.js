@@ -35,6 +35,7 @@ import SearchIcon from "react-native-vector-icons/AntDesign";
 import { Text, View, TextInput } from "react-native";
 import DrawerNav from "./DrawerNav";
 import OthersPosts from "../screens/OthersPosts";
+import RoomsScreen from "../screens/RoomsScreen";
 const Stack = createNativeStackNavigator();
 
 export default function Navigation() {
@@ -52,11 +53,7 @@ export default function Navigation() {
           component={SignInScreen}
           options={{ headerShown: false }}
         />
-        <Stack.Screen
-          name="Test"
-          component={DormitoryScreen}
-          options={{ headerShown: false }}
-        />
+
         <Stack.Screen name="SignUp" component={SignUpScreen} />
         <Stack.Screen name="Main" component={DrawerNav} />
         <Stack.Screen name="ConfirmCode" component={ConfirmCodeScreen} />

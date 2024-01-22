@@ -145,42 +145,44 @@ export default function MapScreen() {
     }
   };
   return (
-    <View style={styles.root}>
-      <View style={{ ...styles.mapCont, height: 0.8 * height }}>
-        <Map
-          currentPosition={currentPosition}
-          routeCoordinates={routeCoordinates}
-          destCoordinates={destCoordinates}
-          setCurrentPosition={setCurrentPosition}
-          fetch={fetchRoute}
-        />
-        <View style={styles.footer}>
-          <View style={{ ...styles.pickerCont, marginTop: 5 }}>
-            <Picker
-              selectedValue={selectedBuilding}
-              onValueChange={setSelectedBuilding}
-              itemStyle={{ textAlign: "right" }}
-            >
-              {faculties.map((building) => (
-                <Picker.Item
-                  key={building.facultyName}
-                  label={building.facultyName}
-                  value={building.facultyName}
-                />
-              ))}
-            </Picker>
-          </View>
-
-          <CustomButton text="Show Route" onPress={fetchRoute} />
-
-          <CustomButton
-            text="Indoor Navigation"
-            type="Tertiary"
-            onPress={() => navigation.navigate("IndoorQR")}
+    <>
+      <View style={styles.root}>
+        <View style={{ ...styles.mapCont, height: 0.8 * height }}>
+          <Map
+            currentPosition={currentPosition}
+            routeCoordinates={routeCoordinates}
+            destCoordinates={destCoordinates}
+            setCurrentPosition={setCurrentPosition}
+            fetch={fetchRoute}
           />
+          <View style={styles.footer}>
+            <View style={{ ...styles.pickerCont, marginTop: 5 }}>
+              <Picker
+                selectedValue={selectedBuilding}
+                onValueChange={setSelectedBuilding}
+                itemStyle={{ textAlign: "right" }}
+              >
+                {faculties.map((building) => (
+                  <Picker.Item
+                    key={building.facultyName}
+                    label={building.facultyName}
+                    value={building.facultyName}
+                  />
+                ))}
+              </Picker>
+            </View>
+
+            <CustomButton text="Show Route" onPress={fetchRoute} />
+
+            <CustomButton
+              text="Indoor Navigation"
+              type="Tertiary"
+              onPress={() => navigation.navigate("IndoorQR")}
+            />
+          </View>
         </View>
       </View>
-    </View>
+    </>
   );
 }
 

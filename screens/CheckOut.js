@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet, FlatList, Alert } from "react-native";
-import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, FlatList, Alert, Modal } from "react-native";
+import React, { useState, useEffect, useMemo } from "react";
 import CustomButton from "../components/CustomButton";
 import MenuRow from "../components/MenuRow";
 import CustomHeader from "../components/CustomHeader";
@@ -11,14 +11,34 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { useUser } from "../Contexts/UserContext";
 import BASE_URL from "../BaseUrl";
 import io from "socket.io-client";
-
+import RadioGroup from "react-native-radio-buttons-group";
+import WebView from "react-native-webview";
+import { Button } from "react-native-elements";
 const socket = io.connect("http://192.168.1.8:3000");
 
 const CheckOut = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const { restaurantId, data } = route.params;
+  const radioButtons = useMemo(
+    () => [
+      {
+        id: "1", // acts as primary key, should be unique and non-empty string
+        label: "Upon receipt",
+        value: "Upon receipt",
+      },
+      {
+        id: "2",
+        label: "Paypal",
+        value: "Paypal",
+      },
+    ],
+    []
+  );
 
+  const [selectedId, setSelectedId] = useState("1");
+  console.log(selectedId);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   useEffect(() => {
     // Connect to the server and listen for private messages
     const connectToSocket = () => {
@@ -71,6 +91,7 @@ const CheckOut = () => {
   const price = route.params.price;
   const [notes, setNotes] = useState("");
   const { userId } = useUser();
+
   const confirmOrder = async () => {
     try {
       console.log("hi");
@@ -106,9 +127,50 @@ const CheckOut = () => {
       }
     }
   };
+  const confirmOrderPaypal = async () => {
+    try {
+      console.log("paypal");
+      const token = await getTokenFromKeychain();
+      setIsModalVisible(true);
+      const response = await axios.post(
+        `${BASE_URL}//payment/order/${userId}`,
+        JSON.stringify({ restaurantId, orderItem: transformedArray, notes }),
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("gg");
+    } catch (error) {
+      if (error.response) {
+        Alert.alert("Error", error.response.data.message);
+      } else if (error.request) {
+        Alert.alert(
+          "Network Error",
+          "There was a problem with the network. Please check your internet connection and try again.",
+          [{ text: "OK" }]
+        );
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        Alert.alert(
+          "Something Wrong",
+          "Something went wrong, try again please",
+          [{ text: "OK" }]
+        );
+      }
+    }
+  };
 
   const handleCheckOut = async () => {
-    await confirmOrder();
+    if (selectedId === "1") {
+      await confirmOrder();
+    } else if (selectedId === "2") {
+      console.log("ggzzz");
+      setIsModalVisible(true);
+    }
     socket.connect();
     console.log("xdssss");
     socket.emit("newOrder", {
@@ -150,6 +212,14 @@ const CheckOut = () => {
           placeholder="Any Notes?"
         />
       </View>
+      <View style={{ alignItems: "center" }}>
+        <RadioGroup
+          radioButtons={radioButtons}
+          onPress={setSelectedId}
+          selectedId={selectedId}
+          layout="row"
+        />
+      </View>
       <View style={styles.buttonsCont}>
         <CustomButton text="Check Out" onPress={handleCheckOut} />
         <CustomButton
@@ -158,6 +228,18 @@ const CheckOut = () => {
           onPress={() => navigation.goBack()}
         />
       </View>
+
+      <Modal style={styles.modal} visible={isModalVisible}>
+        <WebView
+          source={{
+            method: "POST",
+
+            uri: `http://192.168.1.8:3000/api/v1/unilife/payment/order/${userId}`,
+          }}
+          style={{ flex: 1 }}
+        ></WebView>
+        <Button title="Close Modal" onPress={() => setIsModalVisible(false)} />
+      </Modal>
     </View>
   );
 };
@@ -168,6 +250,10 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     flex: 1,
     paddingTop: 10,
+  },
+  modal: {
+    height: "100%",
+    width: "100%",
   },
   mainTxt: {
     marginTop: 20,

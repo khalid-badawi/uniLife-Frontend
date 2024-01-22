@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   Keyboard,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import CustomHeader from "../navigation/CustomHeader";
 import io from "socket.io-client";
@@ -46,12 +47,13 @@ const getTokenFromKeychain = async () => {
     return null;
   }
 };
-const ChatScreen = ({ route }) => {
+const ChatScreen = ({ route, navigation }) => {
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState([]);
   const [showEmojiSelector, setShowEmojiSelector] = useState(false);
   const [receivedImage, setReceivedImage] = useState(null);
   const [image, setImage] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const { userId } = useUser();
   const currentUserId = userId;
   console.log("Currentuser=" + currentUserId);
@@ -67,6 +69,7 @@ const ChatScreen = ({ route }) => {
   useEffect(() => {
     const getMessages = async () => {
       try {
+        setIsLoading(true);
         const token = await getTokenFromKeychain();
         const response = await axios.get(
           `${BASE_URL}/message/${currentUserId}/${recieverUser}`,
@@ -77,10 +80,9 @@ const ChatScreen = ({ route }) => {
             },
           }
         );
-
-        // Handle the response data here, for example:
         const lol = response.data;
         setChat(response.data.data);
+        setIsLoading(false);
         console.log(response.data.data);
       } catch (error) {
         if (error.response) {
@@ -102,8 +104,11 @@ const ChatScreen = ({ route }) => {
       }
     };
 
-    // Call the function to make the GET request
-    getMessages();
+    const unsubscribe = navigation.addListener("focus", () => {
+      getMessages();
+    });
+
+    return unsubscribe;
   }, []);
   useEffect(() => {
     // Connect to the server and listen for private messages
@@ -346,62 +351,74 @@ const ChatScreen = ({ route }) => {
     }
   };
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={[...chat]}
-        renderItem={renderMessageItem}
-        keyExtractor={(_, index) => index.toString()}
-        inverted
-      />
-
-      <View style={styles.inputContainer}>
-        <TouchableOpacity
-          onPress={() => {
-            Keyboard.dismiss(); // Hide the keyboard
-            setShowEmojiSelector(!showEmojiSelector);
-          }}
-          style={styles.btnCont}
+    <>
+      {isLoading && (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <Icon name="smile" size={22} color="white" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.btnCont}>
-          <PickImageSmall
-            iconName="image"
-            size={22}
-            image={image}
-            setImage={setImage}
-            sendImage={sendImage}
-          />
-        </TouchableOpacity>
-        <TextInput
-          style={styles.input}
-          value={message}
-          onChangeText={setMessage}
-          placeholder="Type a message..."
-          onFocus={() => {
-            console.log("TextInput focused");
-            setShowEmojiSelector(false);
-          }} // Hide emoji picker on focus
-        />
-
-        <TouchableOpacity onPress={handleSend} style={styles.btnCont}>
-          <Icon name="send" size={22} color="white" />
-        </TouchableOpacity>
-      </View>
-      {showEmojiSelector && (
-        <View style={{ height: 250 }}>
-          <EmojiSelector
-            category={Categories.emotion}
-            onEmojiSelected={(emoji) => {
-              setMessage((prevMessage) => prevMessage + emoji);
-            }}
-            showTabs={false}
-            showSearchBar={false}
-            columns={10}
-          />
+          <Text>Loading...</Text>
+          <ActivityIndicator size="large" color="#8F00FF" />
         </View>
       )}
-    </View>
+      {!isLoading && (
+        <View style={styles.container}>
+          <FlatList
+            data={[...chat]}
+            renderItem={renderMessageItem}
+            keyExtractor={(_, index) => index.toString()}
+            inverted
+          />
+
+          <View style={styles.inputContainer}>
+            <TouchableOpacity
+              onPress={() => {
+                Keyboard.dismiss(); // Hide the keyboard
+                setShowEmojiSelector(!showEmojiSelector);
+              }}
+              style={styles.btnCont}
+            >
+              <Icon name="smile" size={22} color="white" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.btnCont}>
+              <PickImageSmall
+                iconName="image"
+                size={22}
+                image={image}
+                setImage={setImage}
+                sendImage={sendImage}
+              />
+            </TouchableOpacity>
+            <TextInput
+              style={styles.input}
+              value={message}
+              onChangeText={setMessage}
+              placeholder="Type a message..."
+              onFocus={() => {
+                console.log("TextInput focused");
+                setShowEmojiSelector(false);
+              }} // Hide emoji picker on focus
+            />
+
+            <TouchableOpacity onPress={handleSend} style={styles.btnCont}>
+              <Icon name="send" size={22} color="white" />
+            </TouchableOpacity>
+          </View>
+          {showEmojiSelector && (
+            <View style={{ height: 250 }}>
+              <EmojiSelector
+                category={Categories.emotion}
+                onEmojiSelected={(emoji) => {
+                  setMessage((prevMessage) => prevMessage + emoji);
+                }}
+                showTabs={false}
+                showSearchBar={false}
+                columns={10}
+              />
+            </View>
+          )}
+        </View>
+      )}
+    </>
   );
 };
 

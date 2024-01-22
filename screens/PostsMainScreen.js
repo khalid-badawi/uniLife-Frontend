@@ -106,9 +106,13 @@ const PostsMainScreen = () => {
     }
   };
   useEffect(() => {
-    getPosts();
+    const unsubscribe = navigation.addListener("focus", () => {
+      getPosts();
+    });
+
     return () => {
       abortController.abort();
+      unsubscribe;
     };
   }, [forceUpdate, searchQuery]);
   const getMorePosts = async () => {

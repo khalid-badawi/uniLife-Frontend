@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Alert } from "react-native";
+import { View, Text, StyleSheet, Alert, ActivityIndicator } from "react-native";
 import React, { useEffect, useState } from "react";
 import ChatCard from "../components/ChatCard";
 import CustomHeader from "../components/CustomHeader";
@@ -8,12 +8,14 @@ import axios from "axios";
 import { useUser } from "../Contexts/UserContext";
 import { FlatList } from "react-native-gesture-handler";
 
-const MyChats = () => {
+const MyChats = ({ navigation }) => {
   const { userId } = useUser();
   const [myChats, setMyChats] = useState();
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     const getChats = async () => {
       try {
+        setIsLoading(true);
         console.log("hi", userId);
 
         const token = await getTokenFromKeychain();
@@ -27,6 +29,7 @@ const MyChats = () => {
         // Handle the response data here, for example:
         const result = response.data;
         setMyChats(result);
+        setIsLoading(false);
         console.log(result);
         //setChat(response.data.data);
       } catch (error) {
@@ -48,16 +51,32 @@ const MyChats = () => {
         }
       }
     };
-    getChats();
+    const unsubscribe = navigation.addListener("focus", () => {
+      getChats();
+    });
+
+    return unsubscribe;
   }, []);
   return (
-    <View style={styles.root}>
-      <FlatList
-        data={myChats?.messages} // Use myChats?.messages instead of myChats
-        renderItem={({ item }) => <ChatCard item={item} />}
-        keyExtractor={(item) => item.otherPersonId.toString()}
-      />
-    </View>
+    <>
+      {isLoading && (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <Text>Loading...</Text>
+          <ActivityIndicator size="large" color="#8F00FF" />
+        </View>
+      )}
+      {!isLoading && (
+        <View style={styles.root}>
+          <FlatList
+            data={myChats?.messages} // Use myChats?.messages instead of myChats
+            renderItem={({ item }) => <ChatCard item={item} />}
+            keyExtractor={(item) => item.otherPersonId.toString()}
+          />
+        </View>
+      )}
+    </>
   );
 };
 

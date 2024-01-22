@@ -90,7 +90,11 @@ const MyOrders = () => {
         }
       }
     };
-    getMenu();
+    const unsubscribe = navigation.addListener("focus", () => {
+      getMenu();
+    });
+
+    return unsubscribe;
   }, []);
   return (
     <>

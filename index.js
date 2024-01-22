@@ -3,6 +3,7 @@ import { registerRootComponent } from "expo";
 import App from "./App";
 import PushNotification from "react-native-push-notification";
 import messaging from "@react-native-firebase/messaging";
+import Logo from "./assets/Logo1.png";
 // Must be outside of any component LifeCycle (such as `componentDidMount`).
 PushNotification.configure({
   onRegister: function (token) {
@@ -11,11 +12,11 @@ PushNotification.configure({
   onNotification: function (notification) {
     const notificationTime = new Date(Date.now()).toLocaleString(); // Get the current time in a readable format
     const notificationMessage = `${notification.message}\n\n${notificationTime}`;
-
     PushNotification.localNotification({
       channelId: "your-channel-id",
       title: notification.title,
       message: notificationMessage,
+      largeIcon: Logo,
     });
 
     // Handle notification in background or when the app is closed

@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Alert } from "react-native";
+import { View, Text, StyleSheet, Alert, ActivityIndicator } from "react-native";
 import React, { useEffect, useState } from "react";
 import RestCard from "../components/RestCard";
 import MenuItem from "../components/MenuItem";
@@ -38,6 +38,7 @@ const RestaurantScreen = () => {
   const [menuItems, setMenuItems] = useState([]);
   const [search, setSearch] = useState("");
   const [orderContent, setOrderContent] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const uniqueCategories = [
     "All",
     ...Array.from(new Set(menuItems.map((item) => item.category))),
@@ -64,15 +65,16 @@ const RestaurantScreen = () => {
   const route = useRoute();
   const { restaurantId } = route.params;
   console.log(restaurantId);
-  const { userId } = useUser();
+  const { userId, username } = useUser();
 
   useEffect(() => {
     const getMenu = async () => {
       try {
+        setIsLoading(true);
         const token = await getTokenFromKeychain();
         const response = await axios.get(
           `${BASE_URL}/menu/${restaurantId}/${userId}`,
-          
+
           {
             headers: {
               "Content-Type": "application/json",
@@ -84,6 +86,7 @@ const RestaurantScreen = () => {
         // Handle the response data here, for example:
         const result = response.data;
         setMenuItems(result);
+        setIsLoading(false);
         console.log(result);
         //setChat(response.data.data);
       } catch (error) {
@@ -105,142 +108,164 @@ const RestaurantScreen = () => {
         }
       }
     };
-    getMenu();
+    const unsubscribe = navigation.addListener("focus", () => {
+      getMenu();
+    });
+
+    return unsubscribe;
   }, []);
   console.log(orderContent.length);
   return (
-    <View style={styles.root}>
-      <View style={{ flexDirection: "row", width: "100%" }}>
-        <Text style={{ ...styles.title }}>
-          Welcome,{" "}
-          <Text
-            style={{ ...styles.title, color: "#8F00FF", fontWeight: "bold" }}
-          >
-            Ahmad
-          </Text>
-        </Text>
-        {/* Wrap the content inside TouchableOpacity */}
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("MyOrders");
-          }}
-          style={{ position: "absolute", right: 12, flexDirection: "row" }}
+    <>
+      {isLoading && (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <Text style={{ color: "#8F00FF", fontSize: 20 }}>My Orders</Text>
-          <Icon
-            name="food"
-            style={{ ...styles.icon, color: "#8F00F0" }}
-            size={22}
-          />
-        </TouchableOpacity>
-      </View>
-      <Text style={styles.descTxt}>What do you wanna eat? 😋</Text>
-      <View style={styles.searchBarCont}>
-        <Ionicons name="search" style={styles.icon} size={20} />
+          <Text>Loading...</Text>
+          <ActivityIndicator size="large" color="#8F00FF" />
+        </View>
+      )}
+      {!isLoading && (
+        <View style={styles.root}>
+          <View style={{ flexDirection: "row", width: "100%" }}>
+            <Text style={{ ...styles.title }}>
+              Welcome,{" "}
+              <Text
+                style={{
+                  ...styles.title,
+                  color: "#8F00FF",
+                  fontWeight: "bold",
+                }}
+              >
+                {username}
+              </Text>
+            </Text>
+            {/* Wrap the content inside TouchableOpacity */}
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("MyOrders");
+              }}
+              style={{ position: "absolute", right: 12, flexDirection: "row" }}
+            >
+              <Text style={{ color: "#8F00FF", fontSize: 20 }}>My Orders</Text>
+              <Icon
+                name="food"
+                style={{ ...styles.icon, color: "#8F00F0" }}
+                size={22}
+              />
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.descTxt}>What do you wanna eat? 😋</Text>
+          <View style={styles.searchBarCont}>
+            <Ionicons name="search" style={styles.icon} size={20} />
 
-        <TextInput
-          style={styles.searchBar}
-          placeholder={
-            selectedCategory === "All"
-              ? `Search Menu...`
-              : `Search ${selectedCategory}...`
-          }
-          onChangeText={(text) => setSearch(text)}
-        />
-      </View>
-      <View style={{ marginLeft: 10 }}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={{
-            flexDirection: "row",
-            height: 80,
-            marginTop: 5,
-          }}
-        >
-          {uniqueCategories.map((category) => (
-            <CustomButton
-              key={category}
-              text={category}
-              type={category === selectedCategory ? "Selected" : "NotSelected"}
-              onPress={() => handleCategoryClick(category)}
-            />
-          ))}
-        </ScrollView>
-      </View>
-      <View style={{ flex: 1 }}>
-        <FlatList
-          data={filteredMenuItems}
-          renderItem={({ item }) => (
-            <MenuItem
-              item={item}
-              setOrderContent={setOrderContent}
-              orderContent={orderContent}
-            />
-          )}
-          keyExtractor={(item) => item.foodId.toString()}
-          contentContainerStyle={{
-            paddingBottom: orderContent.length !== 0 ? 120 : 0,
-          }}
-        />
-      </View>
-      {orderContent.length !== 0 && (
-        <Animated.View
-          style={styles.footer}
-          entering={FadeInUp.duration(200).springify().damping(10)}
-          exiting={FadeOutDown.duration(200).springify().damping(10)}
-        >
-          {/* Use BlurView to blur the content under the footer */}
-          <BlurView
-            overlayColor=""
-            style={{ ...StyleSheet.absoluteFillObject }}
-            blurType="light"
-            blurAmount={1}
-            reducedTransparencyFallbackColor="white"
-          />
-          <View style={{ width: "70%" }}>
-            <CustomButton
-              text="Order"
-              onPress={() =>
-                navigation.navigate("CheckOut", {
-                  restaurantId,
-                  data: orderContent,
-                  price: totalPrice,
-                })
+            <TextInput
+              style={styles.searchBar}
+              placeholder={
+                selectedCategory === "All"
+                  ? `Search Menu...`
+                  : `Search ${selectedCategory}...`
               }
+              onChangeText={(text) => setSearch(text)}
             />
           </View>
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: "bold",
+          <View style={{ marginLeft: 10 }}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={{
+                flexDirection: "row",
+                height: 80,
+                marginTop: 5,
+              }}
+            >
+              {uniqueCategories.map((category) => (
+                <CustomButton
+                  key={category}
+                  text={category}
+                  type={
+                    category === selectedCategory ? "Selected" : "NotSelected"
+                  }
+                  onPress={() => handleCategoryClick(category)}
+                />
+              ))}
+            </ScrollView>
+          </View>
+          <View style={{ flex: 1 }}>
+            <FlatList
+              data={filteredMenuItems}
+              renderItem={({ item }) => (
+                <MenuItem
+                  item={item}
+                  setOrderContent={setOrderContent}
+                  orderContent={orderContent}
+                />
+              )}
+              keyExtractor={(item) => item.foodId.toString()}
+              contentContainerStyle={{
+                paddingBottom: orderContent.length !== 0 ? 120 : 0,
+              }}
+            />
+          </View>
+          {orderContent.length !== 0 && (
+            <Animated.View
+              style={styles.footer}
+              entering={FadeInUp.duration(200).springify().damping(10)}
+              exiting={FadeOutDown.duration(200).springify().damping(10)}
+            >
+              {/* Use BlurView to blur the content under the footer */}
+              <BlurView
+                overlayColor=""
+                style={{ ...StyleSheet.absoluteFillObject }}
+                blurType="light"
+                blurAmount={1}
+                reducedTransparencyFallbackColor="white"
+              />
+              <View style={{ width: "70%" }}>
+                <CustomButton
+                  text="Order"
+                  onPress={() =>
+                    navigation.navigate("CheckOut", {
+                      restaurantId,
+                      data: orderContent,
+                      price: totalPrice,
+                    })
+                  }
+                />
+              </View>
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontWeight: "bold",
 
-              backgroundColor: "#e6cafc",
-              paddingVertical: 10,
-              paddingHorizontal: 20,
-              borderRadius: 20,
-            }}
-          >
-            <Text style={{ color: "#8F00FF" }}>Total Price:</Text>
-            {totalPrice}₪
-          </Text>
-          {/* <View
+                  backgroundColor: "#e6cafc",
+                  paddingVertical: 10,
+                  paddingHorizontal: 20,
+                  borderRadius: 20,
+                }}
+              >
+                <Text style={{ color: "#8F00FF" }}>Total Price:</Text>
+                {totalPrice}₪
+              </Text>
+              {/* <View
             style={{
               position: "absolute",
               right: 10,
               bottom: 5,
               backgroundColor: "white",
             }}
-          >
+            >
             <CustomButton
-              text="Reset"
-              type="Tertiary"
-              onPress={() => setOrderContent([])}
+            text="Reset"
+            type="Tertiary"
+            onPress={() => setOrderContent([])}
             />
           </View> */}
-        </Animated.View>
+            </Animated.View>
+          )}
+        </View>
       )}
-    </View>
+    </>
   );
 };
 const styles = StyleSheet.create({

@@ -1,11 +1,23 @@
-import React, { useState, Component, useEffect } from "react";
-import { StyleSheet, View } from "react-native";
-import Mapbox from "@rnmapbox/maps";
+import React, { useState, useEffect } from "react";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import Mapbox, { Logger } from "@rnmapbox/maps";
 import Icon from "react-native-vector-icons/FontAwesome";
+
 // Will be null for most users (only Mapbox authenticates this way).
 // Required on Android. See Android installation notes.
 import { PermissionsAndroid } from "react-native";
+Logger.setLogCallback((log) => {
+  const { message } = log;
 
+  // expected warnings - see https://github.com/mapbox/mapbox-gl-native/issues/15341#issuecomment-522889062
+  if (
+    message.match("Request failed due to a permanent error: Canceled") ||
+    message.match("Request failed due to a permanent error: Socket Closed")
+  ) {
+    return true;
+  }
+  return false;
+});
 Mapbox.setWellKnownTileServer("Mapbox");
 Mapbox.setAccessToken(
   "pk.eyJ1IjoiajFyZW4iLCJhIjoiY2xvcm9zdm85MHY5czJrbzZrdXI1amZmMSJ9.UW9QsP8ErGFgGNctDwoG5w"
@@ -19,6 +31,7 @@ const Map = ({
   fetch,
 }) => {
   const [userLocationWatchId, setUserLocationWatchId] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const debounce = (func, delay) => {
     let timeoutId;
     return function () {
@@ -81,56 +94,54 @@ const Map = ({
     coord.longitude,
     coord.latitude,
   ]);
-
+  console.log(isLoading);
   return (
-    <View style={styles.page}>
-      <Mapbox.MapView
-        style={styles.map}
-        logoEnabled={false}
-        styleURL="mapbox://styles/mapbox/streets-v12"
-      >
-        <Mapbox.Camera zoomLevel={16.5} centerCoordinate={currentPosition} />
-        {
-          <Mapbox.PointAnnotation
-            id="currentPosition"
-            coordinate={currentPosition}
-            draggable={true}
-            onDrag={(event) => {
-              setCurrentPosition(event.geometry.coordinates);
-            }}
-            style={{
-              iconImage: Icon.getImageSourceSync("male", 30), // Use the icon you want (replace 'rocket' with the actual icon name)
-              iconAllowOverlap: true,
-              iconIgnorePlacement: true,
-            }}
-          />
-        }
-        {destCoordinates && (
-          <Mapbox.PointAnnotation
-            id="destCoordinates"
-            coordinate={destCoordinates}
-            title="destination"
-            draggable={false}
-          />
-        )}
-
-        <Mapbox.ShapeSource
-          id="lineSource"
-          shape={{
-            type: "LineString",
-            coordinates: coordinates,
-          }}
+    <>
+      <View style={styles.page}>
+        <Mapbox.MapView
+          style={styles.map}
+          logoEnabled={false}
+          styleURL="mapbox://styles/mapbox/streets-v12"
+          onDidFinishLoadingMap={() => setIsLoading(false)}
         >
-          <Mapbox.LineLayer
-            id="lineLayer"
-            style={{
-              lineColor: "blue",
-              lineWidth: 3,
+          <Mapbox.Camera zoomLevel={16.5} centerCoordinate={currentPosition} />
+          {
+            <Mapbox.PointAnnotation
+              id="currentPosition"
+              coordinate={currentPosition}
+              draggable={true}
+              onDrag={(event) => {
+                setCurrentPosition(event.geometry.coordinates);
+              }}
+            />
+          }
+          {destCoordinates && (
+            <Mapbox.PointAnnotation
+              id="destCoordinates"
+              coordinate={destCoordinates}
+              title="destination"
+              draggable={false}
+            />
+          )}
+
+          <Mapbox.ShapeSource
+            id="lineSource"
+            shape={{
+              type: "LineString",
+              coordinates: coordinates,
             }}
-          />
-        </Mapbox.ShapeSource>
-      </Mapbox.MapView>
-    </View>
+          >
+            <Mapbox.LineLayer
+              id="lineLayer"
+              style={{
+                lineColor: "blue",
+                lineWidth: 3,
+              }}
+            />
+          </Mapbox.ShapeSource>
+        </Mapbox.MapView>
+      </View>
+    </>
   );
 };
 

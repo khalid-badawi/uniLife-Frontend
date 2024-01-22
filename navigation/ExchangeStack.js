@@ -5,6 +5,7 @@ import MyPostsScreen from "../screens/MyPostsScreen";
 import ChatScreen from "../screens/ChatScreen";
 import CreatePost from "../screens/CreatePost";
 import CustomHeader from "./CustomHeader";
+import OthersPosts from "../screens/OthersPosts";
 const Stack = createNativeStackNavigator();
 
 const ExchangeStack = () => {
@@ -31,6 +32,13 @@ const ExchangeStack = () => {
         name="CreatePost"
         component={CreatePost}
         options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="OthersPosts"
+        component={OthersPosts}
+        options={{
+          header: () => <CustomHeader title="Profile" type="stack" />,
+        }}
       />
     </Stack.Navigator>
   );

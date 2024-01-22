@@ -33,7 +33,7 @@ const PostCard = ({
   selectedButton,
 }) => {
   const { userId } = useUser();
-
+  console.log("item:", item.image);
   const navigation = useNavigation();
   const handleChatPressed = () => {
     navigation.navigate("ChatScreen", { receiverId: item.userId });
@@ -49,7 +49,7 @@ const PostCard = ({
   const handleCancel = () => {
     setModalVisible(false);
   };
-
+  console.log(item.major);
   const reserve = async () => {
     try {
       const confirmed = await showConfirmationDialog(
@@ -249,6 +249,8 @@ const PostCard = ({
   };
   return (
     <View style={styles.root}>
+      <View style={{ height: 5, backgroundColor: "#E3E3E3" }}></View>
+
       {type === "mine" && (
         <View
           style={{
@@ -287,19 +289,29 @@ const PostCard = ({
             style={{ flexDirection: "row" }}
             onPress={() => setModalVisible(true)}
           >
-            <Text style={{ color: "red", fontWeight: "bold" }}>Report</Text>
-            <MaterialIcon name="report-problem" size={19} color="red" />
+            <Text style={{ color: "#8F00FF", fontWeight: "bold" }}>Report</Text>
+            <MaterialIcon name="report-problem" size={17} color="#8F00FF" />
           </TouchableOpacity>
         </View>
       )}
       <View style={styles.header}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <TouchableOpacity style={styles.profileImgCont}>
+          <TouchableOpacity
+            style={styles.profileImgCont}
+            onPress={() =>
+              navigation.navigate("OthersPosts", {
+                otherId: item.userId,
+                userImage: item.userImage,
+                username: item.username,
+                major: item.major,
+              })
+            }
+          >
             <Image
               source={
-                item.image === "" || !item.image
+                item.userImage === "" || !item.userImage
                   ? defaultImage
-                  : { uri: item.image }
+                  : { uri: item.userImage }
               }
               alt="profile image"
               style={styles.profileImg}
@@ -307,7 +319,16 @@ const PostCard = ({
             />
           </TouchableOpacity>
           <View>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("OthersPosts", {
+                  otherId: item.userId,
+                  userImage: item.userImage,
+                  username: item.username,
+                  major: item.major,
+                })
+              }
+            >
               <Text style={styles.MainTxt}>{item.username}</Text>
             </TouchableOpacity>
             <Text style={{ fontSize: 12, color: "gray", marginLeft: 8 }}>
