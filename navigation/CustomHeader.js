@@ -7,6 +7,7 @@ import Icon3 from "react-native-vector-icons/MaterialIcons";
 import SearchIcon from "react-native-vector-icons/AntDesign";
 import Icon4 from "react-native-vector-icons/Ionicons";
 import { useSearch } from "../Contexts/SearchContext";
+import StickyAd from "../components/StickyAd";
 
 const CustomHeader = ({
   close,
@@ -42,80 +43,82 @@ const CustomHeader = ({
     return null;
   };
   return (
-    <Header
-      placement="center"
-      centerComponent={
-        <View style={{ flex: 1, flexDirection: "row" }}>
-          {isSearchVisible ? (
-            <View
-              style={{
-                paddingVertical: 5,
-                borderRadius: 25,
-                paddingHorizontal: 5,
-                backgroundColor: "#AC43FF",
-
-                flex: 1,
-              }}
-            >
-              <TextInput
+    <View>
+      <Header
+        placement="center"
+        centerComponent={
+          <View style={{ flex: 1, flexDirection: "row" }}>
+            {isSearchVisible ? (
+              <View
                 style={{
-                  color: "white",
-                  fontSize: 16,
-                  fontWeight: "700",
+                  paddingVertical: 5,
+                  borderRadius: 25,
                   paddingHorizontal: 5,
+                  backgroundColor: "#AC43FF",
+
+                  flex: 1,
                 }}
-                placeholder={searchPlaceHolder}
-                value={searchQuery}
-                placeholderTextColor="white"
-                onChangeText={(text) => setSearchQuery(text)}
-              />
-            </View>
-          ) : (
-            <Text
-              style={{
-                color: "#fff",
-                fontSize: 20,
-                paddingVertical: 5,
-                alignSelf: "flex-start",
-                flex: 1,
-              }}
-            >
-              {title}
-            </Text>
-          )}
-        </View>
-      }
-      leftComponent={renderLeftComponent}
-      backgroundColor="#A100FF"
-      rightComponent={() => (
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            paddingVertical: 5,
-          }}
-        >
-          {isSearchVisible && (
-            <TouchableOpacity
-              onPress={() => {
-                setIsSearchVisible(false);
-              }}
-            >
-              <Icon3 name="cancel" size={25} color="white" />
-            </TouchableOpacity>
-          )}
-          {!isSearchVisible && search && (
-            <TouchableOpacity
-              style={{ marginRight: 10 }}
-              onPress={() => setIsSearchVisible(!isSearchVisible)}
-            >
-              <SearchIcon name="search1" size={25} color="white" />
-            </TouchableOpacity>
-          )}
-          {!search && children}
-        </View>
-      )}
-    />
+              >
+                <TextInput
+                  style={{
+                    color: "white",
+                    fontSize: 16,
+                    fontWeight: "700",
+                    paddingHorizontal: 5,
+                  }}
+                  placeholder={searchPlaceHolder}
+                  value={searchQuery}
+                  placeholderTextColor="white"
+                  onChangeText={(text) => setSearchQuery(text)}
+                />
+              </View>
+            ) : (
+              <Text
+                style={{
+                  color: "#fff",
+                  fontSize: 20,
+                  paddingVertical: 5,
+                  alignSelf: "flex-start",
+                  flex: 1,
+                }}
+              >
+                {title}
+              </Text>
+            )}
+          </View>
+        }
+        leftComponent={renderLeftComponent}
+        backgroundColor="#A100FF"
+        rightComponent={() => (
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              paddingVertical: 5,
+            }}
+          >
+            {isSearchVisible && (
+              <TouchableOpacity
+                onPress={() => {
+                  setIsSearchVisible(false);
+                }}
+              >
+                <Icon3 name="cancel" size={25} color="white" />
+              </TouchableOpacity>
+            )}
+            {!isSearchVisible && search && (
+              <TouchableOpacity
+                style={{ marginRight: 10 }}
+                onPress={() => setIsSearchVisible(!isSearchVisible)}
+              >
+                <SearchIcon name="search1" size={25} color="white" />
+              </TouchableOpacity>
+            )}
+            {!search && children}
+          </View>
+        )}
+      />
+    </View>
   );
 };
 export default CustomHeader;

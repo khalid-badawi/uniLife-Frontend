@@ -51,7 +51,7 @@ const EditProfileScreen = () => {
   const [errorMsg, setErrorMsg] = useState("");
   const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
-  console.log(image);
+
   const { userId } = useUser();
   const handleEditPress = async (values) => {
     // Validate postText, relatedMajors, and image
@@ -318,4 +318,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EditProfileScreen;
+export default React.memo(EditProfileScreen);
+EditProfileScreen.displayName = "EditProfileScreen";

@@ -271,4 +271,5 @@ const styles = StyleSheet.create({
   list: {},
 });
 
-export default ScheduleScreen;
+export default React.memo(ScheduleScreen);
+ScheduleScreen.MyPostsScreen = "ScheduleScreen";

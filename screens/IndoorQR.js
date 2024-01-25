@@ -248,4 +248,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
-export default IndoorQR;
+
+export default React.memo(IndoorQR);
+IndoorQR.displayName = "IndoorQR";

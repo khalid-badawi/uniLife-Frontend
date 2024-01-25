@@ -17,6 +17,7 @@ const PickImageSmall = ({
   iconName,
   size = 25,
   sendImage,
+  onImageSelected,
 }) => {
   const pickImage = async (sourceType) => {
     let result;
@@ -40,6 +41,7 @@ const PickImageSmall = ({
 
     if (!result.canceled) {
       await saveImage(result.assets[0]);
+      onImageSelected(result.assets[0]);
 
       console.log(image);
     }

@@ -16,13 +16,20 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import PushNotification from "react-native-push-notification";
 import { Platform } from "react-native";
 import { SearchProvider } from "./Contexts/SearchContext";
+import StickyAd from "./components/StickyAd";
+import { AdProvider } from "./Contexts/AdContext";
+import { DrawerProvider } from "./Contexts/openContext";
 const App = () => {
   return (
     <SafeAreaView style={styles.container}>
       <SearchProvider>
-        <UserProvider>
-          <Navigation />
-        </UserProvider>
+        <AdProvider>
+          <DrawerProvider>
+            <UserProvider>
+              <Navigation />
+            </UserProvider>
+          </DrawerProvider>
+        </AdProvider>
       </SearchProvider>
       <StatusBar barStyle="light-content" backgroundColor="#A100FF" />
     </SafeAreaView>

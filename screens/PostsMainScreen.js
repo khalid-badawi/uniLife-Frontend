@@ -253,4 +253,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PostsMainScreen;
+export default React.memo(PostsMainScreen);
+PostsMainScreen.MyPostsScreen = "PostsMainScreen";

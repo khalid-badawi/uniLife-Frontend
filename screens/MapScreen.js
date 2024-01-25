@@ -17,7 +17,7 @@ import axios from "axios";
 import { useUser } from "../Contexts/UserContext";
 const routeData = require("../data/routeData.json");
 
-export default function MapScreen() {
+function MapScreen() {
   const searchOptions = ["Building Name", "Class Number"];
   const navigation = useNavigation();
   const { height, width } = useWindowDimensions();
@@ -206,3 +206,5 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
 });
+export default React.memo(MapScreen);
+MapScreen.displayName = "MapScreen";

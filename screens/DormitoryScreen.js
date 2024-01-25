@@ -153,4 +153,6 @@ const styles = StyleSheet.create({
   },
   icon: { color: "#8F00FF" },
 });
-export default DormitoryScreen;
+
+export default React.memo(DormitoryScreen);
+DormitoryScreen.displayName = "DormitoryScreen";

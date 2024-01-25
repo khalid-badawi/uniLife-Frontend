@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -46,7 +46,7 @@ const SignInScreen = () => {
   const navigation = useNavigation();
   const { height, width } = useWindowDimensions();
   const [errorMsg, setErrorMsg] = useState("");
-
+  const [isSignedIn, setIsSignedIn] = useState(true);
   const { userId, setUserId, setUsername } = useUser();
   const onForgotPasswordPressed = () => {
     console.warn("forgot password");
@@ -83,13 +83,43 @@ const SignInScreen = () => {
       return null;
     }
   };
+  const getUser = async () => {
+    try {
+      const token = await getTokenFromKeychain();
+      console.log("gd", token);
+      const response = await axios.get(`${BASE_URL}/user`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log("Hellooo");
+      // Handle the response data here, for example:
+      const result = response.data;
+      console.log("result:", result);
+      setUserId(result.id);
+      setUsername(result.username);
+      return true;
+      //setChat(response.data.data);
+    } catch (error) {
+      console.log(error);
+      setIsSignedIn(false);
+      return false;
+    }
+  };
   // useEffect(() => {
   //   const checkTokenAndNavigate = async () => {
   //     const storedToken = await getTokenFromKeychain();
-
+  //     console.log("Aloo", storedToken);
   //     if (storedToken) {
-  //       // Token exists, navigate to the main screen
-  //       navigation.navigate("Main");
+  //       const res = await getUser();
+  //       if (res) {
+  //         navigation.navigate("Main");
+  //       } else {
+  //         setIsSignedIn(false);
+  //       }
+  //     } else {
+  //       setIsSignedIn(false);
   //     }
   //   };
 
@@ -139,91 +169,98 @@ const SignInScreen = () => {
   };
 
   return (
-    <Formik
-      initialValues={{
-        email: "s11923593@stu.najah.edu",
-        password: "1234saiF@",
-      }}
-      onSubmit={handleSignIn}
-      validationSchema={SignInSchema}
-    >
-      {({
-        values,
-        errors,
-        touched,
-        handleSubmit,
-        handleChange,
-        setFieldTouched,
-        isValid,
-      }) => (
-        <View style={{ ...styles.root, width: width }}>
-          <Animated.View
-            entering={FadeInUp.delay(200).duration(1000).springify().damping(3)}
-          >
-            <Image
-              source={Logo}
-              style={{ ...styles.logo, height: height * 0.4, width: width }} // Fixed style object
-              resizeMode="contain"
-            />
-          </Animated.View>
-          <Animated.View
-            style={styles.animInput}
-            entering={FadeInDown.duration(200).springify()}
-          >
-            <CustomInput
-              placeholder="Email"
-              value={values.email}
-              setValue={handleChange("email")}
-              secureTextEntry={false}
-              errors={errors.email}
-              iconName={"mail"}
-              onBlur={() => setFieldTouched("email")}
-            />
-          </Animated.View>
-          <Animated.View
-            style={styles.animInput}
-            entering={FadeInDown.delay(200).duration(1000).springify()}
-          >
-            <CustomInput
-              placeholder="Password"
-              value={values.password}
-              setValue={handleChange("password")}
-              secureTextEntry={true}
-              errors={errors.password}
-              iconName={"key"}
-              onBlur={() => setFieldTouched("password")}
-            />
-          </Animated.View>
-          <Animated.View
-            style={styles.animInput}
-            entering={FadeInDown.delay(400).duration(1000).springify()}
-          >
-            <CustomButton text="Sign In" onPress={handleSubmit} />
-          </Animated.View>
-          {errorMsg && <Text style={styles.errorText}>❌ {errorMsg}</Text>}
-          <Animated.View
-            style={styles.animInput}
-            entering={FadeInDown.delay(600).duration(1000).springify()}
-          >
-            <CustomButton
-              text="Forgot password?"
-              onPress={onForgotPasswordPressed}
-              type="Tertiary"
-            />
-          </Animated.View>
-          <Animated.View
-            style={styles.animInput}
-            entering={FadeInDown.delay(800).duration(1000).springify()}
-          >
-            <CustomButton
-              text="Not registered yet? Sign Up Now!"
-              onPress={onSignUpPressed}
-              type="Tertiary"
-            />
-          </Animated.View>
-        </View>
+    <>
+      {isSignedIn && (
+        <Formik
+          initialValues={{
+            email: "s11923593@stu.najah.edu",
+            password: "1234saiF@",
+          }}
+          onSubmit={handleSignIn}
+          validationSchema={SignInSchema}
+        >
+          {({
+            values,
+            errors,
+            touched,
+            handleSubmit,
+            handleChange,
+            setFieldTouched,
+            isValid,
+          }) => (
+            <View style={{ ...styles.root, width: width }}>
+              <Animated.View
+                entering={FadeInUp.delay(200)
+                  .duration(1000)
+                  .springify()
+                  .damping(3)}
+              >
+                <Image
+                  source={Logo}
+                  style={{ ...styles.logo, height: height * 0.4, width: width }} // Fixed style object
+                  resizeMode="contain"
+                />
+              </Animated.View>
+              <Animated.View
+                style={styles.animInput}
+                entering={FadeInDown.duration(200).springify()}
+              >
+                <CustomInput
+                  placeholder="Email"
+                  value={values.email}
+                  setValue={handleChange("email")}
+                  secureTextEntry={false}
+                  errors={errors.email}
+                  iconName={"mail"}
+                  onBlur={() => setFieldTouched("email")}
+                />
+              </Animated.View>
+              <Animated.View
+                style={styles.animInput}
+                entering={FadeInDown.delay(200).duration(1000).springify()}
+              >
+                <CustomInput
+                  placeholder="Password"
+                  value={values.password}
+                  setValue={handleChange("password")}
+                  secureTextEntry={true}
+                  errors={errors.password}
+                  iconName={"key"}
+                  onBlur={() => setFieldTouched("password")}
+                />
+              </Animated.View>
+              <Animated.View
+                style={styles.animInput}
+                entering={FadeInDown.delay(400).duration(1000).springify()}
+              >
+                <CustomButton text="Sign In" onPress={handleSubmit} />
+              </Animated.View>
+              {errorMsg && <Text style={styles.errorText}>❌ {errorMsg}</Text>}
+              <Animated.View
+                style={styles.animInput}
+                entering={FadeInDown.delay(600).duration(1000).springify()}
+              >
+                <CustomButton
+                  text="Forgot password?"
+                  onPress={onForgotPasswordPressed}
+                  type="Tertiary"
+                />
+              </Animated.View>
+              <Animated.View
+                style={styles.animInput}
+                entering={FadeInDown.delay(800).duration(1000).springify()}
+              >
+                <CustomButton
+                  text="Not registered yet? Sign Up Now!"
+                  onPress={onSignUpPressed}
+                  type="Tertiary"
+                />
+              </Animated.View>
+            </View>
+          )}
+        </Formik>
       )}
-    </Formik>
+    </>
   );
 };
 

@@ -304,4 +304,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreatePost;
+export default React.memo(CreatePost);
+CreatePost.displayName = "CreatePost";

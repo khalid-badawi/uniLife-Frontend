@@ -140,4 +140,5 @@ const styles = StyleSheet.create({
   },
   userDetails: { alignItems: "center", marginTop: 80 },
 });
-export default OthersPosts;
+export default React.memo(OthersPosts);
+OthersPosts.MyPostsScreen = "OthersPosts";

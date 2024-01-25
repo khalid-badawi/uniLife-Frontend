@@ -19,4 +19,5 @@ const AddScheduleScreen = () => {
   );
 };
 
-export default AddScheduleScreen;
+export default React.memo(AddScheduleScreen);
+AddScheduleScreen.displayName = "AddScheduleScreen";

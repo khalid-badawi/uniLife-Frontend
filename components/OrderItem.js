@@ -9,7 +9,6 @@ import axios from "axios";
 import { useUser } from "../Contexts/UserContext";
 
 const OrderItem = ({ item }) => {
-  console.log(item);
   const dateString = item.createdAt;
   const dateObject = new Date(dateString);
   const [rating, setRating] = useState(item.rating);

@@ -195,4 +195,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CafiteriaHome;
+export default React.memo(CafiteriaHome);
+CafiteriaHome.displayName = "CafiteriaHome";

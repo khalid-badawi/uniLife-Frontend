@@ -18,6 +18,9 @@ import { useUser } from "../Contexts/UserContext";
 import { getTokenFromKeychain } from "../globalFunc/Keychain";
 import axios from "axios";
 import CustomHeader from "../navigation/CustomHeader";
+import NotificationCard from "../components/NotificationCard";
+import { useDrawer } from "../Contexts/openContext";
+import { useDrawerStatus } from "@react-navigation/drawer";
 
 const NotificationScreen = ({ navigation }) => {
   const [notifications, setNotifications] = useState("");
@@ -31,51 +34,47 @@ const NotificationScreen = ({ navigation }) => {
 
   const { userId } = useUser();
 
-  const getOrders = async () => {
+  const getNotifications = async () => {
     try {
+      console.log("NOOOOOOOOO");
       setIsLoading(true);
       const token = await getTokenFromKeychain();
-      const response = await axios.get(`${BASE_URL}/orders/${userId}`, {
+      const response = await axios.get(`${BASE_URL}/notification/${userId}`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
-
+      console.log("Hellooo");
+      // Handle the response data here, for example:
       const result = response.data;
       setNotifications(result);
+      console.log(result);
       setIsLoading(false);
+      //setChat(response.data.data);
     } catch (error) {
-      // Handle errors
-    }
-  };
-
-  const getExchangeNotifications = async () => {
-    try {
-      setIsLoading(true);
-      const token = await getTokenFromKeychain();
-      const response = await axios.get(`${BASE_URL}/exchange/${userId}`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const result = response.data;
-      setNotifications(result);
-      setIsLoading(false);
-    } catch (error) {
-      // Handle errors
+      if (error.response) {
+        Alert.alert("Error", error.response.data.message);
+      } else if (error.request) {
+        Alert.alert(
+          "Network Error",
+          "There was a problem with the network. Please check your internet connection and try again.",
+          [{ text: "OK" }]
+        );
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        Alert.alert(
+          "Something Wrong",
+          "Something went wrong, try again please",
+          [{ text: "OK" }]
+        );
+      }
     }
   };
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
-      if (selectedButton === buttons[0]) {
-        getOrders();
-      } else if (selectedButton === buttons[1]) {
-        getExchangeNotifications();
-      }
+      getNotifications();
     });
 
     return unsubscribe;
@@ -93,40 +92,11 @@ const NotificationScreen = ({ navigation }) => {
       )}
       {!isLoading && (
         <View style={styles.root}>
-          <CustomHeader title="Notifications" />
-
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              paddingVertical: 15,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {buttons.map((category) => (
-              <CustomButton
-                key={category}
-                text={category}
-                type={category === selectedButton ? "Selected" : "NotSelected"}
-                onPress={() => handleCategoryClick(category)}
-              />
-            ))}
-          </View>
-          <View style={{ height: 10, backgroundColor: "#E3E3E3" }}></View>
-          {/* <FlatList
+          <FlatList
             data={notifications}
-            renderItem={({ item }) => (
-              <NotificationCard
-                item={item}
-                type={selectedButton === buttons[0] ? "order" : "exchange"}
-                setNotifications={setNotifications}
-                notifications={notifications}
-                selectedButton={selectedButton}
-              />
-            )}
+            renderItem={({ item }) => <NotificationCard item={item} />}
             keyExtractor={(item) => item.id.toString()}
-          /> */}
+          />
         </View>
       )}
     </>
@@ -137,4 +107,5 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: "white" },
 });
 
-export default NotificationScreen;
+export default React.memo(NotificationScreen);
+NotificationScreen.MyPostsScreen = "NotificationScreen";

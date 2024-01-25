@@ -143,8 +143,6 @@ const MyPostsScreen = ({ navigation }) => {
       )}
       {!isLoading && (
         <View style={styles.root}>
-          <CustomHeader title="My Posts" />
-
           <View
             style={{
               display: "flex",
@@ -196,4 +194,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MyPostsScreen;
+export default React.memo(MyPostsScreen);
+MyPostsScreen.MyPostsScreen = "MyPostsScreen";

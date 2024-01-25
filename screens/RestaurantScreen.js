@@ -312,4 +312,5 @@ const styles = StyleSheet.create({
     borderRadius: 0,
   },
 });
-export default RestaurantScreen;
+export default React.memo(RestaurantScreen);
+RestaurantScreen.MyPostsScreen = "RestaurantScreen";

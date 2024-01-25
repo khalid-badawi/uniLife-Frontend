@@ -1,21 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import MyChats from "../screens/MyChats";
-
-import EditProfileScreen from "../screens/EditProfile";
+import PostsMainScreen from "../screens/PostsMainScreen";
+import MyPostsScreen from "../screens/MyPostsScreen";
+import ChatScreen from "../screens/ChatScreen";
+import CreatePost from "../screens/CreatePost";
 import CustomHeader from "./CustomHeader";
-import { Alert, View } from "react-native";
-import axios from "axios";
+import OthersPosts from "../screens/OthersPosts";
 import BASE_URL from "../BaseUrl";
 import { getTokenFromKeychain } from "../globalFunc/Keychain";
+import axios from "axios";
 import { useUser } from "../Contexts/UserContext";
 import { useNavigation } from "@react-navigation/native";
+import { Alert, View } from "react-native";
 import StickyAd from "../components/StickyAd";
 import { useDrawer } from "../Contexts/openContext";
 import { useDrawerStatus } from "@react-navigation/drawer";
 const Stack = createNativeStackNavigator();
 
-const ScheduleStack = ({ route: { params } }) => {
+const MyPostsStack = () => {
   const navigation = useNavigation();
   const [ad, setAd] = useState(null);
   const { userId } = useUser();
@@ -87,12 +89,20 @@ const ScheduleStack = ({ route: { params } }) => {
   }, [navigation]);
   return (
     <View style={{ flex: 1 }}>
-      <Stack.Navigator initialRouteName="Edit Profile" screenOptions={{}}>
+      <Stack.Navigator initialRouteName="MyPosts">
         <Stack.Screen
-          name="Edit Profile"
-          component={EditProfileScreen}
+          name="MyPosts"
+          component={MyPostsScreen}
           options={{
-            header: () => <CustomHeader title="Edit Profile" type="drawer" />,
+            header: () => <CustomHeader title="My Posts" type="drawer" />,
+          }}
+        />
+
+        <Stack.Screen
+          name="OthersPosts"
+          component={OthersPosts}
+          options={{
+            header: () => <CustomHeader title="Profile" type="stack" />,
           }}
         />
       </Stack.Navigator>
@@ -107,5 +117,5 @@ const ScheduleStack = ({ route: { params } }) => {
   );
 };
 
-export default React.memo(ScheduleStack);
-ScheduleStack.displayName = "ScheduleStack";
+export default React.memo(MyPostsStack);
+MyPostsStack.displayName = "MyPostsStack";

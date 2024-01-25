@@ -4,9 +4,11 @@ import MyChats from "../screens/MyChats";
 
 import ChatScreen from "../screens/ChatScreen";
 import CustomHeader from "./CustomHeader";
+import { useDrawer } from "../Contexts/openContext";
+import { useDrawerStatus } from "@react-navigation/drawer";
 const Stack = createNativeStackNavigator();
 
-const ScheduleStack = ({ route: { params } }) => {
+const ChatStack = ({ route: { params } }) => {
   return (
     <Stack.Navigator initialRouteName="My Chats" screenOptions={{}}>
       <Stack.Screen
@@ -19,11 +21,15 @@ const ScheduleStack = ({ route: { params } }) => {
       <Stack.Screen
         name="Chat Screen"
         component={ChatScreen}
-        options={{ headerShown: false }}
+        options={{
+          headerShown: true,
+          header: () => <CustomHeader title="Chat" type="stack" />,
+        }}
         initialParams={params}
       />
     </Stack.Navigator>
   );
 };
 
-export default ScheduleStack;
+export default React.memo(ChatStack);
+ChatStack.displayName = "ChatStack";

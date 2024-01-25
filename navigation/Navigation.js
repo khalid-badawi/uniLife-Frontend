@@ -36,6 +36,7 @@ import { Text, View, TextInput } from "react-native";
 import DrawerNav from "./DrawerNav";
 import OthersPosts from "../screens/OthersPosts";
 import RoomsScreen from "../screens/RoomsScreen";
+import StickyAd from "../components/StickyAd";
 const Stack = createNativeStackNavigator();
 
 export default function Navigation() {

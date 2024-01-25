@@ -22,4 +22,5 @@ const RoomsScreen = () => {
 const styles = StyleSheet.create({
   root: { backgroundColor: "white", flex: 1 },
 });
-export default RoomsScreen;
+export default React.memo(RoomsScreen);
+RoomsScreen.MyPostsScreen = "RoomsScreen";

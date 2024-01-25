@@ -55,6 +55,8 @@ const ChatScreen = ({ route, navigation }) => {
   const [image, setImage] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const { userId } = useUser();
+  const [isTextMessageEnabled, setTextMessageEnabled] = useState(true);
+
   const currentUserId = userId;
   console.log("Currentuser=" + currentUserId);
 
@@ -368,7 +370,6 @@ const ChatScreen = ({ route, navigation }) => {
             keyExtractor={(_, index) => index.toString()}
             inverted
           />
-
           <View style={styles.inputContainer}>
             <TouchableOpacity
               onPress={() => {
@@ -385,7 +386,7 @@ const ChatScreen = ({ route, navigation }) => {
                 size={22}
                 image={image}
                 setImage={setImage}
-                sendImage={sendImage}
+                onImageSelected={sendImage}
               />
             </TouchableOpacity>
             <TextInput
@@ -433,6 +434,23 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginBottom: 8,
     marginHorizontal: 2,
+  },
+  selectedImageContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+    marginHorizontal: 2,
+    backgroundColor: "#8F00FF",
+    borderRadius: 20,
+    overflow: "hidden",
+  },
+  selectedImage: {
+    width: 50,
+    height: 50,
+    marginRight: 8,
+  },
+  cancelIconContainer: {
+    padding: 8,
   },
   messageBubble: {
     padding: 8,
@@ -497,4 +515,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChatScreen;
+export default React.memo(ChatScreen);
+ChatScreen.displayName = "ChatScreen";

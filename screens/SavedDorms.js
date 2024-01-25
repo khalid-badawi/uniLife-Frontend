@@ -104,4 +104,5 @@ const styles = StyleSheet.create({
   },
   icon: { color: "#8F00FF" },
 });
-export default SavedDorms;
+export default React.memo(SavedDorms);
+SavedDorms.MyPostsScreen = "SavedDorms";

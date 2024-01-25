@@ -19,7 +19,9 @@ const socket = io.connect("http://192.168.1.8:3000");
 const CheckOut = () => {
   const route = useRoute();
   const navigation = useNavigation();
+  const [tok, setTok] = useState("");
   const { restaurantId, data } = route.params;
+  let token = "";
   const radioButtons = useMemo(
     () => [
       {
@@ -87,6 +89,14 @@ const CheckOut = () => {
       Qauntity: item.Quantity,
     };
   });
+  useEffect(() => {
+    const getToken = async () => {
+      token = await getTokenFromKeychain();
+      setTok(token);
+      console.log("got:", token);
+    };
+    getToken();
+  }, []);
 
   const price = route.params.price;
   const [notes, setNotes] = useState("");
@@ -95,7 +105,7 @@ const CheckOut = () => {
   const confirmOrder = async () => {
     try {
       console.log("hi");
-      const token = await getTokenFromKeychain();
+      token = await getTokenFromKeychain();
       const response = await axios.post(
         `${BASE_URL}/order/${userId}`,
         JSON.stringify({ restaurantId, orderItem: transformedArray, notes }),
@@ -167,17 +177,43 @@ const CheckOut = () => {
   const handleCheckOut = async () => {
     if (selectedId === "1") {
       await confirmOrder();
+      socket.connect();
+      console.log("xdssss");
+      socket.emit("newOrder", {
+        restaurantId: 2,
+      });
     } else if (selectedId === "2") {
       console.log("ggzzz");
+
+      console.log(token, notes, restaurantId, transformedArray);
       setIsModalVisible(true);
     }
-    socket.connect();
-    console.log("xdssss");
-    socket.emit("newOrder", {
-      restaurantId: 2,
-    });
   };
-
+  const handleWebViewNavigation = (navState) => {
+    // Check if the URL includes the success or cancel URL
+    if (
+      navState.url.includes(
+        "http://192.168.1.8:3000/api/v1/unilife/payment/order/success"
+      )
+    ) {
+      Alert.alert("Success", "Ordered Successfully, Wait for order updates", [
+        { text: "OK" },
+      ]);
+      setIsModalVisible(false);
+      socket.connect();
+      console.log("xdssss");
+      socket.emit("newOrder", {
+        restaurantId: 2,
+      });
+    } else if (
+      navState.url.includes(
+        "http://192.168.1.8:3000/api/v1/unilife/payment/order/cancel"
+      )
+    ) {
+      Alert("Cancelled", "Payment Cancelled");
+      setIsModalVisible(false);
+    }
+  };
   return (
     <View style={styles.root}>
       <Icon name="cart-check" size={100} style={styles.icon} />
@@ -233,10 +269,13 @@ const CheckOut = () => {
         <WebView
           source={{
             method: "POST",
-
             uri: `http://192.168.1.8:3000/api/v1/unilife/payment/order/${userId}`,
+            body: `token=${tok}&orderArr=${JSON.stringify(
+              transformedArray
+            )}&restaurantId=${restaurantId}&notes=${notes}&price=${price}`,
           }}
           style={{ flex: 1 }}
+          onNavigationStateChange={handleWebViewNavigation}
         ></WebView>
         <Button title="Close Modal" onPress={() => setIsModalVisible(false)} />
       </Modal>
@@ -287,4 +326,6 @@ const styles = StyleSheet.create({
     color: "#8F00FF",
   },
 });
-export default CheckOut;
+
+export default React.memo(CheckOut);
+CheckOut.displayName = "CheckOut";

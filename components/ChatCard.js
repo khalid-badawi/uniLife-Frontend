@@ -19,7 +19,11 @@ const ChatCard = ({ item }) => {
     >
       <View style={styles.root}>
         <Image
-          source={test1}
+          source={
+            item.userimage !== "" && item.userimage
+              ? { uri: item.userimage }
+              : test1
+          }
           style={styles.img} // Fixed style object
           resizeMode="contain"
         />
@@ -34,28 +38,29 @@ const ChatCard = ({ item }) => {
             <Text style={{ ...styles.txt, marginTop: 1 }} numberOfLines={1}>
               {item.text ? item.text : "image message..."}
             </Text>
-            <View
-              style={{
-                width: 25,
-                height: 25,
-                borderRadius: 50,
-
-                backgroundColor: "#8F00FF",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Text
+            {item.unseenMessageCount !== 0 && (
+              <View
                 style={{
-                  ...styles.txt,
-                  color: "white",
-                  fontSize: 15,
-                  marginLeft: 1,
+                  width: 25,
+                  height: 25,
+                  borderRadius: 50,
+                  backgroundColor: "#8F00FF",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                5{" "}
-              </Text>
-            </View>
+                <Text
+                  style={{
+                    ...styles.txt,
+                    color: "white",
+                    fontSize: 15,
+                    marginLeft: 1,
+                  }}
+                >
+                  {item.unseenMessageCount}
+                </Text>
+              </View>
+            )}
           </View>
         </View>
       </View>

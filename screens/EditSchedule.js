@@ -29,4 +29,5 @@ const EditScheduleScreen = ({}) => {
   );
 };
 
-export default EditScheduleScreen;
+export default React.memo(EditScheduleScreen);
+EditScheduleScreen.displayName = "EditScheduleScreen";

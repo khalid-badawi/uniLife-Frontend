@@ -87,4 +87,6 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
 });
-export default MyChats;
+
+export default React.memo(MyChats);
+MyChats.displayName = "MyChats";

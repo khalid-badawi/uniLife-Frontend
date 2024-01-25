@@ -20,6 +20,8 @@ import { useUser } from "../Contexts/UserContext";
 import BASE_URL from "../BaseUrl";
 import CustomHeader from "../navigation/CustomHeader";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { useDrawer } from "../Contexts/openContext";
+import { useDrawerStatus } from "@react-navigation/drawer";
 
 const MyOrders = () => {
   const navigation = useNavigation();
@@ -30,6 +32,7 @@ const MyOrders = () => {
   const [selectedButton] = uniqueCategories;
   const [date, setDate] = useState(new Date());
   const { userId } = useUser();
+
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
     setSearch("");
@@ -171,4 +174,6 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
 });
-export default MyOrders;
+
+export default React.memo(MyOrders);
+MyOrders.displayName = "MyOrders";
