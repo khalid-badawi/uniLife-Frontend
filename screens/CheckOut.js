@@ -1,4 +1,12 @@
-import { View, Text, StyleSheet, FlatList, Alert, Modal } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Alert,
+  Modal,
+  ScrollView,
+} from "react-native";
 import React, { useState, useEffect, useMemo } from "react";
 import CustomButton from "../components/CustomButton";
 import MenuRow from "../components/MenuRow";
@@ -14,7 +22,7 @@ import io from "socket.io-client";
 import RadioGroup from "react-native-radio-buttons-group";
 import WebView from "react-native-webview";
 import { Button } from "react-native-elements";
-const socket = io.connect("http://192.168.1.8:3000");
+const socket = io.connect("http://192.168.1.10:3000");
 
 const CheckOut = () => {
   const route = useRoute();
@@ -180,8 +188,10 @@ const CheckOut = () => {
       socket.connect();
       console.log("xdssss");
       socket.emit("newOrder", {
-        restaurantId: 2,
+        restaurantId,
       });
+      Alert.alert("Success", "Ordered Successfully");
+      navigation.navigate("MyOrders");
     } else if (selectedId === "2") {
       console.log("ggzzz");
 
@@ -193,7 +203,7 @@ const CheckOut = () => {
     // Check if the URL includes the success or cancel URL
     if (
       navState.url.includes(
-        "http://192.168.1.8:3000/api/v1/unilife/payment/order/success"
+        "http://192.168.1.10:3000/api/v1/unilife/payment/order/success"
       )
     ) {
       Alert.alert("Success", "Ordered Successfully, Wait for order updates", [
@@ -203,11 +213,12 @@ const CheckOut = () => {
       socket.connect();
       console.log("xdssss");
       socket.emit("newOrder", {
-        restaurantId: 2,
+        restaurantId,
       });
+      navigation.navigate("MyOrders");
     } else if (
       navState.url.includes(
-        "http://192.168.1.8:3000/api/v1/unilife/payment/order/cancel"
+        "http://192.168.1.10:3000/api/v1/unilife/payment/order/cancel"
       )
     ) {
       Alert("Cancelled", "Payment Cancelled");
@@ -269,7 +280,7 @@ const CheckOut = () => {
         <WebView
           source={{
             method: "POST",
-            uri: `http://192.168.1.8:3000/api/v1/unilife/payment/order/${userId}`,
+            uri: `http://192.168.1.10:3000/api/v1/unilife/payment/order/${userId}`,
             body: `token=${tok}&orderArr=${JSON.stringify(
               transformedArray
             )}&restaurantId=${restaurantId}&notes=${notes}&price=${price}`,
@@ -307,10 +318,11 @@ const styles = StyleSheet.create({
   dataCont: {
     paddingTop: 40,
     paddingBottom: 30,
-    height: "40%",
+    height: "37%",
     borderRadius: 20,
     marginBottom: 10,
     marginHorizontal: 5,
+
     backgroundColor: "#8F00FF",
   },
   notesCont: {

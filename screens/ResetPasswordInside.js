@@ -15,6 +15,8 @@ import * as Yup from "yup";
 import axios from "axios";
 import BASE_URL from "../BaseUrl";
 import { useNavigation } from "@react-navigation/native";
+import { useUser } from "../Contexts/UserContext";
+import { getTokenFromKeychain } from "../globalFunc/Keychain";
 
 const validate = Yup.object().shape({
   password: Yup.string()
@@ -24,31 +26,41 @@ const validate = Yup.object().shape({
       "Must contain minimum 8 characters, at least one uppercase, at least one uppercase letter, one lowercase letter, one number and one special character"
     )
     .required("❌ Please enter your password"),
+  newPassword: Yup.string()
+    .min(8, "❌ Password should contain at least 8 characters")
+    .matches(
+      /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}/,
+      "Must contain minimum 8 characters, at least one uppercase, at least one uppercase letter, one lowercase letter, one number and one special character"
+    )
+    .required("❌ Please enter your password"),
   confirmPassword: Yup.string()
     .required("❌ Please confirm your password")
     .min(8, "❌ Password should contain at least 8 characters")
-    .oneOf([Yup.ref("password")], "❌ Your passwords do not match"),
+    .oneOf([Yup.ref("newPassword")], "❌ Your passwords do not match"),
 });
 
-const ForgotPasswordScreen = () => {
+const ResetPasswordInside = () => {
   const { height, width } = useWindowDimensions();
   const navigation = useNavigation();
-
+  const { userId } = useUser();
   //states
   const handleReset = async (values, { resetForm }) => {
     try {
-      const response = await axios.post(
-        `${BASE_URL}/resetPassword`,
+      const token = await getTokenFromKeychain();
+      console.log(token);
+      const response = await axios.patch(
+        `${BASE_URL}/password/${userId}`,
         JSON.stringify(values),
         {
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
         }
       );
 
-      // resetForm();
-      navigation.navigate("SignIn");
+      Alert.alert("Success", "Changed Successfully");
+      navigation.navigate("EditProfile");
     } catch (error) {
       console.log(error);
       Alert.alert("Error", "Error setting new password");
@@ -58,7 +70,7 @@ const ForgotPasswordScreen = () => {
 
   return (
     <Formik
-      initialValues={{ password: "", confirmPassword: "" }}
+      initialValues={{ newPassword: "", password: "", confirmPassword: "" }}
       onSubmit={handleReset}
       validationSchema={validate}
     >
@@ -78,15 +90,27 @@ const ForgotPasswordScreen = () => {
             resizeMode="contain"
           />
           <Text style={styles.mainText}>Reset Password</Text>
+
           <View style={styles.animInput}>
             <CustomInput
-              placeholder="Password"
+              placeholder="Current Password"
               value={values.password}
               setValue={handleChange("password")}
               secureTextEntry={true}
               errors={errors.password}
               iconName={"key"}
               onBlur={() => setFieldTouched("password")}
+            />
+          </View>
+          <View style={styles.animInput}>
+            <CustomInput
+              placeholder="New Password"
+              value={values.newPassword}
+              setValue={handleChange("newPassword")}
+              secureTextEntry={true}
+              errors={errors.newPassword}
+              iconName={"key"}
+              onBlur={() => setFieldTouched("newPassword")}
             />
           </View>
           <View style={styles.animInput}>
@@ -140,4 +164,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ForgotPasswordScreen;
+export default ResetPasswordInside;

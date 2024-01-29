@@ -51,7 +51,7 @@ const EditProfileScreen = () => {
   const [errorMsg, setErrorMsg] = useState("");
   const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
-
+  const [majors, setMajors] = useState([]);
   const { userId } = useUser();
   const handleEditPress = async (values) => {
     // Validate postText, relatedMajors, and image
@@ -118,6 +118,44 @@ const EditProfileScreen = () => {
     },
     validationSchema: SignupSchema,
   });
+
+  useEffect(() => {
+    const getMenu = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/major`, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        console.log("Hellooo");
+        // Handle the response data here, for example:
+        const result = response.data;
+
+        console.log(result);
+        const mappedArray = result.map((item) => item.name);
+        setMajors(mappedArray);
+        //setChat(response.data.data);
+      } catch (error) {
+        if (error.response) {
+          Alert.alert("Error", error.response.data.message);
+        } else if (error.request) {
+          Alert.alert(
+            "Network Error",
+            "There was a problem with the network. Please check your internet connection and try again.",
+            [{ text: "OK" }]
+          );
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          Alert.alert(
+            "Something Wrong",
+            "Something went wrong, try again please",
+            [{ text: "OK" }]
+          );
+        }
+      }
+    };
+    getMenu();
+  }, []);
 
   useEffect(() => {
     const getProfileInfo = async () => {
@@ -250,6 +288,7 @@ const EditProfileScreen = () => {
             entering={FadeInDown.delay(150).duration(1000).springify()}
           >
             <CustomPicker
+              items={majors}
               value={formik.values.major}
               errors={formik.errors.major}
               onValueChange={formik.handleChange("major")}
@@ -274,7 +313,7 @@ const EditProfileScreen = () => {
               text="Change Password"
               type="Tertiary"
               onPress={() => {
-                navigation.navigate("SignIn");
+                navigation.navigate("ResetPasswordInside");
               }}
             />
           </Animated.View>

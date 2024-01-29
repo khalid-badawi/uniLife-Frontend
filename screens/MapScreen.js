@@ -49,7 +49,7 @@ function MapScreen() {
         // Handle the response data here, for example:
         const result = response.data;
         setFaculties(result);
-        console.log(result[0].locations);
+
         //setChat(response.data.data);
       } catch (error) {
         if (error.response) {
@@ -63,7 +63,7 @@ function MapScreen() {
         } else {
           // Something happened in setting up the request that triggered an Error
           Alert.alert(
-            "Something Wrong",
+            "Something Wrong23",
             "Something went wrong, try again please",
             [{ text: "OK" }]
           );

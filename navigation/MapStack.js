@@ -104,6 +104,7 @@ const MapStack = () => {
           title={ad.title}
           description={ad.description}
           imageUrl={ad.image}
+          link={ad.link}
         />
       )}
     </View>

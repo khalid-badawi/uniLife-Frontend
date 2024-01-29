@@ -144,6 +144,7 @@ const ScheduleInput = ({ setRefreshTrigger }) => {
       setRefreshTrigger((prev) => !prev);
 
       console.log("gg");
+      navigation.navigate("My Schedule");
     } catch (error) {
       if (error.response) {
         setErrorMsg(error.response.data.message);

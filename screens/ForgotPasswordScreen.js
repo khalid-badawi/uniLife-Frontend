@@ -5,6 +5,7 @@ import {
   Text,
   Image,
   useWindowDimensions,
+  Alert,
 } from "react-native";
 import Logo from "../assets/Logo2.png";
 import CustomInput from "../components/CustomInput";
@@ -12,6 +13,9 @@ import CustomButton from "../components/CustomButton";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import { AlignLeft } from "react-native-feather";
+import axios from "axios";
+import BASE_URL from "../BaseUrl";
+import { useNavigation } from "@react-navigation/native";
 
 const validate = Yup.object().shape({
   email: Yup.string()
@@ -24,10 +28,42 @@ const validate = Yup.object().shape({
 
 const ForgotPasswordScreen = () => {
   const { height, width } = useWindowDimensions();
-
-  //states
-  const handleConfirm = (values, { resetForm }) => {
-    console.warn(values);
+  const navigation = useNavigation();
+  const sendEmail = async (values) => {
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/forgetPassword`,
+        JSON.stringify(values),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      // Handle the response data here, for example:
+      navigation.navigate("ConfirmCode");
+      //setChat(response.data.data);
+    } catch (error) {
+      if (error.response) {
+        Alert.alert("Error", error.response.data.message);
+      } else if (error.request) {
+        Alert.alert(
+          "Network Error",
+          "There was a problem with the network. Please check your internet connection and try again.",
+          [{ text: "OK" }]
+        );
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        Alert.alert(
+          "Something Wrong",
+          "Something went wrong, try again please",
+          [{ text: "OK" }]
+        );
+      }
+    }
+  };
+  const handleConfirm = async (values, { resetForm }) => {
+    await sendEmail(values);
     resetForm();
   };
 
@@ -54,9 +90,7 @@ const ForgotPasswordScreen = () => {
           />
           <Text style={styles.mainText}>Forgot Password?</Text>
 
-          <Text style={styles.descText}>
-            Happens! Let's Reset Your Password Now
-          </Text>
+          <Text style={styles.descText}>Let's Reset Your Password Now</Text>
 
           <View style={styles.animInput}>
             <CustomInput
@@ -72,6 +106,13 @@ const ForgotPasswordScreen = () => {
           <View style={styles.animInput}>
             <CustomButton text="Confirm" onPress={handleSubmit} />
           </View>
+          <View style={styles.animInput}>
+            <CustomButton
+              text="Go back"
+              type="Tertiary"
+              onPress={() => navigation.goBack()}
+            />
+          </View>
         </View>
       )}
     </Formik>
@@ -83,6 +124,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
     backgroundColor: "white",
+    flex: 1,
   },
 
   logo: {
@@ -97,10 +139,10 @@ const styles = StyleSheet.create({
     fontSize: 25,
 
     fontWeight: "bold",
-    color: "#643b66",
+    color: "#8F00FF",
   },
   descText: {
-    color: "#643b66",
+    color: "#8F00FF",
     marginBottom: 20,
     fontSize: 15,
     fontWeight: "bold",

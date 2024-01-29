@@ -101,7 +101,7 @@ const ExchangeStack = () => {
           name="ChatScreen"
           component={ChatScreen}
           options={{
-            header: () => <CustomHeader title="Cafeteria" type="stack" />,
+            header: () => <CustomHeader title="Chat" type="stack" />,
           }}
         />
         <Stack.Screen
@@ -122,6 +122,7 @@ const ExchangeStack = () => {
           title={ad.title}
           description={ad.description}
           imageUrl={ad.image}
+          link={ad.link}
         />
       )}
     </View>

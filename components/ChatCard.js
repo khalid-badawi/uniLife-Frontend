@@ -14,6 +14,7 @@ const ChatCard = ({ item }) => {
         navigation.navigate("Chat Screen", {
           receiverId: item.otherPersonId,
           userName: item.username,
+          otherImage: item.userimage,
         })
       }
     >

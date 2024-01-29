@@ -199,7 +199,7 @@ const ScheduleScreen = () => {
               </TouchableOpacity>
             </View>
           </View>
-          <View style={{ ...styles.list, height: height * 0.6 }}>
+          <View style={{ ...styles.list, height: height * 0.55 }}>
             <FlatList
               data={filteredLectures}
               renderItem={renderItem}

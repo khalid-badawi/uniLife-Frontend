@@ -54,11 +54,9 @@ const CreatePost = () => {
     const getMenu = async () => {
       try {
         setIsLoading(true);
-        const token = await getTokenFromKeychain();
-        const response = await axios.get(`${BASE_URL}/major/${userId}`, {
+        const response = await axios.get(`${BASE_URL}/major`, {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
         });
         console.log("Hellooo");
@@ -96,7 +94,7 @@ const CreatePost = () => {
       try {
         setIsLoading(true);
         const token = await getTokenFromKeychain();
-        const response = await axios.get(`${BASE_URL}/catigory/${userId}`, {
+        const response = await axios.get(`${BASE_URL}/category/${userId}`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -108,7 +106,7 @@ const CreatePost = () => {
 
         console.log(result);
         const mappedArray = result.map((item) => item.name);
-        setCatigories(["Select Category", ...mappedArray]);
+        setCatigories(["Select Category", ...mappedArray, "Other"]);
 
         setIsLoading(false);
         //setChat(response.data.data);
@@ -188,9 +186,11 @@ const CreatePost = () => {
             },
           }
         );
+        Alert.alert("Success", "Post Created Successfully");
 
         console.log("Post created:", response.data);
       } catch (error) {
+        console.log(error);
         if (error.response) {
           Alert("Error", error.response.data.message);
         } else if (error.request) {
@@ -202,7 +202,7 @@ const CreatePost = () => {
         } else {
           // Something happened in setting up the request that triggered an Error
           Alert.alert(
-            "Something Wrong",
+            "Something Wrong1",
             "Something went wrong, try again please",
             [{ text: "OK" }]
           );

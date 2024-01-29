@@ -24,13 +24,13 @@ const validate = Yup.object().shape({
 const onResendPressed = () => {
   console.warn("ok");
 };
-const ConfirmCodeScreen = ({ code = "0597401453" }) => {
+const ConfirmSignUp = ({ code = "0597401453" }) => {
   const { height, width } = useWindowDimensions();
   const navigation = useNavigation();
   const handleConfirm = async (values, { resetForm }) => {
     try {
       const response = await axios.post(
-        `${BASE_URL}/verifyUpdatePassword`,
+        `${BASE_URL}/verify`,
         JSON.stringify(values),
         {
           headers: {
@@ -40,7 +40,7 @@ const ConfirmCodeScreen = ({ code = "0597401453" }) => {
       );
 
       resetForm();
-      navigation.navigate("ResetPassword");
+      navigation.navigate("SignIn");
     } catch (error) {
       Alert.alert("Error", "Wrong Code");
     }
@@ -120,5 +120,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.memo(ConfirmCodeScreen);
-ConfirmCodeScreen.displayName = "ConfirmCodeScreen";
+export default React.memo(ConfirmSignUp);
+ConfirmSignUp.displayName = "ConfirmSignUp";

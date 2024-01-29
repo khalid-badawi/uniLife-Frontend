@@ -86,7 +86,11 @@ const OthersPosts = ({ navigation }) => {
           <View style={{ alignItems: "center" }}>
             <View style={styles.imageCont}>
               <Image
-                source={userImage !== "" ? { uri: userImage } : defaultImage}
+                source={
+                  userImage !== "" && userImage
+                    ? { uri: userImage }
+                    : defaultImage
+                }
                 alt="Profile Image"
                 style={styles.image}
                 resizeMode="stretch"

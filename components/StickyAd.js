@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { TouchableOpacity } from "react-native";
+import { Modal, TouchableOpacity } from "react-native";
 import { View, Text, Image, StyleSheet } from "react-native";
 import { useAd } from "../Contexts/AdContext";
 import Icon from "react-native-vector-icons/FontAwesome";
-const StickyAd = ({ title, description, imageUrl }) => {
+import WebView from "react-native-webview";
+import { Button } from "react-native-elements";
+const StickyAd = ({ title, description, imageUrl, link }) => {
   const { isVisible, handleHideAd } = useAd();
-
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const handleHidePress = () => {
     handleHideAd(false);
   };
@@ -13,9 +15,12 @@ const StickyAd = ({ title, description, imageUrl }) => {
   if (!isVisible) {
     return null; // Return null to render nothing if not visible
   }
-
+  console.log(link);
   return (
-    <View style={styles.container}>
+    <TouchableOpacity
+      style={styles.container}
+      onPress={() => setIsModalVisible(true)}
+    >
       <Image source={{ uri: imageUrl }} style={styles.image} />
 
       <View style={styles.textContainer}>
@@ -31,7 +36,7 @@ const StickyAd = ({ title, description, imageUrl }) => {
             style={{ marginRight: 5 }}
             onPress={handleHidePress}
           >
-            <Icon name="close" size={20} />
+            <Icon name="close" size={16} />
           </TouchableOpacity>
         </View>
 
@@ -49,7 +54,21 @@ const StickyAd = ({ title, description, imageUrl }) => {
       >
         ADs
       </Text>
-    </View>
+      {link && (
+        <Modal style={styles.modal} visible={isModalVisible}>
+          <WebView
+            source={{
+              uri: link,
+            }}
+            style={{ flex: 1 }}
+          ></WebView>
+          <Button
+            title="Return To App"
+            onPress={() => setIsModalVisible(false)}
+          />
+        </Modal>
+      )}
+    </TouchableOpacity>
   );
 };
 
@@ -58,6 +77,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "#EAEAEA", // Light gray background
     padding: 10,
+    paddingVertical: 5,
     alignItems: "center",
     position: "sticky",
     top: 0,

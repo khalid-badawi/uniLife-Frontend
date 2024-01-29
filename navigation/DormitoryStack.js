@@ -103,11 +103,12 @@ const DormitoryStack = () => {
         />
       </Stack.Navigator>
       {ad && (
-        <StickyAd
-          title={ad.title}
-          description={ad.description}
-          imageUrl={ad.image}
-        />
+         <StickyAd
+         title={ad.title}
+         description={ad.description}
+         imageUrl={ad.image}
+         link={ad.link}
+       />
       )}
     </View>
   );

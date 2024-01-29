@@ -20,6 +20,7 @@ import { useUser } from "../Contexts/UserContext";
 import { useContext } from "react";
 import messaging from "@react-native-firebase/messaging";
 import BASE_URL from "../BaseUrl";
+import BlockedScreen from "./BlockedScreen";
 
 const SignInSchema = Yup.object().shape({
   email: Yup.string()
@@ -49,7 +50,7 @@ const SignInScreen = () => {
   const [isSignedIn, setIsSignedIn] = useState(true);
   const { userId, setUserId, setUsername } = useUser();
   const onForgotPasswordPressed = () => {
-    console.warn("forgot password");
+    navigation.navigate("ForgotPassword");
   };
   const onSignUpPressed = () => {
     navigation.navigate("SignUp");
@@ -107,24 +108,24 @@ const SignInScreen = () => {
       return false;
     }
   };
-  // useEffect(() => {
-  //   const checkTokenAndNavigate = async () => {
-  //     const storedToken = await getTokenFromKeychain();
-  //     console.log("Aloo", storedToken);
-  //     if (storedToken) {
-  //       const res = await getUser();
-  //       if (res) {
-  //         navigation.navigate("Main");
-  //       } else {
-  //         setIsSignedIn(false);
-  //       }
-  //     } else {
-  //       setIsSignedIn(false);
-  //     }
-  //   };
+  useEffect(() => {
+    const checkTokenAndNavigate = async () => {
+      const storedToken = await getTokenFromKeychain();
+      console.log("Aloo", storedToken);
+      if (storedToken) {
+        const res = await getUser();
+        if (res) {
+          navigation.navigate("Main");
+        } else {
+          setIsSignedIn(false);
+        }
+      } else {
+        setIsSignedIn(false);
+      }
+    };
 
-  //   checkTokenAndNavigate();
-  // }, []);
+    checkTokenAndNavigate();
+  }, []);
 
   //states
   const handleSignIn = async (values, { resetForm }) => {
@@ -140,13 +141,19 @@ const SignInScreen = () => {
           },
         }
       );
-      await storeTokenInKeychain(response.data.token);
-      setErrorMsg("");
-      requestFCMPermission();
-      setUserId(response.data.data.id);
-      setUsername(response.data.data.username);
-      console.log(response.data.data);
-      navigation.navigate("Main");
+      if (response.data.data.blocked) {
+        navigation.navigate("BlockedScreen");
+      } else {
+        await storeTokenInKeychain(response.data.token);
+        setErrorMsg("");
+        requestFCMPermission();
+        setUserId(response.data.data.id);
+        setUsername(response.data.data.username);
+
+        console.log(response.data.data);
+        navigation.navigate("Main");
+        setIsSignedIn(false);
+      }
     } catch (error) {
       if (error.response) {
         setErrorMsg(error.response.data.message);
@@ -170,7 +177,7 @@ const SignInScreen = () => {
 
   return (
     <>
-      {isSignedIn && (
+      {!isSignedIn && (
         <Formik
           initialValues={{
             email: "s11923593@stu.najah.edu",

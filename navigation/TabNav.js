@@ -16,7 +16,7 @@ const TabNav = () => {
   return (
     <View style={{ flex: 1 }}>
       <Tab.Navigator
-        initialRouteName="MapTab"
+        initialRouteName="CafiteriaTab"
         screenOptions={{
           headerShown: false,
           showLabel: true, // Hide the defshowLabel: true,
@@ -28,16 +28,6 @@ const TabNav = () => {
           tabBarStyle: {},
         }}
       >
-        <Tab.Screen
-          name="MapTab"
-          component={MapStack}
-          options={{
-            tabBarIcon: ({ color, size }) => (
-              <Icon name="map-marker" color={color} size={23} />
-            ),
-            tabBarLabel: "Map",
-          }}
-        />
         <Tab.Screen
           name="CafiteriaTab"
           component={CafiteriaStack}
@@ -66,6 +56,16 @@ const TabNav = () => {
               <Icon2 name="exchange-alt" color={color} size={23} />
             ),
             tabBarLabel: "Exchange",
+          }}
+        />
+        <Tab.Screen
+          name="MapTab"
+          component={MapStack}
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <Icon name="map-marker" color={color} size={23} />
+            ),
+            tabBarLabel: "Map",
           }}
         />
       </Tab.Navigator>

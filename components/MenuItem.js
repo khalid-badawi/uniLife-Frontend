@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
   },
   descTxt: {
     marginLeft: 15,
-    marginRight: 2,
+    marginRight: 15,
   },
 
   icon: {

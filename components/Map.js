@@ -7,17 +7,30 @@ import Icon from "react-native-vector-icons/FontAwesome";
 // Required on Android. See Android installation notes.
 import { PermissionsAndroid } from "react-native";
 Logger.setLogCallback((log) => {
-  const { message } = log;
-
-  // expected warnings - see https://github.com/mapbox/mapbox-gl-native/issues/15341#issuecomment-522889062
-  if (
-    message.match("Request failed due to a permanent error: Canceled") ||
-    message.match("Request failed due to a permanent error: Socket Closed")
-  ) {
-    return true;
-  }
-  return false;
+  // Always return true to prevent further processing of logs
+  return true;
 });
+// Logger.setLogCallback((log) => {
+//   const { message } = log;
+
+//   // expected warnings - see https://github.com/mapbox/mapbox-gl-native/issues/15341#issuecomment-522889062
+//   if (
+//     message.match("Request failed due to a permanent error: Canceled") ||
+//     message.match("Request failed due to a permanent error: Socket Closed")
+//   ) {
+//     return true;
+//   }
+
+//   // handle eglSwapBuffer warning
+//   if (message.includes("eglSwapBuffer error: 12301. Waiting for new surface")) {
+//     // Do something to handle or suppress the warning
+//     // For example, you can log it without returning true to continue processing other logs
+//     console.warn("EGL Swap Buffer Warning: 12301. Waiting for new surface");
+//     return false; // Continue processing other logs
+//   }
+
+//   return false;
+// });
 Mapbox.setWellKnownTileServer("Mapbox");
 Mapbox.setAccessToken(
   "pk.eyJ1IjoiajFyZW4iLCJhIjoiY2xvcm9zdm85MHY5czJrbzZrdXI1amZmMSJ9.UW9QsP8ErGFgGNctDwoG5w"

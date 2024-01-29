@@ -72,8 +72,8 @@ const PostCard = ({
           }
         );
         Alert.alert("Success", "Item Reserved Successfully");
-        forceUpdate();
-        // Update the state or perform any other actions as needed
+        const filtered = postsMain.filter((post) => post.id !== item.id);
+        setPostsMain(filtered);
       } else {
         // User canceled the operation
         console.log("Reservation canceled");

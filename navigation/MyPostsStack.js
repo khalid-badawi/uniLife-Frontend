@@ -105,12 +105,20 @@ const MyPostsStack = () => {
             header: () => <CustomHeader title="Profile" type="stack" />,
           }}
         />
+        <Stack.Screen
+          name="ChatScreen"
+          component={ChatScreen}
+          options={{
+            header: () => <CustomHeader title="Chat" type="stack" />,
+          }}
+        />
       </Stack.Navigator>
       {ad && (
         <StickyAd
           title={ad.title}
           description={ad.description}
           imageUrl={ad.image}
+          link={ad.link}
         />
       )}
     </View>

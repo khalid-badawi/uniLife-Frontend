@@ -12,7 +12,14 @@ const truncateText = (text, limit) => {
     return text;
   }
 };
-const RestCard = ({ visitRest, username, image, description, rating }) => {
+const RestCard = ({
+  visitRest,
+  username,
+  image,
+  restaurantDesc,
+  rating,
+  isOpen,
+}) => {
   const desc =
     "asdljksads sadl sakjdjladasdsad ksad ljksad lkasdl ksad lkjsad lksadj lsakdj lksadj aslkdj salkdj aslkjd saldj  sa dlksad jsad lsakd jsaldk jsalkd ";
   const truncatedDescription = truncateText(desc, 8); // Change 10 to your desired word limit
@@ -29,20 +36,30 @@ const RestCard = ({ visitRest, username, image, description, rating }) => {
         <View style={styles.textCont}>
           <Text style={styles.mainTxt}>{username}</Text>
 
-          <Text style={{ flex: 1, flexWrap: "wrap" }} numberOfLines={2}>
-            {description}
+          <Text
+            style={{ flex: 1, flexWrap: "wrap", color: "gray" }}
+            numberOfLines={2}
+          >
+            {restaurantDesc}
           </Text>
-
-          <View style={{ flexDirection: "row" }}>
-            <Icon name="star" style={styles.icon} size={20} />
-            <Text style={{ fontSize: 15 }}>({rating})</Text>
-          </View>
+          {rating !== 0 ? (
+            <View style={{ flexDirection: "row" }}>
+              <Icon name="star" style={styles.icon} size={20} />
+              <Text style={{ fontSize: 15 }}>({rating})</Text>
+            </View>
+          ) : null}
         </View>
 
         <View style={{ position: "absolute", bottom: 7, right: 7 }}>
-          <TouchableOpacity onPress={visitRest}>
-            <Icon name="arrowright" style={styles.icon} size={25} />
-          </TouchableOpacity>
+          <Text
+            style={{
+              color: isOpen === true ? "green" : "#FF0000",
+              paddingBottom: 2,
+              paddingRight: 7,
+            }}
+          >
+            {isOpen === true ? "Open" : "Closed"}
+          </Text>
         </View>
       </View>
     </Pressable>

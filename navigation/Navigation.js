@@ -37,16 +37,19 @@ import DrawerNav from "./DrawerNav";
 import OthersPosts from "../screens/OthersPosts";
 import RoomsScreen from "../screens/RoomsScreen";
 import StickyAd from "../components/StickyAd";
+import BlockedScreen from "../screens/BlockedScreen";
+import CustomHeader from "./CustomHeader";
+import ResetPasswordInside from "../screens/ResetPasswordInside";
+import ConfirmSignup from "../screens/ConfirmSignup";
 const Stack = createNativeStackNavigator();
 
 export default function Navigation() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Test"
+        initialRouteName="SignIn"
         screenOptions={({ navigation }) => ({
           headerShown: false,
-          headerTitleAlign: "center",
         })}
       >
         <Stack.Screen
@@ -58,6 +61,21 @@ export default function Navigation() {
         <Stack.Screen name="SignUp" component={SignUpScreen} />
         <Stack.Screen name="Main" component={DrawerNav} />
         <Stack.Screen name="ConfirmCode" component={ConfirmCodeScreen} />
+        <Stack.Screen name="ConfirmSignUp" component={ConfirmSignup} />
+        <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+        <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+        <Stack.Screen
+          name="ResetPasswordInside"
+          component={ResetPasswordInside}
+        />
+        <Stack.Screen
+          name="BlockedScreen"
+          component={BlockedScreen}
+          options={{
+            headerShown: true,
+            header: () => <CustomHeader title="Blocked" type="stack" />,
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -27,7 +27,10 @@ import Animated, {
 } from "react-native-reanimated";
 import CustomPicker from "../components/CustomPicker";
 import BASE_URL from "../BaseUrl";
+import { getTokenFromKeychain } from "../globalFunc/Keychain";
+import { useUser } from "../Contexts/UserContext";
 const SignupSchema = Yup.object().shape({
+  major: Yup.string().required("❌Please Choose your major"),
   username: Yup.string()
     .min(3, "❌ Too Short!")
     .max(25, "❌ Too Long!")
@@ -54,13 +57,14 @@ const SignupSchema = Yup.object().shape({
     .matches(/^[0-9]+$/, "❌ Use digits only")
     .min(10, "❌ Must be exactly 10 digits")
     .max(10, "❌ Must be exactly 10 digits"),
-  major: Yup.string().required("❌Please Choose your major"),
 });
 
 const SignUpScreen = () => {
   const navigation = useNavigation();
   const { height, width } = useWindowDimensions();
   const [errorMsg, setErrorMsg] = useState("");
+  const [majors, setMajors] = useState([]);
+  const { userId } = useUser();
   const handleSubmit = async (values) => {
     try {
       const response = await axios.post(
@@ -74,7 +78,7 @@ const SignUpScreen = () => {
       );
       console.log(values);
       console.log(response.status);
-      navigation.navigate("ConfirmCode");
+      navigation.navigate("ConfirmSignUp");
     } catch (error) {
       if (error.response) {
         setErrorMsg(error.response.data.message);
@@ -94,7 +98,44 @@ const SignUpScreen = () => {
       }
     }
   };
+  useEffect(() => {
+    const getMenu = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/major`, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        console.log("Hellooo");
+        // Handle the response data here, for example:
+        const result = response.data;
 
+        console.log(result);
+        const mappedArray = result.map((item) => item.name);
+        setMajors(mappedArray);
+
+        //setChat(response.data.data);
+      } catch (error) {
+        if (error.response) {
+          Alert.alert("Error", error.response.data.message);
+        } else if (error.request) {
+          Alert.alert(
+            "Network Error",
+            "There was a problem with the network. Please check your internet connection and try again.",
+            [{ text: "OK" }]
+          );
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          Alert.alert(
+            "Something Wrong",
+            "Something went wrong, try again please",
+            [{ text: "OK" }]
+          );
+        }
+      }
+    };
+    getMenu();
+  }, []);
   return (
     <Formik
       initialValues={{
@@ -109,6 +150,8 @@ const SignUpScreen = () => {
         handleSubmit(values);
       }}
       validationSchema={SignupSchema}
+      validateOnChange={false}
+      validateOnBlur={false}
     >
       {({
         values,
@@ -119,7 +162,7 @@ const SignUpScreen = () => {
         setFieldTouched,
       }) => (
         <KeyboardAvoidingView
-          style={{ ...styles.root, width: width }}
+          style={{ ...styles.root, width: width, height: height }}
           behavior="padding"
           keyboardVerticalOffset={Platform.select({
             ios: () => 0,
@@ -130,7 +173,7 @@ const SignUpScreen = () => {
             style={{ flexGrow: 1 }}
             showsVerticalScrollIndicator={false}
           >
-            <View style={{ ...styles.container, width: width, height: height }}>
+            <View style={{ ...styles.container, width: width, flex: 1 }}>
               <Animated.View
                 entering={FadeInDown.delay(200)
                   .duration(1000)
@@ -220,6 +263,7 @@ const SignUpScreen = () => {
                 entering={FadeInDown.delay(250).duration(1000).springify()}
               >
                 <CustomPicker
+                  items={majors}
                   value={values.major}
                   errors={errors.major}
                   onValueChange={handleChange("major")}

@@ -26,8 +26,9 @@ import { useRoute } from "@react-navigation/native";
 import * as FileSystem from "expo-file-system";
 import BASE_URL from "../BaseUrl";
 import PickImageSmall from "../components/PickImageSmall";
+import defaultImage from "../assets/defaultProfile.jpg";
 
-const socket = io.connect("http://192.168.1.8:3000");
+const socket = io.connect("http://192.168.1.10:3000");
 
 const getTokenFromKeychain = async () => {
   try {
@@ -58,15 +59,11 @@ const ChatScreen = ({ route, navigation }) => {
   const [isTextMessageEnabled, setTextMessageEnabled] = useState(true);
 
   const currentUserId = userId;
-  console.log("Currentuser=" + currentUserId);
 
-  console.log(route);
-  const { receiverId } = route.params;
+  const { receiverId, otherImage } = route.params;
   const recieverUser = receiverId;
   const { userName } = route.params;
-  console.log(recieverUser);
   const messageId = chat.length + 1;
-  console.log(currentUserId, recieverUser);
 
   useEffect(() => {
     const getMessages = async () => {
@@ -163,6 +160,14 @@ const ChatScreen = ({ route, navigation }) => {
       socket.disconnect();
     };
   }, []);
+  useEffect(() => {
+    if (image) {
+      sendImage();
+      setImage(null);
+    }
+
+    // Cleanup on component unmount
+  }, [image]);
 
   //notificationEnd
   useEffect(() => {
@@ -186,43 +191,7 @@ const ChatScreen = ({ route, navigation }) => {
       socket.disconnect();
     };
   }, []);
-  // const storeMessage = async () => {
-  //   try {
-  //     const token = await getTokenFromKeychain();
 
-  //     const formData = new FormData();
-
-  //     formData.append("data", JSON.stringify({ text: message }));
-  //     console.log(formData);
-  //     const response = await axios.post(
-  //       `http://10.0.2.2:3000/api/v1/unilife/message/${currentUserId}/${recieverUser}`,
-  //       formData,
-  //       {
-  //         headers: {
-  //           "Content-Type": "multipart/form-data",
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       }
-  //     );
-  //   } catch (error) {
-  //     if (error.response) {
-  //       Alert.alert("Error", error.response.data.message);
-  //     } else if (error.request) {
-  //       Alert.alert(
-  //         "Network Error",
-  //         "There was a problem with the network. Please check your internet connection and try again.",
-  //         [{ text: "OK" }]
-  //       );
-  //     } else {
-  //       // Something happened in setting up the request that triggered an Error
-  //       Alert.alert(
-  //         "Something Wrong",
-  //         "Something went wrong, try again please",
-  //         [{ text: "OK" }]
-  //       );
-  //     }
-  //   }
-  // };
   const sendImage = async () => {
     try {
       console.log("uri:", image.uri);
@@ -309,6 +278,18 @@ const ChatScreen = ({ route, navigation }) => {
             isCurrentUser && styles.currentUserContainer,
           ]}
         >
+          {!isCurrentUser && (
+            <View style={{ marginRight: 3 }}>
+              <Image
+                source={
+                  otherImage && otherImage !== ""
+                    ? { uri: otherImage }
+                    : defaultImage
+                }
+                style={{ width: 32, height: 32, borderRadius: 20 }}
+              />
+            </View>
+          )}
           {isCurrentUser && (
             <Text style={styles.createdAtText}>
               {messageDate.toLocaleTimeString(undefined, timeFormatOptions)}

@@ -1,8 +1,8 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import { Picker } from "@react-native-picker/picker";
-const majors = ["Choose your Major", "CE", "Physics", "Chemics"];
-const CustomPicker = ({ value, onValueChange, errors }) => {
+
+const CustomPicker = ({ value, onValueChange, errors, items }) => {
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.pickerCont}>
@@ -10,13 +10,9 @@ const CustomPicker = ({ value, onValueChange, errors }) => {
           selectedValue={value}
           onValueChange={(itemValue, itemIndex) => onValueChange(itemValue)}
         >
-          {majors.map((major, index) => (
-            <Picker.Item
-              key={index}
-              label={major}
-              value={major}
-              enabled={index !== 0}
-            />
+          <Picker.Item label="Choose Major" value={null} enabled={false} />
+          {items.map((major, index) => (
+            <Picker.Item key={index} label={major} value={major} />
           ))}
         </Picker>
       </View>
@@ -24,6 +20,7 @@ const CustomPicker = ({ value, onValueChange, errors }) => {
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   pickerCont: {
     borderColor: "#8F00FF",

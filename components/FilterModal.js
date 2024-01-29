@@ -1,7 +1,18 @@
-import React from "react";
-import { View, Text, Modal, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  Modal,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import CustomButton from "./CustomButton";
 import { Picker } from "@react-native-picker/picker";
+import { getTokenFromKeychain } from "../globalFunc/Keychain";
+import BASE_URL from "../BaseUrl";
+import axios from "axios";
+import { useUser } from "../Contexts/UserContext";
 const majors = ["All", "Relevant"];
 const Catigory = ["All", "Books", "Equipments"];
 const FilterModal = ({
@@ -17,7 +28,50 @@ const FilterModal = ({
     closeModal();
     getPosts();
   };
+  const [Catigories, setCatigories] = useState(["All"]);
+  const { userId } = useUser();
+  useEffect(() => {
+    const getFaculties = async () => {
+      try {
+        console.log("hi", userId);
 
+        const token = await getTokenFromKeychain();
+        const response = await axios.get(`${BASE_URL}/category/${userId}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        
+        // Handle the response data here, for example:
+        const result = response.data;
+        console.log(result);
+        let newCategories = result.map((item) => item.name);
+        newCategories = [...newCategories, "Other"];
+        setCatigories(newCategories);
+
+        //setChat(response.data.data);
+      } catch (error) {
+        if (error.response) {
+          Alert.alert("Error", error.response.data.message);
+        } else if (error.request) {
+          Alert.alert(
+            "Network Error",
+            "There was a problem with the network. Please check your internet connection and try again.",
+            [{ text: "OK" }]
+          );
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          Alert.alert(
+            "Something Wrong23",
+            "Something went wrong, try again please",
+            [{ text: "OK" }]
+          );
+        }
+      }
+    };
+    getFaculties();
+  }, []);
   return (
     <Modal
       animationType="slide"
@@ -53,7 +107,7 @@ const FilterModal = ({
                 selectedValue={catigory}
                 onValueChange={(itemValue, itemIndex) => setCatigory(itemValue)}
               >
-                {Catigory.map((catigory, index) => (
+                {Catigories.map((catigory, index) => (
                   <Picker.Item key={index} label={catigory} value={catigory} />
                 ))}
               </Picker>

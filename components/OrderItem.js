@@ -47,11 +47,26 @@ const OrderItem = ({ item }) => {
         );
       }
     }
-
-    // resetForm();
-    // setSelectedDays([]);
-    //navigation.navigate("");
   };
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "PENDING":
+        return "#FF5959"; // yellow
+      case "RECEIVED":
+        return "orange"; // green
+      case "IN PROGRESS":
+        return "#BBB900"; // blue
+      case "READY":
+        return "green"; // orange
+      case "DELIVERED":
+        return "#8F00FF"; // dark green
+      case "CANCELLED":
+        return "red"; // dark green
+      default:
+        return "#ffffff"; // default color
+    }
+  };
+
   // Now you can format the date using either method mentioned earlier
   // Using toLocaleString:
   const formattedDate = dateObject.toLocaleString();
@@ -79,21 +94,21 @@ const OrderItem = ({ item }) => {
           }}
         >
           <Text style={styles.mainTxt}>Content: </Text>
-          <View>
-            <FlatList
-              data={item.items}
-              renderItem={({ item }) => (
-                <MenuRow
-                  itemText={item.nameOfFood}
-                  quantity={item.Qauntity}
-                  color="black"
-                />
-              )}
-              keyExtractor={(item, index) => item.nameOfFood}
-              persistentScrollbar={true}
-              scrollIndicatorInsets={{ color: "blue" }}
-            />
-          </View>
+
+          <FlatList
+            style={{ maxHeight: 150 }}
+            data={item.items}
+            renderItem={({ item }) => (
+              <MenuRow
+                itemText={item.nameOfFood}
+                quantity={item.Qauntity}
+                color="black"
+              />
+            )}
+            keyExtractor={(item, index) => item.nameOfFood}
+            persistentScrollbar={true}
+            scrollIndicatorInsets={{ color: "blue" }}
+          />
         </View>
         <View
           style={{
@@ -103,7 +118,11 @@ const OrderItem = ({ item }) => {
           }}
         >
           <Text
-            style={{ ...styles.descTxt, color: "green", fontWeight: "bold" }}
+            style={{
+              ...styles.descTxt,
+              color: getStatusColor(item.status),
+              fontWeight: "bold",
+            }}
           >
             <Text style={styles.mainTxt}>Status: </Text>
             {item.status}
@@ -138,7 +157,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "white",
     minHeight: 200,
-    maxHeight: 320,
+    maxHeight: 500,
     elevation: 10,
     marginBottom: 10,
     marginHorizontal: 15,

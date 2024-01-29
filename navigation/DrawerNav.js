@@ -81,48 +81,7 @@ const DrawerNav = () => {
         })}
       >
         <Drawer.Screen name="MainNav" component={TabNav} />
-        <Drawer.Screen
-          name="EditProfile"
-          component={EditProfileStack}
-          options={({ route }) => ({
-            drawerIcon: ({ focused, color, size }) => (
-              <Icon
-                name="account"
-                size={size}
-                color={focused ? "white" : "#808080"}
-              />
-            ),
-            drawerLabel: "Edit Profile",
-          })}
-        />
-        <Drawer.Screen
-          name="ChatScreen"
-          component={ChatStack}
-          options={({ route }) => ({
-            drawerIcon: ({ focused, color, size }) => (
-              <Icon
-                name="chat"
-                size={size}
-                color={focused ? "white" : "#808080"}
-              />
-            ),
-            drawerLabel: "Chats",
-          })}
-        />
-        <Drawer.Screen
-          name="Schedule"
-          component={ScheduleStack}
-          options={({ route }) => ({
-            drawerIcon: ({ focused, color, size }) => (
-              <Icon2
-                name="table"
-                size={size}
-                color={focused ? "white" : "#808080"}
-              />
-            ),
-            drawerLabel: "My Schedule",
-          })}
-        />
+
         <Drawer.Screen
           name="SavedDormsStack"
           component={MyDormitoriesStack}
@@ -154,6 +113,35 @@ const DrawerNav = () => {
             header: () => <CustomHeader title="My Orders" type="drawer" />,
           })}
         />
+
+        <Drawer.Screen
+          name="MyPostsScreen"
+          component={MyPostsStack}
+          options={({ route }) => ({
+            drawerIcon: ({ focused, color, size }) => (
+              <Icon
+                name="card-text-outline"
+                size={size}
+                color={focused ? "white" : "#808080"}
+              />
+            ),
+            drawerLabel: "My Posts",
+          })}
+        />
+        <Drawer.Screen
+          name="ChatScreen"
+          component={ChatStack}
+          options={({ route }) => ({
+            drawerIcon: ({ focused, color, size }) => (
+              <Icon
+                name="chat"
+                size={size}
+                color={focused ? "white" : "#808080"}
+              />
+            ),
+            drawerLabel: "Chats",
+          })}
+        />
         <Drawer.Screen
           name="Notifications"
           component={NotificationScreen}
@@ -171,17 +159,31 @@ const DrawerNav = () => {
           })}
         />
         <Drawer.Screen
-          name="MyPostsScreen"
-          component={MyPostsStack}
+          name="Schedule"
+          component={ScheduleStack}
           options={({ route }) => ({
             drawerIcon: ({ focused, color, size }) => (
-              <Icon
-                name="card-text-outline"
+              <Icon2
+                name="table"
                 size={size}
                 color={focused ? "white" : "#808080"}
               />
             ),
-            drawerLabel: "My Posts",
+            drawerLabel: "My Schedule",
+          })}
+        />
+        <Drawer.Screen
+          name="EditProfile"
+          component={EditProfileStack}
+          options={({ route }) => ({
+            drawerIcon: ({ focused, color, size }) => (
+              <Icon
+                name="account"
+                size={size}
+                color={focused ? "white" : "#808080"}
+              />
+            ),
+            drawerLabel: "Edit Profile",
           })}
         />
         <Drawer.Screen
