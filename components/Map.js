@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import Mapbox, { Logger } from "@rnmapbox/maps";
-import Icon from "react-native-vector-icons/FontAwesome";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 // Will be null for most users (only Mapbox authenticates this way).
 // Required on Android. See Android installation notes.
@@ -125,6 +125,12 @@ const Map = ({
               draggable={true}
               onDrag={(event) => {
                 setCurrentPosition(event.geometry.coordinates);
+              }}
+              style={{
+                icon: {
+                  // You can customize the color here
+                  color: "red",
+                },
               }}
             />
           }

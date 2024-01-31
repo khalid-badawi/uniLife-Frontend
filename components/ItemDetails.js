@@ -4,7 +4,6 @@ import CustomButton from "./CustomButton";
 import test2 from "../assets/test2.png";
 import CustomHeader from "../navigation/CustomHeader";
 const ItemDetails = ({ isVisible, closeModal, item }) => {
-  console.log(item);
   return (
     <Modal
       animationType="slide"

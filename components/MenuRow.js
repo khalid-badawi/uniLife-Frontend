@@ -4,7 +4,6 @@ import { StyleSheet } from "react-native";
 
 const MenuRow = ({ itemText, quantity, color = "white" }) => {
   const dots = ".".repeat(1000 - itemText.length);
-  console.log(quantity);
   return (
     <View style={styles.root}>
       <Text style={{ ...styles.txt, color }}>{itemText}</Text>

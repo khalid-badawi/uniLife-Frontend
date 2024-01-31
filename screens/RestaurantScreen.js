@@ -214,14 +214,12 @@ const RestaurantScreen = () => {
               exiting={FadeOutDown.duration(200).springify().damping(10)}
             >
               {/* Use BlurView to blur the content under the footer */}
-              <BlurView
-                overlayColor=""
-                style={{ ...StyleSheet.absoluteFillObject }}
-                blurType="light"
-                blurAmount={1}
-                reducedTransparencyFallbackColor="white"
-              />
-              <View style={{ width: "70%" }}>
+
+              <View
+                style={{
+                  width: "70%",
+                }}
+              >
                 <CustomButton
                   text="Order"
                   onPress={() =>
@@ -301,14 +299,14 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   footer: {
-    backgroundColor: "transparent",
+    backgroundColor: "rgba(255, 255, 255, 0.7)", // Semi-transparent white background
     width: "100%",
 
     alignSelf: "center",
     position: "absolute",
     alignItems: "center",
     justifyContent: "center",
-    bottom: 5,
+    bottom: 1,
     borderRadius: 0,
   },
 });

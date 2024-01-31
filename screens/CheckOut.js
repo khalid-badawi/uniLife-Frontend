@@ -29,7 +29,19 @@ const CheckOut = () => {
   const navigation = useNavigation();
   const [tok, setTok] = useState("");
   const { restaurantId, data } = route.params;
+  const price = route.params.price;
+  const [notes, setNotes] = useState("");
+  const { userId } = useUser();
   let token = "";
+  const [selectedId, setSelectedId] = useState("1");
+  console.log(selectedId);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const transformedArray = data.map((item) => {
+    return {
+      foodId: item.itemId,
+      Qauntity: item.Quantity,
+    };
+  });
   const radioButtons = useMemo(
     () => [
       {
@@ -46,9 +58,6 @@ const CheckOut = () => {
     []
   );
 
-  const [selectedId, setSelectedId] = useState("1");
-  console.log(selectedId);
-  const [isModalVisible, setIsModalVisible] = useState(false);
   useEffect(() => {
     // Connect to the server and listen for private messages
     const connectToSocket = () => {
@@ -81,7 +90,7 @@ const CheckOut = () => {
 
     // Start the initial connection
     connectToSocket();
-
+    console.log("Done2");
     // Cleanup on component unmount
     return () => {
       socket.disconnect();
@@ -91,12 +100,6 @@ const CheckOut = () => {
     };
   }, []);
 
-  const transformedArray = data.map((item) => {
-    return {
-      foodId: item.itemId,
-      Qauntity: item.Quantity,
-    };
-  });
   useEffect(() => {
     const getToken = async () => {
       token = await getTokenFromKeychain();
@@ -104,11 +107,8 @@ const CheckOut = () => {
       console.log("got:", token);
     };
     getToken();
+    console.log("Done1");
   }, []);
-
-  const price = route.params.price;
-  const [notes, setNotes] = useState("");
-  const { userId } = useUser();
 
   const confirmOrder = async () => {
     try {
@@ -225,6 +225,8 @@ const CheckOut = () => {
       setIsModalVisible(false);
     }
   };
+
+  console.log("DATA:", restaurantId, data, price);
   return (
     <View style={styles.root}>
       <Icon name="cart-check" size={100} style={styles.icon} />
@@ -296,7 +298,6 @@ const CheckOut = () => {
 
 const styles = StyleSheet.create({
   root: {
-    height: "100%",
     backgroundColor: "white",
     flex: 1,
     paddingTop: 10,

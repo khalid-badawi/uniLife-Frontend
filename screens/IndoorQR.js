@@ -17,6 +17,7 @@ const IndoorQR = () => {
   const [classInput, setClassInput] = useState(null);
   const [error, setError] = useState("");
   const [resultData, setResultData] = useState(null);
+  const [message, setMessage] = useState("");
   const { userId } = useUser();
   const getDirection = async () => {
     if (textScanned) {
@@ -39,6 +40,27 @@ const IndoorQR = () => {
         const result = response.data;
         setResultData(result);
         console.log(result);
+        const { upDown, rightLeft, currFac, nextFac } = result;
+        if (nextFac !== "") {
+          setMessage(
+            `You are in ${currFac}, You will need to go to ${nextFac}`
+          );
+        } else if (upDown !== 0) {
+          setMessage(
+            upDown > 0
+              ? `Go Up ${upDown} Floors`
+              : `Go Down ${-1 * upDown} Floors`
+          );
+        } else if (rightLeft !== 0) {
+          setMessage(
+            rightLeft > 0
+              ? `Go Right ${rightLeft} Classes`
+              : `Go Left ${-1 * rightLeft} Classes`
+          );
+        } else {
+          setMessage("You are next to the right location");
+        }
+
         //setChat(response.data.data);
       } catch (error) {
         if (error.response) {
@@ -196,18 +218,12 @@ const IndoorQR = () => {
               setValue={setInputTxt}
               placeholder="Class Number,e.g 11G150"
             />
-            <Text style={{ color: "red" }}>{error}</Text>
+
             <CustomButton text="Scan" onPress={handlePress} />
           </View>
 
           <View style={{ flex: 1, alignItems: "center" }}>
-            {resultData && (
-              <Text style={styles.resultTxt}>
-                You are currently in
-                <Text style={styles.nestedTxt}> {resultData.currFac}</Text>,
-                Floor {textScanned.name}
-              </Text>
-            )}
+            {resultData && <Text style={{ fontSize: 16 }}>{message}</Text>}
           </View>
         </>
       )}

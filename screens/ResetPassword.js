@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
     marginBottom: 5,
     fontWeight: "bold",
-    color: "#643b66",
+    color: "#8F00FF",
   },
 });
 

@@ -76,7 +76,7 @@ const ConfirmSignUp = ({ code = "0597401453" }) => {
               placeholder="Verification Code"
               value={values.code}
               setValue={handleChange("verifyCode")}
-              secureTextEntry={true}
+              secureTextEntry={false}
               errors={errors.code}
               iconName={"key"}
               onBlur={() => setFieldTouched("verifyCode")}

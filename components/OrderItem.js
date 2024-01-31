@@ -7,6 +7,7 @@ import CustomHeader from "./CustomHeader";
 import Rating from "./Rating";
 import axios from "axios";
 import { useUser } from "../Contexts/UserContext";
+import BASE_URL from "../BaseUrl";
 
 const OrderItem = ({ item }) => {
   const dateString = item.createdAt;
@@ -18,7 +19,7 @@ const OrderItem = ({ item }) => {
     try {
       const token = await getTokenFromKeychain();
       const response = await axios.patch(
-        `http://10.0.2.2:3000/api/v1/unilife/orders/${userId}/${item.orderId}`,
+        `${BASE_URL}/orders/${userId}/${item.orderId}`,
         JSON.stringify({ rating, rateDesc: ratingNotes }),
         {
           headers: {

@@ -72,10 +72,6 @@ const EditProfileScreen = () => {
         setImage(null);
       }
 
-      console.log("form:", formData);
-      console.log(values);
-      console.log("data", formData);
-
       const response = await axios.patch(
         `${BASE_URL}/profile/${userId}`,
         formData,
@@ -86,6 +82,7 @@ const EditProfileScreen = () => {
           },
         }
       );
+      Alert.alert("Success", "Profile Edited successfully");
     } catch (error) {
       if (error.response) {
         Alert.alert("Error", error.response.data.message);

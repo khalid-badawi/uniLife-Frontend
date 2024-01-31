@@ -154,7 +154,7 @@ const PostCard = ({
       const token = await getTokenFromKeychain();
       console.log(reportMessage);
       const response = await axios.post(
-        `http://10.0.2.2:3000/api/v1/unilife/report/${userId}/${item.userId}/${item.id}`,
+        `${BASE_URL}/report/${userId}/${item.userId}/${item.id}`,
         JSON.stringify({ message: reportMessage }),
         {
           headers: {
@@ -270,9 +270,6 @@ const PostCard = ({
               color="#8F00FF"
               style={{ marginRight: 5 }}
             />
-          </TouchableOpacity>
-          <TouchableOpacity style={{ flexDirection: "row" }}>
-            <AntDesign name="edit" size={25} color="#8F00FF" />
           </TouchableOpacity>
         </View>
       )}
