@@ -4,6 +4,7 @@ import Logo from "../assets/18-Nablus-Postoffice-October-7-9-scaled.jpg";
 import Icon from "react-native-vector-icons/FontAwesome";
 import DormitoryMap from "./DormitoryMap";
 import CustomButton from "./CustomButton";
+import FastImage from "react-native-fast-image";
 const RoomsCard = ({ item, index }) => {
   console.log(item);
   function capitalizeFirstLetter(string) {
@@ -25,11 +26,10 @@ const RoomsCard = ({ item, index }) => {
       </Text>
 
       <View style={styles.imageCont}>
-        <Image
+        <FastImage
           source={item.image !== "" ? { uri: item.image } : null}
-          alt="Dormitory"
           style={styles.image}
-          resizeMode="stretch"
+          resizeMode={FastImage.resizeMode.stretch}
         />
       </View>
       <View style={styles.bottomPart}>

@@ -5,6 +5,7 @@ import { useAd } from "../Contexts/AdContext";
 import Icon from "react-native-vector-icons/FontAwesome";
 import WebView from "react-native-webview";
 import { Button } from "react-native-elements";
+import FastImage from "react-native-fast-image";
 const StickyAd = ({ title, description, imageUrl, link }) => {
   const { isVisible, handleHideAd } = useAd();
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -21,7 +22,7 @@ const StickyAd = ({ title, description, imageUrl, link }) => {
       style={styles.container}
       onPress={() => setIsModalVisible(true)}
     >
-      <Image source={{ uri: imageUrl }} style={styles.image} />
+      <FastImage source={{ uri: imageUrl }} style={styles.image} />
 
       <View style={styles.textContainer}>
         <View

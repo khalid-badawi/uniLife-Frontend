@@ -17,6 +17,7 @@ import axios from "axios";
 import { getTokenFromKeychain } from "../globalFunc/Keychain";
 import { useUser } from "../Contexts/UserContext";
 import showConfirmationDialog from "./Confirmation";
+import FastImage from "react-native-fast-image";
 const DormitoryCard = ({ item, posts, setPosts, type }) => {
   console.log(item);
   const navigation = useNavigation();
@@ -137,10 +138,10 @@ const DormitoryCard = ({ item, posts, setPosts, type }) => {
           }}
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Image
+            <FastImage
               source={item.image !== "" ? { uri: item.ownerImage } : Logo}
               style={styles.profileImg}
-              resizeMode="stretch"
+              resizeMode={FastImage.resizeMode.stretch}
             />
 
             <View>
@@ -194,11 +195,11 @@ const DormitoryCard = ({ item, posts, setPosts, type }) => {
         </View>
       </View>
       <View style={styles.imageCont}>
-        <Image
+        <FastImage
           source={item.image !== "" ? { uri: item.image } : null}
           alt="Dormitory Photo"
           style={styles.image}
-          resizeMode="stretch"
+          resizeMode={FastImage.resizeMode.stretch}
         />
       </View>
       <View style={styles.bottomPart}>

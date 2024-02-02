@@ -50,6 +50,8 @@ export default function Navigation() {
         initialRouteName="SignIn"
         screenOptions={({ navigation }) => ({
           headerShown: false,
+          gestureEnabled: false,
+          animation: "none",
         })}
       >
         <Stack.Screen

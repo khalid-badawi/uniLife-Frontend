@@ -27,7 +27,7 @@ const PostsMainScreen = () => {
   const { searchQuery } = useSearch();
   const [isLoading1, setIsLoading1] = useState(true);
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
-  const [catigory, setCatigory] = useState("Other");
+  const [catigory, setCatigory] = useState("All");
   const [major, setMajor] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [abortController, setAbortController] = useState(new AbortController());
@@ -112,7 +112,14 @@ const PostsMainScreen = () => {
 
     return () => {
       abortController.abort();
-      unsubscribe;
+      unsubscribe();
+    };
+  }, [forceUpdate]);
+  useEffect(() => {
+    getPosts();
+
+    return () => {
+      abortController.abort();
     };
   }, [forceUpdate, searchQuery]);
   const getMorePosts = async () => {

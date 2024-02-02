@@ -4,6 +4,7 @@ import test from "../assets/test.jpg";
 
 import Icon from "react-native-vector-icons/AntDesign";
 import { Pressable } from "react-native";
+import FastImage from "react-native-fast-image";
 const truncateText = (text, limit) => {
   const words = text.split(" ");
   if (words.length > limit) {
@@ -27,10 +28,10 @@ const RestCard = ({
   return (
     <Pressable onPress={visitRest}>
       <View style={styles.root}>
-        <Image
+        <FastImage
           source={{ uri: image }}
           style={styles.img} // Fixed style object
-          resizeMode="contain"
+          resizeMode={FastImage.resizeMode.contain}
         />
 
         <View style={styles.textCont}>

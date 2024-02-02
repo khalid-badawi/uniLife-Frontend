@@ -27,6 +27,7 @@ import * as FileSystem from "expo-file-system";
 import BASE_URL from "../BaseUrl";
 import PickImageSmall from "../components/PickImageSmall";
 import defaultImage from "../assets/defaultProfile.jpg";
+import FastImage from "react-native-fast-image";
 
 const socket = io.connect("http://192.168.1.10:3000");
 
@@ -280,7 +281,7 @@ const ChatScreen = ({ route, navigation }) => {
         >
           {!isCurrentUser && (
             <View style={{ marginRight: 3 }}>
-              <Image
+              <FastImage
                 source={
                   otherImage && otherImage !== ""
                     ? { uri: otherImage }
@@ -303,7 +304,7 @@ const ChatScreen = ({ route, navigation }) => {
 
           {item.image && (
             <View>
-              <Image
+              <FastImage
                 source={{ uri: item.image }}
                 style={{ width: 200, height: 200 }}
               />

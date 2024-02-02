@@ -42,12 +42,12 @@ const FilterModal = ({
             Authorization: `Bearer ${token}`,
           },
         });
-        
+
         // Handle the response data here, for example:
         const result = response.data;
         console.log(result);
         let newCategories = result.map((item) => item.name);
-        newCategories = [...newCategories, "Other"];
+        newCategories = ["All", ...newCategories];
         setCatigories(newCategories);
 
         //setChat(response.data.data);

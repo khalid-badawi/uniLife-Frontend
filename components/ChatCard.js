@@ -3,6 +3,7 @@ import React from "react";
 
 import test1 from "../assets/defaultProfile.jpg";
 import { useNavigation } from "@react-navigation/native";
+import FastImage from "react-native-fast-image";
 
 const ChatCard = ({ item }) => {
   const formattedDateTime = new Date(item.createdAt).toLocaleString();
@@ -19,14 +20,14 @@ const ChatCard = ({ item }) => {
       }
     >
       <View style={styles.root}>
-        <Image
+        <FastImage
           source={
             item.userimage !== "" && item.userimage
               ? { uri: item.userimage }
               : test1
           }
           style={styles.img} // Fixed style object
-          resizeMode="contain"
+          resizeMode={FastImage.resizeMode.contain}
         />
         <View style={{ flex: 1 }}>
           <View style={styles.row1}>

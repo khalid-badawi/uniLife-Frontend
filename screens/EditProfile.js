@@ -9,6 +9,7 @@ import {
   Platform,
   Text,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import Logo from "../assets/defaultProfile.jpg";
 import CustomInput from "../components/CustomInput";
@@ -31,6 +32,7 @@ import PickImageSmall from "../components/PickImageSmall";
 import BASE_URL from "../BaseUrl";
 import { getTokenFromKeychain } from "../globalFunc/Keychain";
 import { useUser } from "../Contexts/UserContext";
+import FastImage from "react-native-fast-image";
 const SignupSchema = Yup.object().shape({
   username: Yup.string()
     .min(3, "❌ Too Short!")
@@ -53,6 +55,7 @@ const EditProfileScreen = () => {
   const [imageUrl, setImageUrl] = useState("");
   const [majors, setMajors] = useState([]);
   const { userId } = useUser();
+  const [isLoading, setIsLoading] = useState(true);
   const handleEditPress = async (values) => {
     // Validate postText, relatedMajors, and image
 
@@ -158,7 +161,7 @@ const EditProfileScreen = () => {
     const getProfileInfo = async () => {
       try {
         console.log("hi", userId);
-
+        setIsLoading(true);
         const token = await getTokenFromKeychain();
         const response = await axios.get(`${BASE_URL}/profile/${userId}`, {
           headers: {
@@ -176,6 +179,7 @@ const EditProfileScreen = () => {
         setImageUrl(image);
 
         console.log(result);
+        setIsLoading(false);
         //setChat(response.data.data);
       } catch (error) {
         if (error.response) {
@@ -196,7 +200,10 @@ const EditProfileScreen = () => {
         }
       }
     };
-    getProfileInfo();
+    const unsubscribe = navigation.addListener("focus", () => {
+      getProfileInfo();
+    });
+    return unsubscribe;
   }, []);
   let source;
 
@@ -210,113 +217,104 @@ const EditProfileScreen = () => {
     source = Logo;
   }
   return (
-    <KeyboardAvoidingView
-      style={{ ...styles.root, width: width }}
-      behavior="padding"
-      keyboardVerticalOffset={Platform.select({
-        ios: () => 0,
-        android: () => -300,
-      })()}
-    >
-      <ScrollView style={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
-        <View style={{ ...styles.container, width: width, height: height }}>
-          <Animated.View
-            entering={FadeInDown.delay(200)
-              .duration(1000)
-              .springify()
-              .damping(3)}
-          >
-            <Image source={source} alt="Profile Image" style={styles.logo} />
-            <View style={{ position: "absolute", bottom: 40, right: 20 }}>
-              <PickImageSmall
-                image={image}
-                setImage={setImage}
-                iconName="edit"
-              />
-            </View>
-          </Animated.View>
-          <Animated.View
-            style={styles.animInput}
-            entering={FadeInDown.delay(50).duration(1000).springify()}
-          >
-            <CustomInput
-              placeholder="Username"
-              value={formik.values.username}
-              setValue={formik.handleChange("username")}
-              secureTextEntry={false}
-              iconName={"user"}
-              errors={formik.errors.username}
-              onBlur={() => formik.setFieldTouched("username")}
-            />
-          </Animated.View>
-          <Animated.View
-            style={styles.animInput}
-            entering={FadeInDown.delay(50).duration(1000).springify()}
-          >
-            <CustomInput
-              placeholder="Email"
-              value={formik.values.email}
-              setValue={formik.handleChange("email")}
-              secureTextEntry={false}
-              iconName={"mail"}
-              errors={formik.errors.email}
-              onBlur={() => formik.setFieldTouched("email")}
-              editable={false}
-            />
-          </Animated.View>
-
-          <Animated.View
-            style={styles.animInput}
-            entering={FadeInDown.delay(100).duration(1000).springify()}
-          >
-            <CustomInput
-              placeholder="Phone Number"
-              value={formik.values.phoneNum}
-              setValue={formik.handleChange("phoneNum")}
-              secureTextEntry={false}
-              errors={formik.errors.phoneNum}
-              iconName={"phone"}
-              keyboardType="phone-pad"
-              onBlur={() => formik.setFieldTouched("phoneNum")}
-            />
-          </Animated.View>
-          <Animated.View
-            style={{ ...styles.animInput, flexDirection: "row" }}
-            entering={FadeInDown.delay(150).duration(1000).springify()}
-          >
-            <CustomPicker
-              items={majors}
-              value={formik.values.major}
-              errors={formik.errors.major}
-              onValueChange={formik.handleChange("major")}
-            />
-          </Animated.View>
-          <Animated.View
-            style={styles.animInput}
-            entering={FadeInDown.delay(250).duration(1000).springify()}
-          >
-            <CustomButton
-              text="Edit"
-              onPress={formik.handleSubmit}
-              type="Primary"
-            />
-          </Animated.View>
-          {errorMsg && <Text style={styles.errorText}>❌ {errorMsg}</Text>}
-          <Animated.View
-            style={styles.animInput}
-            entering={FadeInDown.delay(300).duration(1000).springify()}
-          >
-            <CustomButton
-              text="Change Password"
-              type="Tertiary"
-              onPress={() => {
-                navigation.navigate("ResetPasswordInside");
-              }}
-            />
-          </Animated.View>
+    <>
+      {isLoading && (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <Text>Loading...</Text>
+          <ActivityIndicator size="large" color="#8F00FF" />
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      )}
+      {!isLoading && (
+        <KeyboardAvoidingView
+          style={{ ...styles.root, width: width }}
+          behavior="padding"
+          keyboardVerticalOffset={Platform.select({
+            ios: 0,
+            android: -300,
+          })}
+        >
+          <ScrollView
+            style={{ flexGrow: 1 }}
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={{ ...styles.container, width: width, height: height }}>
+              <View>
+                <FastImage source={source} style={styles.logo} />
+                <View style={{ position: "absolute", bottom: 40, right: 20 }}>
+                  <PickImageSmall
+                    image={image}
+                    setImage={setImage}
+                    iconName="edit"
+                  />
+                </View>
+              </View>
+              <View style={styles.animInput}>
+                <CustomInput
+                  placeholder="Username"
+                  value={formik.values.username}
+                  setValue={formik.handleChange("username")}
+                  secureTextEntry={false}
+                  iconName={"user"}
+                  errors={formik.errors.username}
+                  onBlur={() => formik.setFieldTouched("username")}
+                />
+              </View>
+              <View style={styles.animInput}>
+                <CustomInput
+                  placeholder="Email"
+                  value={formik.values.email}
+                  setValue={formik.handleChange("email")}
+                  secureTextEntry={false}
+                  iconName={"mail"}
+                  errors={formik.errors.email}
+                  onBlur={() => formik.setFieldTouched("email")}
+                  editable={false}
+                />
+              </View>
+              <View style={styles.animInput}>
+                <CustomInput
+                  placeholder="Phone Number"
+                  value={formik.values.phoneNum}
+                  setValue={formik.handleChange("phoneNum")}
+                  secureTextEntry={false}
+                  errors={formik.errors.phoneNum}
+                  iconName={"phone"}
+                  keyboardType="phone-pad"
+                  onBlur={() => formik.setFieldTouched("phoneNum")}
+                />
+              </View>
+              <View style={{ ...styles.animInput, flexDirection: "row" }}>
+                <CustomPicker
+                  items={majors}
+                  value={formik.values.major}
+                  errors={formik.errors.major}
+                  onValueChange={formik.handleChange("major")}
+                />
+              </View>
+              <View style={styles.animInput}>
+                <CustomButton
+                  text="Edit"
+                  onPress={formik.handleSubmit}
+                  type="Primary"
+                />
+              </View>
+              {errorMsg && <Text style={styles.errorText}>❌ {errorMsg}</Text>}
+              <View style={styles.animInput}>
+                <CustomButton
+                  text="Change Password"
+                  type="Tertiary"
+                  onPress={() => {
+                    navigation.navigate("ResetPasswordInside");
+                  }}
+                />
+              </View>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      )}
+    </>
   );
 };
 

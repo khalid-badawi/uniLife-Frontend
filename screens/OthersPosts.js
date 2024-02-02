@@ -16,6 +16,7 @@ import axios from "axios";
 import BASE_URL from "../BaseUrl";
 import { useUser } from "../Contexts/UserContext";
 import PostCard from "../components/PostCard";
+import FastImage from "react-native-fast-image";
 const OthersPosts = ({ navigation }) => {
   const route = useRoute();
   const [isLoading, setIsLoading] = useState(true);
@@ -85,13 +86,12 @@ const OthersPosts = ({ navigation }) => {
         <ScrollView style={styles.root}>
           <View style={{ alignItems: "center" }}>
             <View style={styles.imageCont}>
-              <Image
+              <FastImage
                 source={
                   userImage !== "" && userImage
                     ? { uri: userImage }
                     : defaultImage
                 }
-                alt="Profile Image"
                 style={styles.image}
                 resizeMode="stretch"
               />

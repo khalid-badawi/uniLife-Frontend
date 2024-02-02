@@ -1,6 +1,7 @@
 import { Image, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import Logo from "../assets/defaultProfile.jpg";
+import FastImage from "react-native-fast-image";
 
 const NotificationCard = ({ item }) => {
   const formattedDateTime = new Date(item.createdAt).toLocaleString();
@@ -12,9 +13,8 @@ const NotificationCard = ({ item }) => {
         { backgroundColor: item.seen ? "white" : "#EAEAEA" },
       ]}
     >
-      <Image
+      <FastImage
         source={item.image !== "" && item.image ? { uri: item.image } : Logo}
-        alt="Notification Image"
         style={styles.image}
       />
       <View style={styles.textContainer}>

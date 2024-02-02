@@ -3,6 +3,7 @@ import React from "react";
 import CustomButton from "./CustomButton";
 import test2 from "../assets/test2.png";
 import CustomHeader from "../navigation/CustomHeader";
+import FastImage from "react-native-fast-image";
 const ItemDetails = ({ isVisible, closeModal, item }) => {
   return (
     <Modal
@@ -13,11 +14,11 @@ const ItemDetails = ({ isVisible, closeModal, item }) => {
     >
       <View style={styles.root}>
         <CustomHeader close={closeModal} title="Details" />
-        <Image
+        <FastImage
           source={{ uri: item.image }}
           alt="Menu Item image"
           style={styles.img} // Fixed style object
-          resizeMode="contain"
+          resizeMode={FastImage.resizeMode.contain}
         />
         <View style={styles.descriptionContainer}>
           <Text style={styles.mainTxt}>{item.nameOfFood}</Text>

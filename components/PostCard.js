@@ -22,6 +22,7 @@ import showConfirmationDialog from "./Confirmation";
 import BASE_URL from "../BaseUrl";
 import CustomButton from "./CustomButton";
 import { TextInput } from "react-native-gesture-handler";
+import FastImage from "react-native-fast-image";
 const PostCard = ({
   type = "",
   item,
@@ -304,15 +305,14 @@ const PostCard = ({
               })
             }
           >
-            <Image
+            <FastImage
               source={
                 item.userImage === "" || !item.userImage
                   ? defaultImage
                   : { uri: item.userImage }
               }
-              alt="profile image"
               style={styles.profileImg}
-              resizeMode="stretch"
+              resizeMode={FastImage.resizeMode.stretch}
             />
           </TouchableOpacity>
           <View>
@@ -336,12 +336,12 @@ const PostCard = ({
       </View>
       <View style={styles.Body}>
         <Text style={styles.descTxt}>{item.description}</Text>
-        <Image
+        <FastImage
           source={{
             uri: item.image,
           }}
           style={styles.img}
-          resizeMode="stretch"
+          resizeMode={FastImage.resizeMode.stretch}
         />
       </View>
       <View style={styles.footerCont}>

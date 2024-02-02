@@ -5,6 +5,7 @@ import test2 from "../assets/test2.png";
 import Icon from "react-native-vector-icons/AntDesign";
 import ItemDetails from "./ItemDetails";
 import CustomButton from "./CustomButton";
+import FastImage from "react-native-fast-image";
 
 const MenuItem = ({ item, setOrderContent, orderContent }) => {
   const [quantity, setQuantity] = useState(0);
@@ -69,10 +70,10 @@ const MenuItem = ({ item, setOrderContent, orderContent }) => {
   };
   return (
     <View style={styles.root}>
-      <Image
+      <FastImage
         source={{ uri: item.image }}
-        style={styles.img} // Fixed style object
-        resizeMode="stretch"
+        style={styles.img}
+        resizeMode={FastImage.resizeMode.stretch}
       />
       <Text style={styles.mainTxt}>{item.nameOfFood}</Text>
       <Text style={styles.descTxt}>{item.description}</Text>
