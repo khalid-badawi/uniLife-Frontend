@@ -42,7 +42,10 @@ const LogOut = () => {
       await deleteToken();
       setUserId(null); // Reset user ID in context
       setIsLoggingOut(false);
-      navigation.navigate("SignIn");
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "SignIn" }],
+      });
     } catch (error) {
       console.error("Error during logout:", error);
       setIsLoggingOut(false);

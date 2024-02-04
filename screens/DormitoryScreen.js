@@ -16,6 +16,10 @@ import { getTokenFromKeychain } from "../globalFunc/Keychain";
 import BASE_URL from "../BaseUrl";
 import { useUser } from "../Contexts/UserContext";
 import { useRoute } from "@react-navigation/native";
+import { Viewport } from "@skele/components";
+
+const ViewportAwareView = Viewport.Aware(View);
+
 const DormitoryScreen = ({ navigation }) => {
   const [type, setType] = useState("Any");
   const [distance, setDistance] = useState(null);
@@ -28,6 +32,42 @@ const DormitoryScreen = ({ navigation }) => {
   const { userId } = useUser();
 
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
+
+  const onViewPortEnter = async (id) => {
+    try {
+      const token = await getTokenFromKeychain();
+      console.log(userId, id, token);
+
+      const response = await axios.post(
+        `${BASE_URL}/dormitorypost/view/${userId}/${id}`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    } catch (error) {
+      if (error.response) {
+        console.log(error);
+      } else if (error.request) {
+        Alert.alert(
+          "Network Error",
+          "There was a problem with the network. Please check your internet connection and try again.",
+          [{ text: "OK" }]
+        );
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        Alert.alert(
+          "Something Wrong",
+          "Something went wrong, try again please",
+          [{ text: "OK" }]
+        );
+      }
+    }
+    console.log(id);
+  };
   const getDorms = async () => {
     try {
       setIsLoading(true);
@@ -116,14 +156,23 @@ const DormitoryScreen = ({ navigation }) => {
           <View
             style={{ height: 10, backgroundColor: "#E3E3E3", marginTop: 10 }}
           ></View>
-
-          <FlatList
-            data={posts}
-            renderItem={({ item }) => (
-              <DormitoryCard item={item} posts={posts} setPosts={setPosts} />
-            )}
-            keyExtractor={(item) => item.id.toString()}
-          />
+          <Viewport.Tracker>
+            <FlatList
+              data={posts}
+              renderItem={({ item }) => (
+                <ViewportAwareView
+                  onViewportEnter={() => onViewPortEnter(item.id)}
+                >
+                  <DormitoryCard
+                    item={item}
+                    posts={posts}
+                    setPosts={setPosts}
+                  />
+                </ViewportAwareView>
+              )}
+              keyExtractor={(item) => item.id.toString()}
+            />
+          </Viewport.Tracker>
           <DormitoryModal
             visible={isFilterModalVisible}
             closeModal={closeFilterModal}

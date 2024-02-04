@@ -92,7 +92,7 @@ const ExchangeStack = () => {
           component={PostsMainScreen}
           options={{
             header: () => (
-              <CustomHeader title="Posts" type="drawer" search={true} />
+              <CustomHeader title="Listings" type="drawer" search={true} />
             ),
           }}
         />

@@ -162,7 +162,7 @@ const DormitoryCard = ({ item, posts, setPosts, type }) => {
                     alignSelf: "center",
                   }}
                 >
-                  Save
+                  Bookmark
                 </Text>
               </TouchableOpacity>
             ) : (
@@ -174,7 +174,7 @@ const DormitoryCard = ({ item, posts, setPosts, type }) => {
                   alignSelf: "center",
                 }}
               >
-                Saved
+                Bookmarked
               </Text>
             ))}
           {type === "saved" && (
@@ -188,7 +188,7 @@ const DormitoryCard = ({ item, posts, setPosts, type }) => {
                   alignSelf: "center",
                 }}
               >
-                Unsave
+                remove
               </Text>
             </TouchableOpacity>
           )}

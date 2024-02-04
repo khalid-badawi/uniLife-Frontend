@@ -94,7 +94,7 @@ const MyPostsStack = () => {
           name="MyPosts"
           component={MyPostsScreen}
           options={{
-            header: () => <CustomHeader title="My Posts" type="drawer" />,
+            header: () => <CustomHeader title="My Listings" type="drawer" />,
           }}
         />
 

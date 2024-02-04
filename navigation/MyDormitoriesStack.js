@@ -95,7 +95,7 @@ const MyDormitoriesStack = () => {
           component={SavedDorms}
           options={{
             header: () => (
-              <CustomHeader title="Saved Dormitories" type="drawer" />
+              <CustomHeader title="Bookmarked Dormitories" type="drawer" />
             ),
           }}
         />

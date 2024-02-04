@@ -93,7 +93,7 @@ const DrawerNav = () => {
                 color={focused ? "white" : "#808080"}
               />
             ),
-            drawerLabel: "Saved Dormitories",
+            drawerLabel: "Bookmarked Dormitories",
           })}
         />
 
@@ -125,7 +125,7 @@ const DrawerNav = () => {
                 color={focused ? "white" : "#808080"}
               />
             ),
-            drawerLabel: "My Posts",
+            drawerLabel: "My Listings",
           })}
         />
         <Drawer.Screen

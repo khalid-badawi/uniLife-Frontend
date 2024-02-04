@@ -28,7 +28,7 @@ const MyPostsScreen = ({ navigation }) => {
   const [posts, setPosts] = useState("");
   const [search, setSearch] = useState(searchQuery);
   const [isLoading, setIsLoading] = useState(true);
-  const buttons = ["Posted by me", "Reserved by me"];
+  const buttons = ["Posted by me", "Reserved by me", "Requests"];
   const [selectedButton, setSelectedButton] = useState(buttons[0]);
   console.log("Hi", searchQuery);
   const handleCategoryClick = (btn) => {
@@ -82,7 +82,42 @@ const MyPostsScreen = ({ navigation }) => {
         },
       });
 
-      // Handle the response data here, for example:
+      const result = response.data;
+      setPosts(result);
+      console.log("Hello", result);
+      setIsLoading(false);
+
+      //setChat(response.data.data);
+    } catch (error) {
+      if (error.response) {
+        Alert.alert("Error", error.response.data.message);
+      } else if (error.request) {
+        Alert.alert(
+          "Network Error",
+          "There was a problem with the network. Please check your internet connection and try again.",
+          [{ text: "OK" }]
+        );
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        Alert.alert(
+          "Something Wrong",
+          "Something went wrong, try again please",
+          [{ text: "OK" }]
+        );
+      }
+    }
+  };
+  const getRequests = async () => {
+    try {
+      setIsLoading(true);
+      const token = await getTokenFromKeychain();
+      const response = await axios.get(`${BASE_URL}/request/${userId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       const result = response.data;
       setPosts(result);
       console.log("Hello", result);
@@ -127,6 +162,9 @@ const MyPostsScreen = ({ navigation }) => {
       } else if (selectedButton === buttons[1]) {
         getReservedPosts();
       }
+      if (selectedButton === buttons[2]) {
+        getRequests();
+      }
     }
 
     return unsubscribe;
@@ -167,7 +205,13 @@ const MyPostsScreen = ({ navigation }) => {
             renderItem={({ item }) => (
               <PostCard
                 item={item}
-                type={selectedButton === buttons[0] ? "mine" : "reserved"}
+                type={
+                  selectedButton === buttons[0]
+                    ? "mine"
+                    : selectedButton === buttons[1]
+                    ? "reserved"
+                    : "request"
+                }
                 setPosts={setPosts}
                 posts={posts}
                 selectedButton={selectedButton}

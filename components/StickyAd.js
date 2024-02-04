@@ -22,7 +22,7 @@ const StickyAd = ({ title, description, imageUrl, link }) => {
       style={styles.container}
       onPress={() => setIsModalVisible(true)}
     >
-      <FastImage source={{ uri: imageUrl }} style={styles.image} />
+      <Image source={{ uri: imageUrl }} style={styles.image} />
 
       <View style={styles.textContainer}>
         <View

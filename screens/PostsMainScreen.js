@@ -194,12 +194,12 @@ const PostsMainScreen = () => {
               <Text
                 style={{ fontSize: 17, color: "#8F00FF", fontWeight: "bold" }}
               >
-                Filter Posts
+                Filter
               </Text>
             </TouchableOpacity>
             <View style={{ marginRight: 4 }}>
               <CustomButton
-                text="Create Post"
+                text="Add Listing"
                 type="Tertiary"
                 onPress={() => navigation.navigate("CreatePost")}
               />

@@ -4,6 +4,7 @@ import {
   useWindowDimensions,
   StyleSheet,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -15,6 +16,9 @@ import { getTokenFromKeychain } from "../globalFunc/Keychain";
 import BASE_URL from "../BaseUrl";
 import axios from "axios";
 import { useUser } from "../Contexts/UserContext";
+import Geolocation from "@react-native-community/geolocation";
+import { PermissionsAndroid } from "react-native";
+
 const routeData = require("../data/routeData.json");
 
 function MapScreen() {
@@ -28,11 +32,56 @@ function MapScreen() {
   const [faculties, setFaculties] = useState([]);
   const [destCoordinates, setDestCoordinates] = useState(currentPosition);
   const [classNum, setClassNum] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const { userId } = useUser();
+  const [userLocationWatchId, setUserLocationWatchId] = useState(null);
+
   const handlePickerChange = (itemValue, itemIndex) => {
     setSearchBy(itemValue);
   };
   console.log(selectedBuilding);
+  useEffect(() => {
+    const requestLocationPermission = async () => {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          // Start watching user location
+          const watchId = Geolocation.watchPosition(
+            (position) => {
+              const { latitude, longitude } = position.coords;
+              console.log(latitude, longitude);
+              setCurrentPosition([longitude, latitude]);
+              console.log("Hi");
+            },
+            (error) => {
+              console.error("Error getting current position", error);
+            },
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+          );
+          setUserLocationWatchId(watchId);
+        } else {
+          console.warn("Location permission denied");
+        }
+      } catch (error) {
+        console.error("Error requesting location permission", error);
+      }
+    };
+    const unsubscribe = navigation.addListener("focus", () => {
+      setIsLoading(true);
+      requestLocationPermission();
+      setIsLoading(false);
+    });
+
+    // Cleanup function to clear the watch when the component is unmounted
+    return () => {
+      unsubscribe;
+      if (userLocationWatchId) {
+        Geolocation.clearWatch(userLocationWatchId);
+      }
+    };
+  }, []);
   useEffect(() => {
     const getFaculties = async () => {
       try {
@@ -146,42 +195,52 @@ function MapScreen() {
   };
   return (
     <>
-      <View style={styles.root}>
-        <View style={{ ...styles.mapCont, height: 0.8 * height }}>
-          <Map
-            currentPosition={currentPosition}
-            routeCoordinates={routeCoordinates}
-            destCoordinates={destCoordinates}
-            setCurrentPosition={setCurrentPosition}
-            fetch={fetchRoute}
-          />
-          <View style={styles.footer}>
-            <View style={{ ...styles.pickerCont, marginTop: 5 }}>
-              <Picker
-                selectedValue={selectedBuilding}
-                onValueChange={setSelectedBuilding}
-                itemStyle={{ textAlign: "right" }}
-              >
-                {faculties.map((building) => (
-                  <Picker.Item
-                    key={building.facultyName}
-                    label={building.facultyName}
-                    value={building.facultyName}
-                  />
-                ))}
-              </Picker>
-            </View>
-
-            <CustomButton text="Show Route" onPress={fetchRoute} />
-
-            <CustomButton
-              text="Indoor Navigation"
-              type="Tertiary"
-              onPress={() => navigation.navigate("IndoorQR")}
+      {isLoading && (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <Text>Loading...</Text>
+          <ActivityIndicator size="large" color="#8F00FF" />
+        </View>
+      )}
+      {!isLoading && (
+        <View style={styles.root}>
+          <View style={{ ...styles.mapCont, height: 0.8 * height }}>
+            <Map
+              currentPosition={currentPosition}
+              routeCoordinates={routeCoordinates}
+              destCoordinates={destCoordinates}
+              setCurrentPosition={setCurrentPosition}
+              fetch={fetchRoute}
             />
+            <View style={styles.footer}>
+              <View style={{ ...styles.pickerCont, marginTop: 5 }}>
+                <Picker
+                  selectedValue={selectedBuilding}
+                  onValueChange={setSelectedBuilding}
+                  itemStyle={{ textAlign: "right" }}
+                >
+                  {faculties.map((building) => (
+                    <Picker.Item
+                      key={building.facultyName}
+                      label={building.facultyName}
+                      value={building.facultyName}
+                    />
+                  ))}
+                </Picker>
+              </View>
+
+              <CustomButton text="Show Route" onPress={fetchRoute} />
+
+              <CustomButton
+                text="Indoor Navigation"
+                type="Tertiary"
+                onPress={() => navigation.navigate("IndoorQR")}
+              />
+            </View>
           </View>
         </View>
-      </View>
+      )}
     </>
   );
 }

@@ -15,7 +15,6 @@ import Logo from "../assets/defaultProfile.jpg";
 import CustomInput from "../components/CustomInput";
 import CustomButton from "../components/CustomButton";
 import { useState } from "react";
-import { Svg } from "react-native-svg";
 import { Formik, Form, Field, useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";

@@ -151,7 +151,10 @@ const SignInScreen = () => {
         setUsername(response.data.data.username);
 
         console.log(response.data.data);
-        navigation.navigate("Main");
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Main" }],
+        });
         setIsSignedIn(false);
       }
     } catch (error) {

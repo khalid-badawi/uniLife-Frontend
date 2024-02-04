@@ -51,11 +51,11 @@ const PostCard = ({
     setModalVisible(false);
   };
   console.log(item.major);
-  const reserve = async () => {
+  const handleAccept = async () => {
     try {
       const confirmed = await showConfirmationDialog(
         "Confirmation",
-        "Are you sure you want to reserve this item?"
+        "Accept this request?"
       );
 
       if (confirmed) {
@@ -63,8 +63,8 @@ const PostCard = ({
         console.log(userId, item.id, token);
 
         const response = await axios.patch(
-          `${BASE_URL}/post/reserve/${userId}/${item.id}`,
-          {}, // Empty object for the request body
+          `${BASE_URL}/post/reserve/${userId}/${item.userId}/${item.postId}`,
+          {},
           {
             headers: {
               "Content-Type": "application/json",
@@ -72,7 +72,54 @@ const PostCard = ({
             },
           }
         );
-        Alert.alert("Success", "Item Reserved Successfully");
+        Alert.alert("Success", "Accepted Successfully");
+        const filtered = postsMain.filter((post) => post.id !== item.id);
+        setPostsMain(filtered);
+      } else {
+        // User canceled the operation
+        console.log("Reservation canceled");
+      }
+    } catch (error) {
+      if (error.response) {
+        Alert.alert("Error", error.response.data.message);
+      } else if (error.request) {
+        Alert.alert(
+          "Network Error",
+          "There was a problem with the network. Please check your internet connection and try again.",
+          [{ text: "OK" }]
+        );
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        Alert.alert(
+          "Something Wrong",
+          "Something went wrong, try again please",
+          [{ text: "OK" }]
+        );
+      }
+    }
+  };
+  const reserve = async () => {
+    try {
+      const confirmed = await showConfirmationDialog(
+        "Confirmation",
+        "Request to reserve this listing?"
+      );
+
+      if (confirmed) {
+        const token = await getTokenFromKeychain();
+        console.log(userId, item.id, token);
+
+        const response = await axios.post(
+          `${BASE_URL}/request/${userId}/${item.id}`,
+          {},
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        Alert.alert("Success", "Requested Successfully");
         const filtered = postsMain.filter((post) => post.id !== item.id);
         setPostsMain(filtered);
       } else {
@@ -102,7 +149,7 @@ const PostCard = ({
     try {
       const confirmed = await showConfirmationDialog(
         "Confirmation",
-        "Are you sure you want to unreserve this item?"
+        "Are you sure you want to unreserve this listing?"
       );
 
       if (confirmed) {
@@ -120,15 +167,12 @@ const PostCard = ({
             },
           }
         );
-        Alert.alert("Success", "Item Unreserved Successfully");
+        Alert.alert("Success", "Listing Unreserved Successfully");
         const newPost = posts.map((post) =>
           post.id === item.id ? { ...post, reservedBy: null } : post
         );
         setPosts(newPost);
-
-        // Update the state or perform any other actions as needed
       } else {
-        // User canceled the operation
         console.log("Reservation canceled");
       }
     } catch (error) {
@@ -164,7 +208,7 @@ const PostCard = ({
           },
         }
       );
-      Alert.alert("Success", "Post Reported Successfully");
+      Alert.alert("Success", "Reported Successfully");
       const filtered = postsMain.filter((post) => post.id !== item.id);
       setPostsMain(filtered);
       console.log("gg");
@@ -221,7 +265,7 @@ const PostCard = ({
             },
           }
         );
-        Alert.alert("Success", "Item Deleted Successfully");
+        Alert.alert("Success", "Listing Deleted Successfully");
         const filtered = posts.filter((post) => post.id !== item.id);
         setPosts(filtered); // Update the state or perform any other actions as needed
       } else {
@@ -366,7 +410,42 @@ const PostCard = ({
             </View>
           </>
         )}
-        {type !== "mine" && (
+        {type === "request" && (
+          <>
+            <Text
+              style={{
+                fontSize: 14,
+                fontWeight: "bold",
+                marginBottom: 10,
+                alignSelf: "center",
+              }}
+            >
+              {item.username} Requested to reserve this listing
+            </Text>
+            <View style={{ ...styles.footer, justifyContent: "center" }}>
+              <View style={styles.footerMiddle}>
+                <TouchableOpacity
+                  style={{ flexDirection: "row" }}
+                  onPress={handleAccept}
+                >
+                  <Text style={styles.iconTxt}>Accept</Text>
+                  <AntDesign name="checkcircleo" size={22} />
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.footerRight}>
+                <TouchableOpacity
+                  style={{ flexDirection: "row" }}
+                  onPress={type === "reserved" ? unreserve : reserve}
+                >
+                  <Text style={styles.iconTxt}>Reject</Text>
+                  <AntDesign name="closecircleo" size={22} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </>
+        )}
+        {type !== "mine" && type !== "request" && (
           <View style={{ ...styles.footer, justifyContent: "center" }}>
             {type !== "reserved" && (
               <View style={styles.footerMiddle}>

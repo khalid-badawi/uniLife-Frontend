@@ -88,7 +88,7 @@ const MapStack = () => {
           name="MapScreen"
           component={MapScreen}
           options={{
-            header: () => <CustomHeader title="Map" type="drawer" />,
+            header: () => <CustomHeader title="Navigation" type="drawer" />,
           }}
         />
         <Stack.Screen

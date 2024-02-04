@@ -2,10 +2,9 @@ import React, { useState, useEffect } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import Mapbox, { Logger } from "@rnmapbox/maps";
 import Ionicons from "react-native-vector-icons/Ionicons";
-
 // Will be null for most users (only Mapbox authenticates this way).
 // Required on Android. See Android installation notes.
-import { PermissionsAndroid } from "react-native";
+
 Logger.setLogCallback((log) => {
   // Always return true to prevent further processing of logs
   return true;
@@ -43,7 +42,6 @@ const Map = ({
   destCoordinates,
   fetch,
 }) => {
-  const [userLocationWatchId, setUserLocationWatchId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const debounce = (func, delay) => {
     let timeoutId;
@@ -65,44 +63,7 @@ const Map = ({
 
     delayedFetch();
   }, [currentPosition]);
-  // useEffect(() => {
-  //   // Request location permissions if not granted
-  //   const requestLocationPermission = async () => {
-  //     try {
-  //       const granted = await PermissionsAndroid.request(
-  //         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-  //       );
-  //       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-  //         // Start watching user location
-  //         const watchId = Geolocation.watchPosition(
-  //           (position) => {
-  //             const { latitude, longitude } = position.coords;
-  //             console.log(latitude, longitude);
-  //             setCurrentPosition([longitude, latitude]);
-  //           },
-  //           (error) => {
-  //             console.error("Error getting current position", error);
-  //           },
-  //           { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-  //         );
-  //         setUserLocationWatchId(watchId);
-  //       } else {
-  //         console.warn("Location permission denied");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error requesting location permission", error);
-  //     }
-  //   };
 
-  //   requestLocationPermission();
-
-  //   // Cleanup function to clear the watch when the component is unmounted
-  //   return () => {
-  //     if (userLocationWatchId) {
-  //       Geolocation.clearWatch(userLocationWatchId);
-  //     }
-  //   };
-  // }, []);
   const coordinates = routeCoordinates.map((coord) => [
     coord.longitude,
     coord.latitude,

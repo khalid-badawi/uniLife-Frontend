@@ -65,7 +65,7 @@ const TabNav = () => {
             tabBarIcon: ({ color, size }) => (
               <Icon name="map-marker" color={color} size={23} />
             ),
-            tabBarLabel: "Map",
+            tabBarLabel: "Navigation",
           }}
         />
       </Tab.Navigator>
